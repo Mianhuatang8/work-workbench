@@ -1,0 +1,99 @@
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  vertical-align: baseline;
+  list-style: none;
+}
+#app,
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+:root {
+  --el-color-primary: #f39e00;
+  --el-color-primary-light-7: #f39e00;
+  --el-color-primary-light-9: #fff7ea;
+}
+.el-table {
+  --el-table-row-hover-bg-color: #fff7ea;
+}
+.btnFalses {
+  --el-button-text-color: var(--el-color-white);
+  --el-button-bg-color: rgba(0, 0, 0, 0.88);
+  --el-button-border-color: none;
+  --el-button-outline-color: none;
+  --el-button-active-color: none;
+  --el-button-hover-text-color: var(--el-color-white);
+  --el-button-hover-link-text-color: none;
+  --el-button-hover-bg-color: rgba(0, 0, 0, 0.88);
+  --el-button-hover-border-color: none;
+  --el-button-active-bg-color: rgba(0, 0, 0, 0.88);
+  --el-button-active-border-color: none;
+  --el-button-disabled-text-color: var(--el-color-white);
+  --el-button-disabled-bg-color: none;
+  --el-button-disabled-border-color: none;
+}
+.el-button-primary {
+  width: 76px;
+  height: 32px;
+  background-color: #1f1f1f;
+  color: #f5f5f5 !important;
+  border-radius: 4px;
+  --el-button-active-bg-color: #1f1f1f;
+  --el-button-active-text-color: #f5f5f5;
+  --el-button-active-border-color: #e5e5e5;
+  --el-button-hover-text-color: #f5f5f5;
+  --el-button-hover-bg-color: #1f1f1f;
+  --el-button-hover-border-color: none;
+  --el-button-outline-color: none;
+  border-color: oldlace;
+}
+.el-button-primary:hover {
+  color: #f5f5f5;
+  --el-button-hover-bg-color: #595959;
+  --el-button-hover-border-color: none;
+}
+.el-button-primary-2 {
+  width: 76px;
+  height: 32px;
+  background-color: #ffad28;
+  color: #4d2500 !important;
+  border-radius: 4px;
+  --el-button-active-bg-color: #d28519;
+  --el-button-active-text-color: #4d2500;
+  --el-button-active-border-color: #d28519;
+  --el-button-hover-text-color: #f5f5f5;
+  --el-button-hover-bg-color: #ffad28;
+  --el-button-hover-border-color: #ffbd53;
+  --el-button-outline-color: none;
+}
+.el-button-primary-2:hover {
+  color: #f5f5f5;
+  --el-button-hover-bg-color: #ffbd53;
+}
+.el-button-secondary {
+  width: 76px;
+  height: 32px;
+  border-radius: 4px;
+  background-color: #ffffff;
+  --el-button-hover-text-color: #1f1f1f;
+  --el-button-hover-bg-color: #ffffff;
+  --el-button-hover-border-color: #f0f0f0;
+  --el-button-active-bg-color: #f0f0f0;
+  --el-button-active-text-color: #1f1f1f;
+  --el-button-active-border-color: #e5e5e5;
+  --el-button-outline-color: none;
+}
+.el-button-secondary:hover {
+  --el-button-hover-bg-color: #fafafa;
+  --el-button-hover-border-color: #f0f0f0;
+}
+.el-message-box__btns button {
+  width: 60px;
+}
