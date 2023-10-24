@@ -5,7 +5,7 @@
       <Header></Header>
     </el-header>
     <el-container>
-      <el-aside width="240px">
+      <el-aside width="165px">
         <sider></sider>
       </el-aside>
       <el-main>
@@ -33,8 +33,9 @@ import { RouterLink, RouterView } from 'vue-router'
 }
 
 .el-main {
-  background: url(./assets/img/bg_zhu@2.png);
+  // background: url(./assets/img/bg_zhu@2.png);
   padding: 30px 24px;
+  background-color: whitesmoke;
 }
 </style>
 
