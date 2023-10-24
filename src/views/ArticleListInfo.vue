@@ -2,11 +2,11 @@
     <div class="Container" style="padding: 17px 44px;overflow: auto;">
 
         <div style="margin-bottom: 30px; font-size: 17px;">
-            <span style="font-weight: bold;">社区管理</span>
+            <span>社区管理</span>
             <span style="margin:0 5px">/</span>
             <!-- {{ router.currentRoute.query.CollName ? router.currentRoute.query.CollName : '文章' }} -->
-            <span @click="goback" style="cursor: pointer;font-weight: bold;">文章</span>
-            <span style="margin:0 5px">/{{ this.$route.query.data ? '编辑文章' : '新建图文' }}</span>
+            <span @click="goback" style="cursor: pointer;">文章</span>
+            <span style="margin:0 5px;font-weight: bold;">/{{ this.$route.query.data ? '编辑文章' : '新增图文' }}</span>
         </div>
 
         <div class="articleInfoBox">
@@ -20,17 +20,15 @@
                     </el-form-item>
 
 
-                    <el-form-item label="封面" prop="cover">
-                        <el-upload class="avatar-uploader" action="#" :show-file-list="false"
+                    <el-form-item label="封面" prop="cover" style="position: relative;">
+                        <el-upload class="avatar-uploader" action="#" :show-file-list="false" style="  border: 1px dashed #d9d9d9;margin-bottom: 40px;"
                             :before-upload="beforeAvatarUpload" :on-preview="handlePictureCardPreview">
                             <img v-if="addForm.cover" :src="addForm.cover" class="avatar" />
                             <el-icon v-else class="avatar-uploader-icon">
                                 <Plus />
                             </el-icon>
-
-                            <!-- <div class="el-upload__tip">建议小于20M的JPG、PNG格式图片</div> -->
-
                         </el-upload>
+                        <div class="el-upload__tip">建议小于20M的JPG、PNG格式图片</div>
                     </el-form-item>
 
                     <el-form-item label="合辑分类" prop="collectId">
@@ -38,7 +36,7 @@
                             <el-option v-for="item in collectionList" :key="item.id" :label="item.name" :value="item.id">
                             </el-option>
                         </el-select>
-                        <el-button type="text" @click="goAddCollect">新建分类</el-button>
+                        <el-button type="text" @click="goAddCollect" style="margin-left: 15px;">新建分类</el-button>
                     </el-form-item>
 
                     <el-form-item label="描述词">
@@ -56,8 +54,7 @@
                     </el-form-item>
 
                     <el-form-item style="display: flex;flex-direction: row-reverse;">
-                        <el-button type="primary" @click="publishArticle(0)">{{ route.query.data ? '提交' : '发布'
-                        }}</el-button>
+                        <el-button type="primary" @click="publishArticle(0)">{{ route.query.data ? '提交' : '发布'}}</el-button>
                         <el-button plain @click="publishArticle(1)" v-if="!route.query.data">保存为草稿</el-button>
                         <el-button plain @click="empty">清空</el-button>
                     </el-form-item>
@@ -226,6 +223,8 @@ const handlePictureCardPreview = (file) => {
     color: #BFBFBF;
     font-size: 12px;
     font-weight: 400;
+    position: absolute;
+    bottom: 8px;
 }
 
 .w-e-toolbar {

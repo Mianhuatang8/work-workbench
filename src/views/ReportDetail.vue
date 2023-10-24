@@ -8,152 +8,146 @@
             <span style="margin:0 5px">/</span>
             <span>举报详情</span>
         </div>
-        <el-scrollbar class="article-srcoll outer-srcoll">
-            <div class="center">
-                <div class="article">
-                    <div class="title">
-                        <div class="title-block"></div>
-                        <p>文章信息</p>
-                    </div>
-                    <div class="grid-container">
-                        <div class="grid-item subBox">
-                            <p>标题</p>
-                            <div class="oneRow grid-box">
-                                <p>{{ reportDetail.title }}</p>
-                            </div>
-                        </div>
-                        <div class="grid-item subBox">
-                            <p>合辑分类</p>
-                            <div class="oneRow grid-box">
-                                <p>{{ reportDetail.classify }}</p>
-                            </div>
-                        </div>
-                        <div class="grid-item subBox">
-                            <p>描述词</p>
-                            <div class="eightRow grid-box">
-                                <p>{{ reportDetail.descriptor }}</p>
-                            </div>
-                        </div>
-                        <div class="grid-item subBox">
-                            <p>封面</p>
-                            <div class="eightRow grid-box inform-center">
-                                <img class="cover-img" :src='reportDetail.coverUrl'>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="imgDetail subBox">
-                        <p>图文详情</p>
-                        <el-scrollbar v-show="flod" :style="{ height: articleDetailMaxHeight }"
-                            class="article-srcoll grid-box">
-                            <div v-html="reportDetail.articleDetail">
-                            </div>
-                            <div class="flodArticle" @click="unfoldArticle">
-                                <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1"
-                                    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                    <title>E4FE5EEA-AB08-4828-9A0B-CC74AD36485D@0.0x</title>
-                                    <g id="社区管理" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                        <g id="举报/详情（待处理）" transform="translate(-1410.000000, -666.000000)">
-                                            <g id="编组-15" transform="translate(604.000000, 160.000000)">
-                                                <g id="编组-3" transform="translate(0.000000, 342.000000)">
-                                                    <g id="icon/zhankai" transform="translate(806.000000, 164.000000)">
-                                                        <rect id="矩形" x="0" y="0" width="24" height="24"></rect>
-                                                        <g id="编组" transform="translate(2.000000, 2.000000)">
-                                                            <circle id="椭圆形" fill-opacity="0.45" fill="#000000" cx="10"
-                                                                cy="10" r="10"></circle>
-                                                            <path
-                                                                d="M15,7.07983126 L10.0000524,2 L5.00012083,7.07983126 L6.13929628,8.23724811 L10.0000524,4.31475187 L13.8608326,8.23724811 L15,7.07983126 Z M5,11.9200869 L9.99997181,17 L14.9999194,11.9200869 L13.8607521,10.7627192 L9.99997181,14.6851827 L6.13917545,10.7627192 L5,11.9200869 Z"
-                                                                id="形状" fill="#FFFFFF" fill-rule="nonzero"></path>
-                                                        </g>
-                                                    </g>
-                                                </g>
-                                            </g>
-                                        </g>
-                                    </g>
-                                </svg>
-                            </div>
-                        </el-scrollbar>
-                        <div v-show="!flod" class="article-srcoll grid-box inform-outerBox">
-                            <div v-html="reportDetail.articleDetail">
-                            </div>
-                            <div class="flodArticle" @click="unfoldArticle">
-                                <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1"
-                                    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                    <title>E4FE5EEA-AB08-4828-9A0B-CC74AD36485D@0.0x</title>
-                                    <g id="社区管理" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                        <g id="举报/详情（待处理）" transform="translate(-1410.000000, -666.000000)">
-                                            <g id="编组-15" transform="translate(604.000000, 160.000000)">
-                                                <g id="编组-3" transform="translate(0.000000, 342.000000)">
-                                                    <g id="icon/zhankai" transform="translate(806.000000, 164.000000)">
-                                                        <rect id="矩形" x="0" y="0" width="24" height="24"></rect>
-                                                        <g id="编组" transform="translate(2.000000, 2.000000)">
-                                                            <circle id="椭圆形" fill-opacity="0.45" fill="#000000" cx="10"
-                                                                cy="10" r="10"></circle>
-                                                            <path
-                                                                d="M15,7.07983126 L10.0000524,2 L5.00012083,7.07983126 L6.13929628,8.23724811 L10.0000524,4.31475187 L13.8608326,8.23724811 L15,7.07983126 Z M5,11.9200869 L9.99997181,17 L14.9999194,11.9200869 L13.8607521,10.7627192 L9.99997181,14.6851827 L6.13917545,10.7627192 L5,11.9200869 Z"
-                                                                id="形状" fill="#FFFFFF" fill-rule="nonzero"></path>
-                                                        </g>
-                                                    </g>
-                                                </g>
-                                            </g>
-                                        </g>
-                                    </g>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="inform-info">
-                    <div class="title">
-                        <div class="title-block"></div>
-                        <p>举报信息</p>
-                    </div>
-                    <div class="inform-box subBox">
-                        <p>举报内容</p>
-                        <div class="grid-box">
-                            <p>{{ reportDetail.reportCxt }}</p>
-                        </div>
-                    </div>
-                    <div class="inform-box subBox">
-                        <p>举报状态</p>
-                        <div class="grid-box inform-state">
-                            <!-- <p> -->
-                            <div :style="{ 'background-color': getStateColor(reportDetail.reportState) }" class="stateIcon">
-                                {{ reportDetail.reportState }}
-                            </div>
+        <!-- <el-scrollbar class="article-srcoll outer-srcoll"> -->
+        <div class="center">
 
-                            <!-- </p>  -->
-                        </div>
+            <div class="center-top" style="display: flex;justify-content: space-between;margin-bottom: 30px;">
+                <div style="font-size: 17px;  font-weight: bold">举报详情</div>
+                <div style="display: flex;margin-right:10px">
+                    <el-button @click="goback()">返回到列表</el-button>
+                    <el-button @click="reject()">驳回</el-button>
+                    <el-button type="primary" @click="remove()">下架</el-button>
+                </div>
+            </div>
+
+            <div style="margin: 18px 40px;border-radius: 0px;box-shadow: 0px 1px 7px 1px #d7d7d7">
+                <div class="basic-content">
+
+                    <div class="title">基础信息</div>
+                    <div>
+                        <el-form ref="ruleFormRef" :model="reportDetail"  label-width="120px"
+                            style="margin-top: 35px;" class="demo-ruleForm" :size="formSize" status-icon>
+                            <el-form-item label="名称" style="width: 550px;" :rules="{'required': true}">
+                                <el-input v-model="reportDetail.title" disabled />
+                            </el-form-item>
+                            <el-form-item label="封面" style="width: 550px;" :rules="{'required': true}">
+                                <div class="eightRow grid-box inform-center">
+                                    <img class="cover-img" :src='reportDetail.coverUrl'>
+                                </div>
+                            </el-form-item>
+                            <el-form-item label="合辑分类" style="width: 550px;" :rules="{'required': true}">
+                                <el-input v-model="reportDetail.classify" disabled />
+                            </el-form-item>
+                            <el-form-item label="描述词" style="width: 550px;">
+                                <el-input v-model="reportDetail.descriptor" show-word-limit resize="none" disabled
+                                    type="textarea" />
+                            </el-form-item>
+                            <el-form-item label="图文详情" style="height: 300px;" :rules="{'required': true}">
+                                <el-scrollbar :style="{ height: articleDetailMaxHeight }" class="article-srcoll grid-box">
+                                    <div v-html="reportDetail.articleDetail"></div>
+                                    <div class="flodArticle" @click="unfoldArticle"></div>
+                                </el-scrollbar>
+
+                            </el-form-item>
+
+
+                        </el-form>
+                    </div>
+
+                </div>
+
+                <div class="center-bottom" style="margin-top: 50px;">
+                    <div style="display: flex;" class="common-border">
+                        <div class="left-text">举报内容：</div>
+                        <div style="font-weight: bold;margin-left: 15px;">文字敏感！！！图片违规了快下架1!!!!!!!!!</div>
+                    </div>
+                    <div style="display: flex;" class="common-border">
+                        <div class="left-text">信息状态：</div>
+                        <div style="color: orange;margin-left: 15px;">已下架</div>
                     </div>
                 </div>
-                <div class="subBox">
-                    <el-steps :active="reportDetail.hadleFlowActive">
-                        <el-step v-for="(item, index) in reportDetail.hadleFlow" :key=index :title="item.title"
-                            :description="item.description">
-                            <div class="handleIcon" slot="icon">
-                                <div v-if="index === reportDetail.hadleFlowActive" class="handle-area">
-                                    <div class="handle-tag handle-ing">{{ index + 1 }}</div><span>正在处理</span>
+            </div>
+
+            <div class="deal-process">
+                <div class="title">处理流程</div>
+                <div style="height: 400px;margin-left: 30px;margin-top: 45px" class="process">
+                    <el-steps direction="vertical" :active="4">
+                        <el-step>
+                            <template #title>
+                                <div style="display: flex;">
+                                    <div>
+                                        <div class="one">用户已上传举报信息</div>
+                                        <div class="two">xxxxx用户名</div>
+                                    </div>
+                                    <div>
+                                        <span class="time">2020-07-12 23:22:11</span>
+                                    </div>
                                 </div>
-                                <div v-if="index < reportDetail.hadleFlowActive" class="handle-area">
-                                    <div class="handle-tag handle-done"><i class="el-icon-check"></i></div><span>处理完成</span>
+                            </template>
+
+                        </el-step>
+
+                        <el-step>
+                            <template #title>
+                                <div style="display: flex;">
+                                    <div>
+                                        <div class="one">系统接收</div>
+                                        <div class="two">后台管理系统-举报管理列表</div>
+                                    </div>
+                                    <div>
+                                        <span class="time">2020-07-12 23:22:11</span>
+                                    </div>
                                 </div>
-                                <div v-if="index > reportDetail.hadleFlowActive" class="handle-area">
-                                    <div class="handle-tag handle-wait">{{ index + 1 }}</div>
-                                    <p>等待处理</p>
+                            </template>
+
+                        </el-step>
+
+                        <el-step>
+                            <template #title>
+                                <div style="display: flex;">
+                                    <div>
+                                        <div class="one">xxx运营人员已处理</div>
+                                        <div class="two">后台管理系统-举报详情</div>
+                                    </div>
+                                    <div>
+                                        <span class="time">2020-07-12 23:22:11</span>
+                                    </div>
                                 </div>
-                            </div>
+                            </template>
+
+                        </el-step>
+                        <el-step>
+                            <template #title>
+                                <div style="display: flex;">
+                                    <div>
+                                        <div class="one">推送消息给用户</div>
+                                        <div class="two">后台管理系统-消息推送</div>
+                                    </div>
+                                    <div>
+                                        <span class="time">2020-07-12 23:22:11</span>
+                                    </div>
+                                </div>
+                            </template>
+
                         </el-step>
                     </el-steps>
                 </div>
-
             </div>
-        </el-scrollbar>
+
+
+
+        </div>
+
+
 
     </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref ,markRaw } from "vue";
 import { useRouter, useRoute } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Select } from '@element-plus/icons-vue'
 const router = useRouter()
 const route = useRoute()
 const reportDetail = ref({
@@ -161,7 +155,7 @@ const reportDetail = ref({
     classify: '合辑分类',
     descriptor: '描述词',
     coverUrl: '',
-    articleDetail: '',
+    articleDetail: '1214324354',
     reportCxt: '举报内容',
     reportState: '待处理',
     hadleFlow: [
@@ -182,6 +176,24 @@ const traslate2APIState = ref({
 
 const goback = () => {
     router.back();
+}
+
+//驳回
+const reject=()=>{
+    ElMessageBox.alert('驳回举报信息', '提示', {
+    // center:true,
+    icon: markRaw(Select),
+  })
+
+}
+
+//下架
+const remove=()=>{
+    ElMessageBox.alert('下架成功', '提示', {
+    // center:true,
+    icon: markRaw(Select),
+  })
+
 }
 
 
@@ -206,6 +218,68 @@ const getStateColor = (state) => {
 </script>
 
 <style lang="scss" scoped>
+.common-border {
+    border: 1px solid #e9e9e9;
+    height: 45px;
+    align-items: center;
+
+    .left-text {
+        height: 100%;
+        width: 10%;
+        display: flex;
+        align-items: center;
+        border-right: 1px solid #e9e9e9;
+        justify-content: center;
+        background-color: #f3f3f3;
+        font-weight: bold;
+    }
+
+}
+
+// .el-step__main {
+//     white-space: normal;
+//     text-align: left;
+//     display: flex;
+// }
+.el-step__description {
+    padding-right: 10%;
+    /* margin-top: -5px; */
+    font-size: 12px;
+    line-height: 20px;
+    font-weight: 400;
+    margin: 0;
+}
+
+.deal-process {
+    margin: 40px;
+
+    .process {
+        .one {
+            font-size: 16px;
+            color: black;
+            font-weight: bold;
+        }
+
+        .two {
+            margin-top: 13px;
+            color: #9b9b9b;
+            font-size: 13px
+        }
+
+        .time {
+            color: gray;
+            font-size: 15px;
+            margin-left: 60px;
+        }
+    }
+
+}
+
+.basic-content {
+    padding-top: 30px;
+    padding-left: 15px;
+}
+
 .grid-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -235,9 +309,8 @@ const getStateColor = (state) => {
 }
 
 .center {
-    padding-left: 400px;
-    padding-right: 400px;
-    background-color: #FFFFFF;
+    border-radius: 15px;
+    padding: 24px;
     border-radius: 2px;
     background-color: #ffffff;
     box-shadow: 0px 0px 6px 0px rgba(224, 224, 239, 0.5);
@@ -252,8 +325,11 @@ const getStateColor = (state) => {
 .title {
     display: flex;
     align-items: center;
-    padding-top: 24px;
+    margin-left: 15px;
     margin-bottom: 12px;
+    font-size: 17px;
+    font-weight: bold;
+
 }
 
 .title p {
@@ -268,7 +344,7 @@ const getStateColor = (state) => {
 }
 
 .grid-box {
-    background-color: #F5F5F5;
+    background-color: #f5f7fa;
     margin-top: 6px;
     border-radius: 2px;
     min-height: 24px;
@@ -306,7 +382,12 @@ const getStateColor = (state) => {
     cursor: pointer;
 }
 
-.article-srcoll {}
+.article-srcoll {
+    // border-radius: 15px;
+    width: 70%;
+    border-radius: 10px;
+}
+
 
 .subBox {
     margin-bottom: 24px;
@@ -316,14 +397,13 @@ const getStateColor = (state) => {
 .subBox p {}
 
 .inform-content {
-    background-color: #fafafa;
+    // background-color: #fafafa;
     height: calc(100% - 64px);
     box-sizing: border-box;
     padding: 25px 46px 0 46px;
 }
 
 .inform-text {
-    color: #979797;
     margin-bottom: 24px;
 }
 

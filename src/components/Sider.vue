@@ -72,7 +72,7 @@ onMounted(() => {
 .leftNav {
     width: 165px;
     height: calc(100vh - 64px);
-    background-color:  #e4f7ff;
+    background-color:  #f5f9fc;
     // background: url(../assets/img/bg_cebiandaohang@2.png);
     // background-size: cover;
     // background-position-y: 64px;
@@ -104,7 +104,7 @@ onMounted(() => {
 }
 
 .el-menu-item:hover {
-    background-color:white;
+    background-color:#ecf4fa;
     // color: #f39e00;
 }
 
@@ -112,6 +112,10 @@ onMounted(() => {
 //     background-color:white;
 // }
 .el-menu-item.is-active {
-    background-color: white;
+    background-color: #ecf4fa;
+    // color: #6494ee;
+}
+.el-menu-item-group__title{
+    padding: 0;
 }
 </style>

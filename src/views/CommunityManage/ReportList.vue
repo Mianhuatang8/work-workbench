@@ -40,7 +40,7 @@
         </div>
       </div>
 
-      <div class="reportContentBox" style="margin-top:30px;border-radius: 15px">
+      <div class="reportContentBox" style="margin-top:30px;">
         <div class="reportContentBox_head">
           <div style="font-weight: bold;">
             举报列表
@@ -375,7 +375,7 @@ const reject = () => {
   
 <style lang="scss" scoped>
 .reportSearchBox {
-  border-radius: 15px;
+  // border-radius: 15px;
   background-color: #fff;
   box-shadow: 0px 0px 6px 0px rgba(224, 224, 239, 0.5);
   margin: 25px 0 12px 0;

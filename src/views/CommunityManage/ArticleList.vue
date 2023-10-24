@@ -3,9 +3,9 @@
 
     <div>
       <div style="margin-bottom: 30px;font-size: 17px;">
-        <span style="font-weight: bold;">社区管理</span>
+        <span>社区管理</span>
         <span style="margin:0 5px">/</span>
-        <span>文章</span>
+        <span style="font-weight: bold;">文章</span>
       </div>
 
       <div class="articleSearchBox">
@@ -274,13 +274,13 @@ const delItem = (id) => {
 .articleContentBox{
   margin-top: 30px;
     background-color: white;
-    border-radius: 15px;
+    // border-radius: 15px;
     padding: 30px;
 }
 .articleSearchBox{
   background-color: white;
     padding: 20px;
-    border-radius: 15px;
+    // border-radius: 15px;
 }
 
 </style>
