@@ -50,7 +50,7 @@
             style="display: flex;margin-bottom: 15px;justify-content: space-between;align-items: center;margin-left: 15px;">
             <el-button type="primary" style="margin-right: 8px;" @click="addRole()">+&nbsp;新建</el-button>
             <div style="display: flex;">
-               <el-button type="primary">批量操作</el-button>
+               <el-button type="primary" plain>批量操作</el-button>
                <el-button type="danger" plain>删除</el-button>
             </div>
          </div>
@@ -89,6 +89,13 @@
                </template>
             </el-table-column>
          </el-table>
+
+         <div style="margin-top: 40px;display: flex;justify-content: flex-end;">
+          <el-pagination v-model:current-page="currentPage4" v-model:page-size="pageSize4" :page-sizes="[10, 20, 30, 40]"
+            :small="small" :disabled="disabled" background layout="total, sizes, prev, pager, next, jumper" :total="400"
+            @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        </div>
+
       </div>
    </div>
 

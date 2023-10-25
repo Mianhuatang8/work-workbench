@@ -59,7 +59,7 @@ const router = createRouter({
       children: [
         {
           path: '/effectManage/sortList',
-          name: '类表列表',
+          name: '类型管理',
           component: () => import('../views/EffectManage/SortList.vue'),
         },
         {
@@ -134,11 +134,12 @@ const router = createRouter({
       children: [
         {
           path: '/campaignManage/campaignList',
-          name: '设计竞选列表',
+          name: '竞选列表',
           component: () => import('../views/CampaignManage/CampaignList.vue'),
         },
       ],
     },
+
     {
       path: '/articleListInfo',
       name: '新建文章',
@@ -149,6 +150,11 @@ const router = createRouter({
       name: '举报详情',
       component: () => import('../views/ReportDetail.vue'),
     },
+    {
+      path:'/campaignDetail',
+      name:'竞选列表详情',
+      component:()=>import('../views/CampaignDetail.vue')
+    }
 
   ]
 })
