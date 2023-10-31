@@ -1,0 +1,140 @@
+<template>
+    <div class="Container" style="padding:17px 44px">
+
+        <div style="display: flex;justify-content: space-between;">
+            <div style="margin-bottom: 30px; font-size: 17px;cursor: pointer;">
+                <span>反馈管理</span>
+                <span style="margin:0 5px;">/</span>
+                <span @click="goback">反馈列表</span>
+                <span style="margin:0 5px;">/</span>
+                <span style="font-weight: bold;">反馈详情</span>
+            </div>
+            <div style="display: flex;">
+                <el-button type="primary" plain @click="goback">返回列表</el-button>
+                <el-button type="primary" plain style="margin-right: 10px;">设置为关闭</el-button>
+                <el-button type="primary" style="margin-right: 10px;">设置为完成</el-button>
+            </div>
+        </div>
+
+        <div style="background-color: white; padding: 25px;width: 100%;display: flex;">
+            <div style="margin: 0 auto;" class="main-content">
+                <div class="one">
+                    <div class="title">
+                        <div class="title-block"></div>
+                        <div>用户信息</div>
+                    </div>
+                    <div style="display: flex;justify-content: space-between;margin-top: 15px;font-size: 15px;">
+                        <div style="width: 48%;margin-right: 15px;">
+                            <div style="margin-bottom: 10px;">用户ID</div>
+                            <el-input v-model="value" disabled style="margin-bottom: 10px;width: 350px;"></el-input>
+                        </div>
+                        <div>
+                            <div style="margin-bottom: 10px;">用户名</div>
+                            <el-input v-model="value" disabled style="margin-bottom: 10px;width: 350px;"></el-input>
+                        </div>
+                    </div>
+                    <div style="display: flex;justify-content: space-between;margin-top: 15px;font-size: 15px;">
+                        <div style="width: 48%;margin-right: 15px;">
+                            <div style="margin-bottom: 10px;">手机号</div>
+                            <el-input v-model="value" disabled style="margin-bottom: 10px;width: 350px;"></el-input>
+                        </div>
+                        <div>
+                            <div style="margin-bottom: 10px;">微信账号</div>
+                            <el-input v-model="value" disabled style="margin-bottom: 10px;width: 350px;"></el-input>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="two">
+                    <div class="title">
+                        <div class="title-block"></div>
+                        <div>反馈信息</div>
+                    </div>
+
+                    <div style="display: flex;justify-content: space-between;margin-top: 15px;font-size: 15px;">
+                        <div style="width: 48%;margin-right: 15px;">
+                            <div style="margin-bottom: 10px;">反馈编号</div>
+                            <el-input v-model="value" disabled style="margin-bottom: 10px;width: 350px;"></el-input>
+                        </div>
+                        <div>
+                            <div style="margin-bottom: 10px;">反馈标题</div>
+                            <el-input v-model="value" disabled style="margin-bottom: 10px;width: 350px;"></el-input>
+                        </div>
+                    </div>
+                    <div style="display: flex;justify-content: space-between;margin-top: 15px;font-size: 15px;">
+                        <div style="width: 48%;margin-right: 15px;">
+                            <div style="margin-bottom: 10px;">平台内容</div>
+                            <el-input v-model="value" disabled style="margin-bottom: 10px;width: 350px;"></el-input>
+                        </div>
+                        <div>
+                            <div style="margin-bottom: 10px;">问题类型</div>
+                            <el-input v-model="value" disabled style="margin-bottom: 10px;width: 350px;"></el-input>
+                        </div>
+                    </div>
+                    <div style="display: flex;justify-content: space-between;margin-top: 15px;font-size: 15px;">
+                        <div style="width: 48%;margin-right: 10px;">
+                            <div style="margin-bottom: 15px;">反馈状态</div>
+                            <el-input v-model="value" disabled style="margin-bottom: 10px;width: 350px;"></el-input>
+                        </div>
+                        <div>
+                            <div style="margin-bottom: 15px;">反馈时间</div>
+                            <el-input v-model="value" disabled style="margin-bottom: 10px;width: 350px;"></el-input>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="margin-bottom: 15px;">具体描述</div>
+                        <el-input v-model="specialDesc" disabled style="margin-bottom: 10px;" type="textarea" resize="none" ></el-input>
+
+                    </div>
+                    <div>
+                        <div style="margin-bottom: 15px;">图片</div>
+                        <ul style="display: flex;flex-wrap: wrap;">
+                            <li style="list-style: none;margin-bottom: 10px;margin-right: 10px;">
+                                <img src="../assets/img/email.png" style="width: 70px;height: 70px;">
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<script setup>
+import { ElMessage } from 'element-plus'
+import { Search, CopyDocument } from '@element-plus/icons-vue'
+import {ref} from 'vue'
+import { useRouter } from 'vue-router';
+const router = useRouter()
+
+const goback = () => {
+    router.back();
+}
+</script>
+
+<style lang="less" scoped>
+.main-content {
+    .title {
+        font-size: 17px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        display: flex;
+        margin-top: 30px;
+
+        .title-block {
+            width: 4px;
+            background-color: #5f90ee;
+            height: 17px;
+            margin-right: 3px;
+        }
+    }
+}
+:deep(.el-textarea__inner){
+    height: 120px;
+}
+
+</style>

@@ -1,7 +1,7 @@
 <template>
     <div>
         <!-- 需求详情 -->
-        <div style="margin-top: 30px;width: 1200px;">
+        <div style="margin-top: 30px;width: 1200px;font-size: 14px;" >
             <span style="font-weight: bold;font-size:15px;">需求详情</span>
             <div style="margin-top: 30px;margin-left: 15px;">
                 <div style="display: flex;">
@@ -13,15 +13,15 @@
                         <span style="margin-right: 15px;">面积：</span>
                         <span>{{ commonds.square }}</span>
                     </li>
-                    <li style="list-style: none;margin-right: 50px;">
+                    <!-- <li style="list-style: none;margin-right: 50px;" v-show="status ==4 ">
                         <span style="margin-right: 15px;">计划入住时间：</span>
                         <span>{{ commonds.time }}</span>
-                    </li>
+                    </li> -->
                     <li style="list-style: none;margin-right: 50px;">
                         <span style="margin-right: 15px;">风格：</span>
                         <span>{{ commonds.style }}</span>
                     </li>
-                    <li style="list-style: none;margin-right: 50px;">
+                    <li style="list-style: none;margin-right: 50px;"  v-show="status==3">
                         <span style="margin-right: 15px;">装修预算：</span>
                         <span>{{ commonds.budget }}</span>
                     </li>
@@ -29,22 +29,22 @@
                         <span style="margin-right: 15px;">房屋类型：</span>
                         <span>{{ commonds.houseType }}</span>
                     </li>
-                    <li style="list-style: none;margin-right: 50px;">
+                    <li style="list-style: none;margin-right: 50px;"  v-show="status ==0  ||status==2 ||status==3">
                         <span style="margin-right: 15px;">户型：</span>
                         <span>{{ commonds.apartmentType }}</span>
                     </li>
-                    <li style="list-style: none;margin-right: 50px;">
+                    <li style="list-style: none;margin-right: 50px;"  v-show="status ==0  ||status==2 ||status==3">
                         <span style="margin-right: 15px;">楼型：</span>
                         <span>{{ commonds.buildingType }}</span>
                     </li>
                 </ul>
-                <div style="display: flex;align-items: center; width: 400px;margin-top:15px;">
+                <div style="display: flex;align-items: center; width: 400px;margin-top:15px;"   v-show="status==3">
                     <span style="margin-right: 15px;width: 130px;">常驻人员：</span>
                     <span style="margin-right: 20px;">{{ commonds.people }}</span>
                     <el-input v-model="commonds.peopleDesc" type="text" placeholder="暂无描述" />
                 </div>
 
-                <div style="display: flex;margin-top: 16px;width:450px;">
+                <div style="display: flex;margin-top: 16px;width:408px;">
                     <span style="margin-right: 20px;width:170px;">空间设计要点：</span>
                     <div>
                         <el-checkbox-group v-model="commonds.designSelect" size="small" style="display:flex;">
@@ -58,17 +58,38 @@
                 </div>
 
                 <div style="display: flex;margin-top: 16px;">
-                    <span style="margin-right: 64px;">客户备注：</span>
+                    <span style="margin-right: 62px;">客户备注：</span>
                     <div style="width:316px;">
                         <el-input v-model="commonds.msg" type="textarea" placeholder="暂无描述" resize="none"
                             class="designDesc" />
                     </div>
                 </div>
+
+                <div style="display: flex;margin-top: 16px;" v-show="status == 2 || status == 3||status == 4">
+                    <span style="margin-right: 62px;">户型图：</span>
+                    <div style="width:316px;">
+                       <ul class="huixing-ul">
+                        <li>
+                            <img src="../assets//img/email.png" alt="">
+                        </li>
+                        <li>
+                            <img src="../assets//img/email.png" alt="" >
+                        </li>
+                        <li>
+                            <img src="../assets//img/email.png" alt="" >
+                        </li>
+                        <li>
+                            <img src="../assets//img/email.png" alt="" >
+                        </li>
+                       </ul>
+                    </div>
+                </div>
+            
             </div>
         </div>
 
         <!-- 已参与的设计师 -->
-        <el-card class="box-card" style="margin-top: 50px;width: 1000px;">
+        <el-card class="box-card" style="margin-top: 50px;width: 1000px;"  v-show="status != 0 ">
             <template #header>
                 <div class="card-header">
                     <span>已参与的设计师</span>
@@ -197,4 +218,21 @@ const checked3 = ref(false)
 
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+.huixing-ul{
+    display: flex;
+    flex-wrap: wrap;
+
+    li{
+        list-style: none;
+        width: 25%;
+        margin-bottom: 10px;
+
+        img{
+            width: 60px;
+            height: 60px;
+
+        }
+    }
+}
+</style>

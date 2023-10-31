@@ -50,7 +50,7 @@
         <el-button type="primary" style="margin-right: 8px;" @click="addVipRank()">+&nbsp;新建</el-button>
         <div style="display: flex;">
           <el-button type="primary" style="margin-right: 8px;" plain>批量操作</el-button>
-          <el-button type="danger" plain>删除</el-button>
+          <el-button type="danger" plain @click="delSome()">删除</el-button>
         </div>
       </div>
       <el-table ref="multipleTableDevice" :data="tableData" @select="selectTab" style="width: 100%;margin-left: 15px;"
@@ -63,9 +63,9 @@
         <el-table-column prop="id" align="center" header-align="center" label="等级ID">
         </el-table-column>
         <el-table-column prop="vipRank" align="center" header-align="center" label="等级类型">
-          <template #default="scope">
+          <!-- <template #default="scope">
             <span style="color: rgb(0, 159, 255);">{{ scope.row.vipRank }}</span>
-          </template>
+          </template> -->
         </el-table-column>
         <el-table-column prop="vipCode" align="center" header-align="center" label="等级编码">
         </el-table-column>
@@ -78,8 +78,8 @@
         <el-table-column align="center" header-align="center" label="操作">
           <template #default="scope">
             <div style="display: flex;justify-content: space-around; cursor: pointer;align-items: center;">
-              <div style="color: #009fff; " @click="lookDetail(scope.row)">详情</div>
               <el-switch v-model="scope.row.changePermission" @change="updatePermission" />
+              <div style="color: #009fff; " @click="lookDetail(scope.row)">详情</div>
               <div style="color: #009fff; " @click="setFunItem(scope.row)">功能配置</div>
             </div>
           </template>
@@ -132,7 +132,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="addDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="addDialogVisible = false">确认 </el-button>
+        <el-button type="primary" @click="finish(type)">确认 </el-button>
       </span>
     </template>
   </el-dialog>
@@ -151,7 +151,6 @@
       </div>
     </div>
 
-
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="detailDialogVisible = false" type="primary">关闭</el-button>
@@ -165,6 +164,7 @@
 <script setup>
 import { ref } from 'vue'
 import { Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const sortRole = ref(['不限', '普通会员', '月度会员', '年度会员'])
 const selectRoleSortIndex = ref(0)
@@ -225,9 +225,9 @@ const form = ref({
   name: '',
   rankCode: '',
   // vipDay: null,
-  inspiration: '+180',
-  getInspiration: '+20',
-  checkList: ['1', '2', '3'],
+  inspiration: '',
+  getInspiration: '',
+  checkList: [],
 })
 const detailDialogVisible = ref(false)
 
@@ -242,6 +242,7 @@ const addVipRank = () => {
 
 //详情
 const lookDetail = () => {
+  type.value='look'
   detailDialogVisible.value = true
 
 }
@@ -255,6 +256,31 @@ const setFunItem = () => {
 //启用/停用权限
 const updatePermission = (value) => {
   console.log('会员列表-启用/停用权限', value);
+}
+
+
+//批量删除
+const delSome = () => {
+  ElMessage({
+    message: '删除成功',
+    type: 'success',
+  })
+}
+//完成新建/编辑/查看
+const finish = (type) => {
+  addDialogVisible.value = false
+  if (type = 'add') {
+    ElMessage({
+      message: '新建成功',
+      type: 'success',
+    })
+  }
+  if (type == 'set') {
+    ElMessage({
+      message: '修改成功',
+      type: 'success',
+    })
+  }
 }
 
 

@@ -7,15 +7,6 @@
     </div>
 
     <div class="card-content">
-      <!-- <div class="role-sort" style="display:flex;">
-        <div style="margin-right: 25px;margin-left: 15px;display: flex;align-items: center;">
-          角色
-        </div>
-        <div v-for="(item, index) in sortRole" :key="index"
-          style="margin-right: 20px;font-size:14px;display: flex;align-items: center;cursor: pointer;"
-          :class="selectRoleSortIndex == index ? 'selectedRoleStyle' : ''" @click="changeIndex(index)">
-          {{ item }}</div>
-      </div> -->
       <div class="datePick">
 
         <div style="display: flex;align-items: center;width: 50%;">
@@ -50,7 +41,7 @@
         <el-button type="primary" style="margin-right: 8px;" @click="addUserRank()">+&nbsp;新建</el-button>
         <div style="display: flex;">
           <el-button type="primary" plain>批量操作</el-button>
-          <el-button type="danger" plain>删除</el-button>
+          <el-button type="danger" plain @click="delSome()">删除</el-button>
         </div>
       </div>
 
@@ -75,7 +66,7 @@
           <template #default="scope">
             <div style="display: flex;justify-content: space-around; cursor: pointer;">
               <el-button type="primary" link @click="gotToRankDetail(scope.row)">详情</el-button>
-              <el-switch v-model="scope.row.changePermission" @change="updatePermission"/>
+              <el-switch v-model="scope.row.changePermission" @change="updatePermission" />
               <el-button type="primary" link @click="setFunction(scope.row)">功能配置</el-button>
 
             </div>
@@ -177,7 +168,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="addDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="addDialogVisible = false">确认 </el-button>
+        <el-button type="primary" @click="finish(type)">确认 </el-button>
       </span>
     </template>
   </el-dialog>
@@ -188,7 +179,7 @@
       <div class="title">{{ currentUserRankData.name }}</div>
       <div class="process" style="margin-bottom: 10px;">
         <el-progress :percentage="parseInt(currentUserRankData.growthValue / 500 * 100)" :stroke-width="10"
-          color="#00000063" />
+          color="rgb(255 255 255)" class="process-content" />
       </div>
       <div style="font-size: 12px;">成长值距离剩升下一级还有{{ 500 - currentUserRankData.growthValue }}成长值</div>
     </div>
@@ -213,6 +204,7 @@
   
 <script setup>
 import { ref, watch } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const pickerOptions = ref({
   disabledDate(time) {
@@ -235,7 +227,7 @@ const tableData = ref([
     rankCode: '后台用户',
     upLoadTime: '2020/09/20 16:12:23',
     updateTime: '2020/09/20 16:12:23',
-    changePermission:false
+    changePermission: false
   },
   {
     id: '2',
@@ -243,7 +235,7 @@ const tableData = ref([
     rankCode: '管理员',
     upLoadTime: '2020/09/20 16:12:23',
     updateTime: '2020/09/20 16:12:23',
-    changePermission:true
+    changePermission: true
   },
   {
     id: '3',
@@ -251,7 +243,7 @@ const tableData = ref([
     rankCode: '等级编码',
     upLoadTime: '2020/09/20 16:12:23',
     updateTime: '2020/09/20 16:12:23',
-    changePermission:false
+    changePermission: false
   },
 
 
@@ -262,13 +254,13 @@ const form = ref({
   rankCode: '',
   vipDay: null,
   inspiration: null,
-  checkList: ['1', '5', '8'],
-  getInspiration: ['1',],
-  useInspiration: ['1','3'],
-  homeSign:'+6',
-  vxCount:'',
-  generate:'-3',
-  downLoad:'-2',
+  checkList: [],//['1', '5', '8']
+  getInspiration:[],// ['1',]
+  useInspiration: [],//['1', '3']
+  homeSign: '',
+  vxCount: '',
+  generate: '',
+  downLoad: '',
 
 })
 
@@ -295,15 +287,49 @@ const currentUserRankData = ref({
   growthValue: 40,
   createPermission: ['专属标识', '每日灵感值+5']
 })
-
 const gotToRankDetail = (row) => {
   detailDialogVisible.value = true
 }
 
 //启用/停用权限
-const updatePermission=(val)=>{
-  console.log('修改权限',val);
+const updatePermission = (val) => {
+  console.log('修改权限', val);
 }
+
+//完成
+const finish = (type) => {
+  addDialogVisible.value = false
+  if (type == 'add') {
+    ElMessage({
+      message: '新建成功',
+      type: 'success',
+    })
+  }
+  if (type == 'setFun') {
+    ElMessage({
+      message: '修改成功',
+      type: 'success',
+    })
+  }
+}
+
+//批量删除
+const delSome = () => {
+  ElMessage({
+    message: '删除成功',
+    type: 'success',
+  })
+}
+
+
+
+
+
+
+
+
+
+
 
 
 </script>
@@ -337,15 +363,12 @@ const updatePermission=(val)=>{
     margin-bottom: 15px;
   }
 
-  .process {
-    //   .el-progress__text {
-    //     font-size: 14px;
-    //     color: var(--el-text-color-regular);
-    //     margin-left: 5px;
-    //     min-width: 50px;
-    //     line-height: 1;
-    //   }
+  :deep(.el-progress-bar__outer) {
+    background-color: #ffffff7a;
+  }
 
+  :deep(.el-progress__text) {
+    display: none;
   }
 }
 </style>

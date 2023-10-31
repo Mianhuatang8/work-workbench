@@ -154,6 +154,16 @@ const router = createRouter({
       path:'/campaignDetail',
       name:'竞选列表详情',
       component:()=>import('../views/CampaignDetail.vue')
+    },
+    {
+      path:'/orderDetail',
+      name:'订单详情',
+      component:()=>import('../views/OrderDetail.vue')
+    },
+    {
+      path:'/feedBackDetail',
+      name:'反馈详情',
+      component:()=>import('../views/FeedBackDetail.vue')
     }
 
   ]

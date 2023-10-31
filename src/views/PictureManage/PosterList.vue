@@ -1,13 +1,210 @@
 <template>
-   海报列表
-  </template>
+   <div class="Container" style="padding:22px">
+      <div style="margin-bottom: 30px; font-size: 17px;">
+         <span>图片管理</span>
+         <span style="margin:0 5px">/</span>
+         <span style="margin:0 5px;font-weight: bold;">海报列表</span>
+      </div>
+
+      <div style="background-color: white;padding: 30px;">
+         <div
+            style="display: flex;margin-bottom: 15px;justify-content: space-between;align-items: center;margin-left: 15px;">
+            <el-button type="primary" style="margin-right: 8px;" @click="addPhoto()">+&nbsp;新建</el-button>
+            <div style="display: flex;">
+               <el-button type="primary" plain>批量操作</el-button>
+               <el-button type="danger" plain @click="delSome()">删除</el-button>
+            </div>
+         </div>
+
+         <el-table ref="multipleTableDevice" :data="tableData" @select="selectTab" style="width: 100%;margin-left: 15px;"
+            :header-cell-style="{ background: '#F2F3F8' }" max-height="380" :row-style="{ height: 40 + 'px' }"
+            :cell-style="{ padding: 0 + 'px' }">
+
+            <el-table-column type="selection" width="60">
+            </el-table-column>
+            <el-table-column prop="imgUrl" align="center" header-align="center" label="图片">
+               <template #default="scope">
+                  <el-image style="width: 100px; height: 100px;margin:10px 0;" :src="scope.row.imgSrc" />
+
+               </template>
+            </el-table-column>
+            <el-table-column prop="desc" align="center" header-align="center" label="备注">
+            </el-table-column>
+            <el-table-column prop="upLoadUser" align="center" header-align="center" label="上传用户">
+            </el-table-column>
+
+            <el-table-column prop="upLoadTime" align="center" header-align="center" label="上传时间">
+            </el-table-column>
+            <el-table-column align="center" header-align="center" label="操作">
+               <template #default="scope">
+                  <div style="display: flex;justify-content: space-around; cursor: pointer;">
+                     <el-switch v-model="scope.row.changePermission" @change="updatePermission" />
+                     <el-button type="primary" link @click="lookPhoto(scope.row)">查看</el-button>
+                     <el-button type="primary" link @click="editPhoto(scope.row)">编辑</el-button>
+
+                  </div>
+               </template>
+            </el-table-column>
+         </el-table>
+
+
+         <div style="margin-top: 40px;display: flex;justify-content: flex-end;">
+            <el-pagination v-model:current-page="currentPage4" v-model:page-size="pageSize4" :page-sizes="[10, 20, 30, 40]"
+               :small="small" :disabled="disabled" background layout="total, sizes, prev, pager, next, jumper" :total="400"
+               @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+         </div>
+
+      </div>
+   </div>
+
+
+   <!-- 新增图片 -->
+   <el-dialog v-model="addDialogVisible" :title="type == 'add' ? '新增图片' : type == 'edit' ? '编辑图片' : '查看图片'" width="35%"
+      :before-close="handleClose">
+      <div>
+         <div style="font-size: 16px;margin-bottom: 20px;" v-if="type != 'look'">上传图片</div>
+         <el-upload v-if="type == 'add'" class="upload-demo" drag
+            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" multiple>
+            <el-icon class="el-icon--upload">
+               <Plus />
+            </el-icon>
+            <div class="el-upload__text">
+               点击上传图片
+            </div>
+         </el-upload>
+
+         <!-- 照片墙 -->
+         <el-upload v-if="type == 'edit'" v-model:file-list="fileList"
+            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" list-type="picture-card"
+            :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
+            <el-icon>
+               <Plus />
+            </el-icon>
+         </el-upload>
+         <!-- 预览图片 -->
+         <el-dialog v-model="dialogVisible">
+            <img w-full :src="dialogImageUrl" alt="Preview Image" />
+         </el-dialog>
+
+         <!-- 查看图片 -->
+         <div style="margin: 0 auto;width: 250px;">
+            <img :src="form.imgSrc" alt="" style="width: 250px;height: 250px;" v-if="type == 'look'">
+         </div>
+      </div>
+
+      <div>
+         <div style="font-size: 16px;margin-bottom: 20px;margin-top: 10px;">备注</div>
+         <el-input v-model="form.desc" placeholder="请输入" :disabled="type == 'look'"></el-input>
+      </div>
+      <template #footer>
+         <span class="dialog-footer">
+            <el-button @click="addDialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="finish(type)">完成</el-button>
+         </span>
+      </template>
+   </el-dialog>
+</template>
   
-  <script>
-  export default {
+<script setup>
+import { ref } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { UploadFilled, Plus, Select } from '@element-plus/icons-vue'
+
+const tableData = ref([
+   {
+      imgSrc: 'D:\obj\workbench\src\assets\img\email.png',
+      desc: 'User',
+      upLoadUser: '后台用户',
+      upLoadTime: '2020/09/10 12:23:33',
+      changePermission: false
+   },
+   {
+      imgSrc: 'D:\obj\workbench\src\assets\img\email.png',
+      desc: 'abd',
+      upLoadUser: '后台用户',
+      upLoadTime: '2020/09/10 12:23:33',
+      changePermission: true,
+   },
+   {
+      imgSrc: 'D:\obj\workbench\src\assets\img\email.png',
+      desc: '1213',
+      upLoadUser: '后台用户',
+      upLoadTime: '2020/09/10 12:23:33',
+      changePermission: false
+   },
+   {
+      imgSrc: 'D:\obj\workbench\src\assets\img\email.png',
+      desc: 'djsf',
+      upLoadUser: '后台用户',
+      upLoadTime: '2020/09/10 12:23:33',
+      changePermission: true
+   },
+])
+
+
+const addDialogVisible = ref(false)
+const type = ref('add')
+const form = ref({
+   imgSrc: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
+   desc: '',
+})
+//新增图片
+const addPhoto = () => {
+   type.value = 'add'
+   addDialogVisible.value = true
+
+}
+//编辑图片
+const editPhoto = () => {
+   type.value = 'edit'
+   addDialogVisible.value = true
+}
+//查看图片
+const lookPhoto = () => {
+   type.value = 'look'
+   addDialogVisible.value = true
+
+}
+
+const fileList = ref([])
+
+const dialogImageUrl = ref('')
+const dialogVisible = ref(false)
+
+//是否删除图片
+const handleRemove = (uploadFile, uploadFiles) => {
+   console.log(uploadFile, uploadFiles)
+}
+
+const handlePictureCardPreview = (uploadFile) => {
+   dialogImageUrl.value = uploadFile.url
+   dialogVisible.value = true
+}
+//完成
+const finish = (type) => {
+   addDialogVisible.value = false
+
+   if (type == 'add') {
+      ElMessageBox.alert('新建成功', '提示', {
+         icon:Select,
+         confirmButtonText: 'OK',
+      })
+   }
+   if (type == 'edit') {
+      ElMessageBox.alert('修改成功', '提示', {
+         icon:Select,
+         confirmButtonText: 'OK',
+      })
+   }
+
+}
+//批量删除
+const delSome = () => {
+  ElMessageBox.alert('批量删除成功', '提示', {
+    icon: Select,
+    confirmButtonText: 'OK',
+  })
+}
+</script>
   
-  }
-  </script>
-  
-  <style>
-  
-  </style>
+<style></style>

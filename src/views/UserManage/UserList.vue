@@ -50,7 +50,7 @@
         <el-button type="primary" style="margin-right: 8px;" @click="addUser()">+&nbsp;新建</el-button>
         <div style="display: flex;">
           <el-button type="primary" style="margin-right: 8px;" plain>批量操作</el-button>
-          <el-button type="danger" plain>删除</el-button>
+          <el-button type="danger" plain @click="delSome()">删除</el-button>
         </div>
       </div>
       <el-table ref="multipleTableDevice" :data="tableData" @select="selectTab" style="width: 100%;margin-left: 15px;"
@@ -83,11 +83,7 @@
             <div style="display: flex;justify-content: space-around; cursor: pointer;">
               <div style="color: #009fff; " @click="lookDetail(scope.row)">查看</div>
               <div style="color: #009fff; " @click="editItem(scope.row)">编辑</div>
-              <el-popconfirm title="请问确定要删除吗?" confirm-button-text="是" cancel-button-text="取消" @confirm="delItem()">
-                <template #reference>
-                  <div style="color: red; ">删除</div>
-                </template>
-              </el-popconfirm>
+              <div style="color: red;" @click="delItem(scope.row)">删除</div>
             </div>
           </template>
         </el-table-column>
@@ -104,62 +100,82 @@
 
 
   <!-- 查看对话框 -->
-  <el-dialog v-model="lookDialogVisible" :title="type == 'look' ? '查看' : type=='edit'?'编辑':'新增'" width="40%" :before-close="handleClose">
-    <div>
+  <el-dialog v-model="lookDialogVisible" :title="type == 'look' ? '查看' : type == 'edit' ? '编辑' : '新增'" width="40%"
+    :before-close="handleClose">
+    <div class="dialog-content">
       <el-form :model="form" label-width="180px">
         <el-form-item label="用户头像">
-          <img :src="form.avatar" style="width: 100px;height: 50px;">
+          <!-- 上传/修改用户头像 -->
+          <el-upload v-model:file-list="fileList" action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+            list-type="picture-card" :disabled="type == 'look'">
+            <el-icon>
+              <Plus />
+            </el-icon>
+          </el-upload>
+
+          <!-- <img :src="form.avatar" style="width: 80px;height: 80px;"> -->
         </el-form-item>
         <el-form-item label="用户名称">
-          <el-input v-model="form.name" style="width: 200px;"  :disabled="type=='look'"/>
+          <el-input v-model="form.name" style="width: 200px;" :disabled="type == 'look'" />
         </el-form-item>
         <el-form-item label="用户等级">
-          <el-select v-model="form.userRank" class="m-2" placeholder="请选择" style="width: 200px;" :disabled="type=='look'">
+          <el-select v-model="form.userRank" class="m-2" placeholder="请选择" style="width: 200px;"
+            :disabled="type == 'look'">
             <el-option v-for="(item, index) in userRankSort" :key="item" :label="item" :value="index" />
           </el-select>
         </el-form-item>
         <el-form-item label="会员等级">
-          <el-select v-model="form.vipRank" class="m-2" placeholder="请选择" style="width: 200px;" :disabled="type=='look'">
+          <el-select v-model="form.vipRank" class="m-2" placeholder="请选择" style="width: 200px;"
+            :disabled="type == 'look'">
             <el-option v-for="(item, index) in vipRankSort" :key="item" :label="item" :value="index" />
           </el-select>
         </el-form-item>
-        <el-form-item label="会员开始时间-结束时间" style="display: flex;" >
-          <el-date-picker v-model="form.startTime" type="date" style="width: 130px;" :disabled="type=='look'"/>
+        <el-form-item label="会员开始时间-结束时间" style="display: flex;">
+          <el-date-picker v-model="form.startTime" type="date" style="width: 130px;" :disabled="type == 'look'" />
           <div style="margin:0 5px">-</div>
-          <el-date-picker v-model="form.endTime" type="date" style="width: 130px;" :disabled="type=='look'"/>
+          <el-date-picker v-model="form.endTime" type="date" style="width: 130px;" :disabled="type == 'look'" />
         </el-form-item>
         <el-form-item label="微信号">
-          <el-input v-model="form.vxNumber" style="width: 200px;" :disabled="type=='look'" />
+          <el-input v-model="form.vxNumber" style="width: 200px;" :disabled="type == 'look'" />
         </el-form-item>
 
         <el-form-item label="手机号">
-          <el-input v-model="form.phone" style="width: 200px;"  :disabled="type=='look'"/>
+          <el-input v-model="form.phone" style="width: 200px;" :disabled="type == 'look'" />
         </el-form-item>
 
-        <el-form-item v-if="type == 'look'" label="用户活动日志" >
-          <div class="record">
-            <div style="margin-bottom: 8px;">2023年10月20日 12:03:33 生图 灵感值-2</div>
-            <div style="margin-bottom: 8px;">2023年10月20日 12:03:33 生图 灵感值-2</div>
-            <div style="margin-bottom: 8px;">2023年10月20日 12:03:33 生图 灵感值-2</div>
-            <div style="margin-bottom: 8px;">2023年10月20日 12:03:33 生图 灵感值-2</div>
-            <div style="margin-bottom: 8px;">2023年10月20日 12:03:33 生图 灵感值-2</div>
+        <el-form-item v-if="type == 'look'" label="用户活动日志">
+          <div class="record" style="height:150px;overflow-y:auto;background-color: #f5f7fa;width: 400px;">
+            <div v-for="item in form.records" :key="item" style="display:flex;margin-top:15px;align-item:center;justify-content:space-between">
+              <div style="display:flex" :style="{'margin-left':Number(item.spiritsValue)>0?'3px':''}" >
+                <div style="font-size:14px;">{{ item.operation }}</div>
+                <div style="margin:0 8px;color:#d7d7d7;">|</div>
+                <div :style="{'color':Number(item.spiritsValue)>0?'#2fd32f':''}" style="font-size:14px;">灵感值{{ item.spiritsValue }}</div>
+              </div>
+              <div ><span style="font-size:12px;color:rgb(155 155 155);">{{ item.time }}</span></div>
+            </div>
           </div>
 
         </el-form-item>
 
+        <!-- style="height: 300px;overflow-y: scroll;" -->
+        <el-form-item label="用户私有图库">
 
-        <el-form-item label="用户私有图库" style="height: 300px;overflow-y: scroll;">
-          <div style="width: 48%;display: flex;flex-wrap: wrap;" v-for="item in form.privacyImages" :key="item">
-            <img :src="item" style="width: 200px;height: 200px;margin-bottom: 15px;">
-          </div>
+          <el-upload v-model:file-list="fileList" action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+            list-type="picture-card" :disabled="type == 'look'">
+            <el-icon>
+              <Plus />
+            </el-icon>
+          </el-upload>
+
+
         </el-form-item>
 
       </el-form>
     </div>
     <template #footer>
       <span class="dialog-footer">
-        <el-button v-if="type == 'edit' || type=='add'" @click="lookDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="lookDialogVisible = false">完成</el-button>
+        <el-button v-if="type == 'edit' || type == 'add'" @click="lookDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="finish(type)">完成</el-button>
       </span>
     </template>
   </el-dialog>
@@ -167,7 +183,8 @@
   
 <script setup>
 import { ref } from 'vue'
-import { Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Delete, Edit, Search, Share, Upload, Plus } from '@element-plus/icons-vue'
 
 const sortRole = ref(['不限', '普通', '月度', '年度'])
 const selectRoleSortIndex = ref(0)
@@ -188,6 +205,15 @@ const daysArr = ref(['今日', '昨日', '最近7天', '最近30天'])
 // const data = ref([])
 // const onionActiveId = ref(0)
 // const dataActivateId = ref(0)
+
+//用户私有图库
+const fileList = ref([
+  {
+    name: 'food.jpeg',
+    url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
+  },
+])
+
 
 const tableData = ref([
   {
@@ -241,6 +267,34 @@ const form = ref({
   ],
   startTime: new Date(2023, 10, 20),
   endTime: new Date(2024, 10, 20),
+  records: [
+    {
+      operation: '生图',
+      spiritsValue: '-2',
+      time: '2023年10月23日 10：10：11'
+    },
+    {
+      operation: '生图',
+      spiritsValue: '+2',
+      time: '2023年10月23日 10：10：11'
+    },
+    {
+      operation: '生图',
+      spiritsValue: '-2',
+      time: '2023年10月23日 10：10：11'
+    },
+    {
+      operation: '生图',
+      spiritsValue: '2',
+      time: '2023年10月23日 10：10：11'
+    },
+    {
+      operation: '生图',
+      spiritsValue: '-2',
+      time: '2023年10月23日 10：10：11'
+    },
+
+  ]
 
 })
 
@@ -256,7 +310,6 @@ const addUser = () => {
 const lookDetail = (row) => {
   type.value = 'look'
   lookDialogVisible.value = true
-
 }
 //编辑
 const editItem = (row) => {
@@ -264,9 +317,57 @@ const editItem = (row) => {
   lookDialogVisible.value = true
 
 }
+
+//完成
+const finish = (type) => {
+  lookDialogVisible.value = false
+  if (type == 'add') {
+    ElMessage({
+      message: '新建成功',
+      type: 'success',
+    })
+  }
+  if (type == 'edit') {
+    ElMessage({
+      message: '修改成功',
+      type: 'success',
+    })
+  }
+}
+//删除
+const delItem = () => {
+  ElMessageBox.confirm(
+    '是否确认删除?',
+    {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      ElMessage({
+        type: 'success',
+        message: '删除成功',
+      })
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '取消删除',
+      })
+    })
+
+}
+//批量删除
+const delSome = () => {
+  ElMessage({
+    message: '删除成功',
+    type: 'success',
+  })
+}
 </script>
   
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .selectedRoleStyle {
   color: white;
   display: flex;
@@ -293,13 +394,29 @@ const editItem = (row) => {
 
 .record {
   margin-top: 10px;
-    height: 130px;
-    border: 1px solid #ebebeb;
-    overflow-y: scroll;
-    padding: 10px;
-    width: 335px;
+  height: 130px;
+  border: 1px solid #ebebeb;
+  overflow-y: scroll;
+  padding: 10px;
+  width: 335px;
+
   .el-form-item__content {
     display: block;
   }
 }
+
+.dialog-content {
+  height: 60vh;
+  overflow: auto;
+}
+
+// :deep(.el-upload-list__item is-success){
+//   width: 80px;
+//   height: 80px;
+// }
+// :deep(.el-upload el-upload--picture-card){
+//   width: 80px;
+//   height: 80px;
+
+// }
 </style>

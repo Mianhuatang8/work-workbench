@@ -65,23 +65,22 @@
           </el-table-column>
 
           <el-table-column prop="hotListOrder" align="center" header-align="center" label="热榜顺序">
-            <template v-slot="scope">
+            <!-- <template v-slot="scope">
               <div>{{ getSort(scope.row, scope) }}</div>
-            </template>
+            </template> -->
           </el-table-column>
 
-          <el-table-column prop="uniqueCode" align="center" header-align="center" label="编号">
+          <el-table-column prop="uniqueCode" align="center" header-align="center" label="文章编号">
           </el-table-column>
           <el-table-column prop="userRole" align="center" header-align="center" label="角色">
           </el-table-column>
           <el-table-column prop="id" align="center" header-align="center" label="用户ID">
           </el-table-column>
-          <el-table-column prop="userInfo.userName" align="center" header-align="center" label="用户名">
+          <el-table-column prop="userName" align="center" header-align="center" label="用户名">
           </el-table-column>
           <el-table-column prop="title" align="center" header-align="center" show-overflow-tooltip label="文章名称">
           </el-table-column>
-          <el-table-column prop="collect.collectName" align="center" header-align="center" label="合辑名称">
-          </el-table-column>
+       
           <el-table-column prop="scanCount" align="center" header-align="center" label="浏览量">
           </el-table-column>
           <el-table-column prop="likeCount" align="center" header-align="center" label="点赞量">
@@ -103,7 +102,7 @@
               <p class="openPicBtn">
                 <el-button type="text" @click="LookArticleListInfo(scope.row.id)">查看</el-button>
                 <el-button type="text" @click="editArticle(scope.row.id)">编辑</el-button>
-                <el-button type="text" @click="delItem(scope.row.id)">删除</el-button>
+                <el-button type="text" @click="delItem(scope.row.id)">更多</el-button>
               </p>
             </template>
           </el-table-column>
@@ -117,43 +116,6 @@
         </div>
       </div>
     </div>
-
-
-    <!-- <el-dialog title="移动到" :visible="moveDialog" width="480px">
-      <div class="articleMoveBox">
-        <el-scrollbar style="height:400px" height="400px">
-          <div class="collectItem" v-for="item in collectionList" :key="item" @click="moveThisCollection(item.id)">
-            <el-image style="width: 40px; height: 40px;margin:0 16px 0 24px" :src="item.cover" fit="cover"></el-image>
-            <div>{{ item.name }}</div>
-            <div class="collectItemCount">{{ item.likeCount }}篇文章</div>
-          </div>
-        </el-scrollbar>
-      </div>
-
-      <div v-slot:footer>
-        <el-button size="small" type="primary" plain style="position: absolute;left:24px">新建合辑</el-button>
-        <el-button size="small" @click="moveDialog = false">取消</el-button>
-        <el-button size="small" type="primary" @click="innerVisible = true">确认</el-button>
-      </div>
-
-    </el-dialog> -->
-
-    <!-- <el-dialog title="推荐指数" :visible.sync="recommendDialog" width="30%">
-      <div style="margin-bottom: 15px;">
-        文章名称：
-        <el-input disabled style="width:300px" placeholder="文章名称" v-model="recommendForm.title">
-        </el-input>
-      </div>
-      <div>
-        推荐指数：
-        <el-input-number v-model="recommendForm.recommend" :min="0" :max="100" label="指数越高排名越高"></el-input-number>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="recommendDialog = false">取 消</el-button>
-        <el-button type="primary" @click="editRecommend">确 定</el-button>
-      </span>
-    </el-dialog> -->
-
   </div>
 </template>
   
@@ -179,7 +141,32 @@ const params = ref({
   date: "",
 
 })
-const tableData = ref([])
+const tableData = ref([
+  {
+    hotListOrder:1,
+    uniqueCode:'121',//文章编号
+    userRole:'后台用户',//角色
+    id:'123',//用户id
+    userName:'User',
+    title:'好设计是沉思的',
+    scanCount:'11131',
+    likeCount:'110',
+    cType:1,// 1-已发布 2-草稿 3-回收 4-下架
+    createTime:'2023/09/10 12:54',
+  },
+  {
+    hotListOrder:1,
+    uniqueCode:'121',//文章编号
+    userRole:'后台用户',//角色
+    id:'123',//用户id
+    userName:'User',
+    title:'好设计是沉思的',
+    scanCount:'11131',
+    likeCount:'110',
+    cType:2,// 1-已发布 2-草稿 3-回收 4-下架
+    createTime:'2023/09/10 12:54',
+  },
+])
 const currentPage = ref(1)
 const userLength = ref(0)
 const showArr = ref([])
@@ -281,6 +268,14 @@ const delItem = (id) => {
   background-color: white;
     padding: 20px;
     // border-radius: 15px;
+}
+.stateIcon{
+    width: 8px;
+    height: 8px;
+    background-color: black;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
 }
 
 </style>

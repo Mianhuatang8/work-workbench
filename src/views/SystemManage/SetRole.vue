@@ -18,7 +18,7 @@
          </div>
          <div class="datePick">
 
-            <div style="display: flex;align-items: center;width: 45%;">
+            <div style="display: flex;align-items: center;width: 52%;">
                <div style="margin-right: 25px;margin-left: 15px;display: flex;align-items: center;">
                   日期
                </div>
@@ -51,7 +51,7 @@
             <el-button type="primary" style="margin-right: 8px;" @click="addRole()">+&nbsp;新建</el-button>
             <div style="display: flex;">
                <el-button type="primary" plain>批量操作</el-button>
-               <el-button type="danger" plain>删除</el-button>
+               <el-button type="danger" plain @click="delSome()">删除</el-button>
             </div>
          </div>
 
@@ -78,10 +78,10 @@
             <el-table-column align="center" header-align="center" label="操作">
                <template #default="scope">
                   <div style="display: flex;justify-content: space-around; cursor: pointer;">
-                     <el-button type="primary" @click="lookDetail()" link>详情</el-button>
+                     <el-button type="primary" @click="lookItem()" link>详情</el-button>
                      <el-button type="primary" @click="editItem(scope.row)" link>编辑</el-button>
                      <el-button type="primary" @click="startItem()" link>权限</el-button>
-                     <el-button type="danger" @click="stop(scope.row)" link>删除</el-button>
+                     <el-button type="danger" @click="delItem(scope.row)" link>删除</el-button>
 
                      <!-- <div style="color: #009fff; " @click="editItem(scope.row)">编辑</div>
                      <div style="color: #009fff; " @click="startItem(scope.row)"></div> -->
@@ -91,42 +91,42 @@
          </el-table>
 
          <div style="margin-top: 40px;display: flex;justify-content: flex-end;">
-          <el-pagination v-model:current-page="currentPage4" v-model:page-size="pageSize4" :page-sizes="[10, 20, 30, 40]"
-            :small="small" :disabled="disabled" background layout="total, sizes, prev, pager, next, jumper" :total="400"
-            @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-        </div>
+            <el-pagination v-model:current-page="currentPage4" v-model:page-size="pageSize4" :page-sizes="[10, 20, 30, 40]"
+               :small="small" :disabled="disabled" background layout="total, sizes, prev, pager, next, jumper" :total="400"
+               @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+         </div>
 
       </div>
    </div>
 
    <!-- 新建角色对话框 -->
-   <el-dialog v-model="dialogVisible" title="新增角色" width="35%" :before-close="handleClose">
+   <el-dialog v-model="dialogVisible" :title="type == 'add' ? '新建角色' : type == 'look' ? '查看角色详情' : '编辑角色'" width="35%" :before-close="handleClose">
       <div>
          <el-form :model="form" label-width="120px">
             <el-form-item label="角色类型">
-               <el-input v-model="form.role" />
+               <el-input v-model="form.role" placeholder="请输入" />
             </el-form-item>
 
             <el-form-item label="角色编码">
-               <el-input v-model="form.roleCode" />
+               <el-input v-model="form.roleCode" placeholder="请输入" />
             </el-form-item>
             <el-form-item label="系统后台权限设置" label-width="174px">
-               <el-tree :data="router.options.routes.slice(0,10)" show-checkbox node-key="name" :default-expanded-keys="[2, 3]"
-                  :default-checked-keys="[5]" :props="defaultProps" />
+               <el-tree :data="router.options.routes.slice(0, 10)" show-checkbox node-key="name"
+                  :default-expanded-keys="[2, 3]" :default-checked-keys="[5]" :props="defaultProps" />
             </el-form-item>
          </el-form>
       </div>
       <template #footer>
          <span class="dialog-footer">
             <el-button @click="dialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="dialogVisible = false">确认 </el-button>
+            <el-button type="primary" @click="finish(type)">完成 </el-button>
          </span>
       </template>
    </el-dialog>
 </template>
   
 <script setup>
-
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { onMounted, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
@@ -178,10 +178,72 @@ const form = ref({
    roleCode: '',
    permission: []
 })
+const type = ref('add')
 //新建角色
 const addRole = () => {
    dialogVisible.value = true
+   type.value = 'add'
+}
+//查看
+const lookItem = () => {
+  type.value = 'look'
+  dialogVisible.value = true
 
+}
+//编辑
+const editItem = (row) => {
+  type.value = 'edit'
+  dialogVisible.value = true
+
+}
+
+
+//完成新建修改
+const finish = () => {
+   dialogVisible.value = false
+   if (type = 'add') {
+      ElMessage({
+         message: '新建成功',
+         type: 'success',
+      })
+   }
+   if (type == 'edit') {
+      ElMessage({
+         message: '修改成功',
+         type: 'success',
+      })
+   }
+}
+//删除
+const delItem = () => {
+  ElMessageBox.confirm(
+    '是否确认删除?',
+    {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      ElMessage({
+        type: 'success',
+        message: '删除成功',
+      })
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '取消删除',
+      })
+    })
+
+}
+//批量删除
+const delSome=()=>{
+  ElMessage({
+      message: '删除成功',
+      type: 'success',
+    })
 }
 
 

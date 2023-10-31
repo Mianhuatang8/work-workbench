@@ -10,11 +10,11 @@
       <div style="display: flex; font-size: 15px; align-items: center+;">
         <div style="display: flex; align-items: center;">
           <span style="margin: 0 10px">关键字</span>
-          <el-input v-model="keyword" placeholder="请输入ID/手机号" style="width: 200px" size="small" />
+          <el-input v-model="keyword" placeholder="请输入ID/手机号" style="width: 200px" />
         </div>
         <div style="display: flex; align-items: center;font-size: 15px;">
           <span style="line-height:32px;width:64px;margin: 0 12px;vertical-align: middle;">订单状态</span>
-          <el-select v-model="orderStateSelect" class="m-2" placeholder="不限" size="small">
+          <el-select v-model="orderStateSelect" class="m-2" placeholder="不限" >
             <el-option label="待支付" value="0" />
             <el-option label="进行中" value="1" />
             <el-option label="已完成" value="2" />
@@ -25,7 +25,7 @@
         <div style="display: flex;align-items: center;font-size: 15px;">
           <span style="line-height:32px;width:64px;margin: 0 12px;vertical-align: middle;">进行状态</span>
 
-          <el-select v-model="doingStateSelect" class="m-2" placeholder="不限" size="small">
+          <el-select v-model="doingStateSelect" class="m-2" placeholder="不限">
             <el-option label="进行中" value="0" />
             <el-option label="上传方案（投稿中）" value="1" />
             <el-option label="待评选" value="2" />
@@ -38,9 +38,9 @@
           提交时间
         </div>
         <el-date-picker v-model="pickTime" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期" width="300px"
-          size="small" />
-        <el-button type="primary" style="margin:0 20px" size="small">查询</el-button>
-        <el-button size="small">重置</el-button>
+          />
+        <el-button type="primary" style="margin:0 20px" >查询</el-button>
+        <el-button>重置</el-button>
       </div>
     </div>
     <div style="padding: 30px; background-color: white;">
@@ -51,9 +51,9 @@
         <el-table-column prop="id" align="center" header-align="center" label="竞选工单ID">
         </el-table-column>
         <el-table-column prop="name" align="center" header-align="center" label="业主名">
-          <template #default="scope">
+          <!-- <template #default="scope">
             <span style="color: blue;">{{ scope.row.name }}</span>
-          </template>
+          </template> -->
         </el-table-column>
         <el-table-column prop="phone" align="center" header-align="center" label="设计师用名">
         </el-table-column>
@@ -234,7 +234,7 @@ const showDetail = (row) => {
 <style lang="scss" scoped>
 .card-content {
   background-color: white;
-  padding: 17px;
+  padding: 30px;
   margin-bottom: 30px;
 
   // .datePick {
