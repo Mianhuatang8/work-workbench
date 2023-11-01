@@ -1,16 +1,39 @@
 <template>
     <div class="header-all">
         <div class="left ">
-            <div class="logo">实现家</div>
-            <div class="text">版本1.0.0</div>
+            <div class="logo">
+                <img src="../assets/img/logo_text_1@3x.png" alt="" style="width: 92px;height: 31px;">
+            </div>
+            <div class="text">实现家后台管理系统</div>
         </div>
 
-        <div class="right">
-            <div class="entryPlatform">入驻平台</div>
-            <el-button class="startDesign" type="text"></el-button>
+        <div class="right" v-if="token">
             <div class="avatar">
-                <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+                <el-dropdown>
+                    <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item @click="loginOut()">退出登录</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
             </div>
+            <div style="margin-left: 10px;">
+                <div>
+                    <span style="font-size: 14px;">
+                        草堂画里21314
+                    </span>
+                </div>
+                <div>
+                    <span style="color: gray;font-size: 12px">普通会员</span>
+                </div>
+            </div>
+        </div>
+        <div class="right" v-if="!token" style="cursor: pointer;">
+            <span @click="login()">登录</span>
+            <span style="margin:0 5px">|</span>
+            <span @click="register()">注册</span>
+
         </div>
 
     </div>
@@ -21,6 +44,15 @@ import { ref } from "vue";
 import { useRouter } from 'vue-router';
 const router = useRouter();
 
+const token = ref('23e25r')
+//登录
+const login = () => {
+    token.value = '1223'
+}
+//退出登录
+const loginOut = () => {
+    token.value = ''
+}
 
 </script>
 
@@ -33,42 +65,33 @@ const router = useRouter();
     justify-content: space-between;
     align-items: center;
     box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.08);
-    background: url(../assets/img/dingbudaohang_bg.png);
-    background-repeat: no-repeat;
-    background-position: right;
+    // background: url(../assets/img/dingbudaohang_bg.png);
+    // background-repeat: no-repeat;
+    // background-position: right;
 
     .left {
-        margin-left: 40px;
+        // margin-left: 40px;
         display: flex;
         align-items: center;
 
         .logo {
-            // background: url(../assets/img/实现家\ 2@2.png);
-            // width: 108px;
-            // height: 32px;
-            // background-size: contain;
-            // background-position: center;
-            // z-index: 99999;
-            color: #9d9d68;
-            font-size: 20px;
-            font-weight: bold;
-            margin-right: 5px;
-            // background: url('../assets/img/实现家 2@2.png');
-            // width: 108px;
-            // height: 32px;
-            // background-size: contain;
-            // background-position: center;
-            // position: absolute;
-            // left: 16px;
-            // top: 0;
-            // margin: auto;
-            // bottom: 0;
+            width: 130px;
+            text-align: center;
+            line-height: 64px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: 14px;
+
         }
 
         .text {
-            color: #9d9d68;
-            font-size: 14px;
-            font-weight: bold;
+            height: 64px;
+            line-height: 64px;
+            padding-left: 35px;
+            color: #333333;
+            font-weight: 600;
+            font-size: 18px;
         }
 
     }

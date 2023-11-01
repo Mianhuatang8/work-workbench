@@ -11,20 +11,22 @@
       <div class="reportSearchBox">
         <el-descriptions class="margin-top inner-block reportFilterWith1" :colon="false" :column="3">
           <el-descriptions-item label="举报编号">
-            <el-input placeholder="请输入内容" size="small" style="width:270px" v-model="formData.UniqueCode"></el-input>
+            <el-input placeholder="请输入内容" style="width:270px" v-model="formData.UniqueCode"></el-input>
           </el-descriptions-item>
           <el-descriptions-item label="状态">
-            <el-select placeholder="请选择" style="width:270px" size="small" v-model="formData.QState">
+            <el-select placeholder="请选择" style="width:270px" v-model="formData.QState">
               <el-option label="待处理" value="1"></el-option>
               <el-option label="已下架" value="2"></el-option>
               <el-option label="已驳回" value="3"></el-option>
             </el-select>
           </el-descriptions-item>
+          <!-- :shortcuts="shortcuts" -->
           <el-descriptions-item label="日期" style="    display: flex;  align-items: center">
-            <el-date-picker v-model="time" @change="changeTime" value-format="yyyy-MM-dd" size="small"
+            <el-date-picker v-model="formData.time" @change="changeTime" format="YYYY-MM-DD" value-format="YYYY-MM-DD"
               style="width:270px;" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
             </el-date-picker>
           </el-descriptions-item>
+
         </el-descriptions>
         <div class="margin-top inner-block reportFilterWith2" :colon="false" :column="2">
           <div class="dateOption" style="padding-bottom: 12px;">
@@ -34,8 +36,8 @@
             <p @click="setTimeByDays(30)">最近30天</p>
           </div>
           <div style="display: flex;align-items: center;padding-bottom: 12px;">
-            <el-button type="primary" style="margin-right:12px" size="small" @click="getList()">查询</el-button>
-            <el-button size="small" @click="reset()">重置</el-button>
+            <el-button type="primary" style="margin-right:12px" @click="getList()">查询</el-button>
+            <el-button @click="reset()">重置</el-button>
           </div>
         </div>
       </div>
@@ -46,8 +48,8 @@
             举报列表
           </div>
           <div>
-            <el-button size="small" @click="updateState(handleList, '已驳回')">批量驳回</el-button>
-            <el-button size="small" @click="updateState(handleList, '已下架')">批量下架</el-button>
+            <el-button @click="updateState(handleList, '已驳回')">批量驳回</el-button>
+            <el-button @click="updateState(handleList, '已下架')">批量下架</el-button>
           </div>
         </div>
 
@@ -261,11 +263,16 @@
         </el-tabs>
 
 
-        <div class="foot-pages">
-          <el-pagination v-model:current-page="currentPage4" v-model:page-size="pageSize4" :page-sizes="[10, 20, 30, 40]"
-            :small="small" :disabled="disabled" background layout="total, sizes, prev, pager, next, jumper" :total="400"
-            @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        <div style="margin-top: 40px;display: flex;justify-content: flex-end;align-items: center;">
+          <div style="margin-right: 15px;">
+            共<span>{{ pages.total }}</span>条
+          </div>
+          <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" :small="small"
+            :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
+            @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
         </div>
+
+
       </div>
     </div>
   </div>
@@ -274,19 +281,63 @@
 <script setup>
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Select } from '@element-plus/icons-vue'
-import { ref, markRaw } from "vue";
+import { ref, markRaw, onMounted, reactive } from "vue";
 import { useRouter } from 'vue-router';
 const router = useRouter()
 
-
-const options = ref([])
-const value = ref('')
-const input = ref('')
-const params = ref({
-  startTime: "",
-  endTime: "",
-  date: "",
+//分页条数据
+const pages = ref({
+  total: 1000,
+  currentPage: 1,
+  limit: 10
 })
+
+const formData = reactive({
+  UniqueCode: "",
+  Title: "",
+  Role: "",
+  CollectId: "",
+  QState: null,
+  PageIndex: 1,
+  PageSize: 8,
+  time: null
+})
+
+//日期选择器日期变化
+const changeTime = (value) => {
+  console.log('日期选择器发生变化', value);
+}
+
+const formatDate = (time) => {
+  const y = time.getFullYear();
+  const yy = y < 10 ? '0' + y : y
+  const m = time.getMonth() + 1;
+  const mm = m < 10 ? '0' + m : m
+  const d = time.getDate();
+  const dd = d < 10 ? '0' + d : d
+  return `${yy}-${mm}-${dd}`;
+}
+
+const setTimeByDays = (value) => {
+  console.log('点击日期', value);
+  const end = new Date()
+  const start = new Date()
+  if (value == 1) {
+    // const date = new Date()
+    start.setTime(start.getTime() - 3600 * 1000 * 24)
+    end.setTime(end.getTime() - 3600 * 1000 * 24)
+  } else if (value == 7) {
+    start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+  } else if (value == 30) {
+    start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+  }
+  //对获取到的时间进行格式化
+  formData.time = [formatDate(start), formatDate(end)]
+  // console.log('form的time', formData.time);
+}
+
+
+
 const tableData = ref([
   {
     uniqueCode: '123456456755',
@@ -296,23 +347,11 @@ const tableData = ref([
     },
     phoneNumber: '12121212121',
     state: 1,
-
-
   }
 ])
-const currentPage = ref(1)
-const userLength = ref(0)
-const TotalPage = ref(0)
-const formData = ref({
-  UniqueCode: "",
-  Title: "",
-  Role: "",
-  CollectId: "",
-  QState: null,
-  PageIndex: 1,
-  PageSize: 8
-})
-const time = ref(null)
+
+
+// const time = ref(null)
 const handleList = ref([])
 const traslate2APIState = ref({
   // 待处理: 1,
@@ -370,6 +409,13 @@ const reject = () => {
   })
 
 }
+
+
+onMounted(() => {
+  document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
+
+})
+
 
 </script>
   

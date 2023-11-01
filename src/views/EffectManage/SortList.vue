@@ -22,12 +22,12 @@
                <div style="margin-right: 25px;margin-left: 15px;display: flex;align-items: center;">
                   日期
                </div>
-               <el-date-picker v-model="params.date" value-format="yyyy/MM/dd" format="yyyy/MM/dd"
-                  :picker-options="pickerOptions" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
+               <el-date-picker v-model="form.time" format="YYYY-MM-DD" value-format="YYYY-MM-DD"
+                  type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
                   style="float:left">
                </el-date-picker>
-               <div class=" " v-for="(item, index) in daysArr" :key="index">
-                  <div @click="daysChoose(index)"
+               <div class=" " v-for="(item, index) in daysArr" :key="index" style="cursor: pointer;">
+                  <div @click="setTimeByDays(index)"
                      style="margin:0 12px;width: 60px;line-height: 32px;font-size: 14px;margin:0 15px">
                      {{ item }}
                   </div>
@@ -81,10 +81,13 @@
          </el-table>
 
 
-         <div style="margin-top: 40px;display: flex;justify-content: flex-end;">
-            <el-pagination v-model:current-page="currentPage4" v-model:page-size="pageSize4" :page-sizes="[10, 20, 30, 40]"
-               :small="small" :disabled="disabled" background layout="total, sizes, prev, pager, next, jumper" :total="400"
-               @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+         <div style="margin-top: 40px;display: flex;justify-content: flex-end;align-items: center;">
+            <div style="margin-right: 15px;">
+               共<span>{{ pages.total }}</span>条
+            </div>
+            <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" :small="small"
+               :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
+               @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
          </div>
 
       </div>
@@ -106,9 +109,10 @@
             </el-select>
          </el-form-item>
          <el-form-item label="类别底图" prop="backImg">
-            <el-upload v-model:file-list="fileList" action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-               list-type="picture-card" :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
-               <el-icon>
+            <el-upload class="avatar-uploader" action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+               :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+               <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+               <el-icon v-else class="avatar-uploader-icon">
                   <Plus />
                </el-icon>
             </el-upload>
@@ -130,8 +134,17 @@
 </template>
   
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+
+
+//分页条数据
+const pages = ref({
+   total: 1000,
+   currentPage: 1,
+   limit: 10
+
+})
 
 const pickerOptions = ref({
    disabledDate(time) {
@@ -140,11 +153,7 @@ const pickerOptions = ref({
    }
 
 })
-const params = ref({
-   startTime: '',
-   endTime: '',
-   date: ''
-})
+
 const daysArr = ref(['今日', '昨日', '最近7天', '最近30天'])
 
 
@@ -230,12 +239,43 @@ const tableData = ref([
 const type = ref('add')
 const addDialogVisible = ref(false)
 //表单数据
-const form = ref({
+const form = reactive({
    sortName: '',
    sortRank: null,
    backImg: '',
    desc: '',
+   time: null
 })
+const formatDate = (time) => {
+   const y = time.getFullYear();
+   const yy = y < 10 ? '0' + y : y
+   const m = time.getMonth() + 1;
+   const mm = m < 10 ? '0' + m : m
+   const d = time.getDate();
+   const dd = d < 10 ? '0' + d : d
+   return `${yy}-${mm}-${dd}`;
+}
+
+const setTimeByDays = (value) => {
+   console.log('点击日期', value);
+   const end = new Date()
+   const start = new Date()
+   if (value == 1) {
+      // const date = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24)
+      end.setTime(end.getTime() - 3600 * 1000 * 24)
+   } else if (value == 2) {
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+   } else if (value == 3) {
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+   }
+   //对获取到的时间进行格式化
+   form.time = [formatDate(start), formatDate(end)]
+   // console.log('form的time', formData.time);
+}
+
+
+
 const rules = reactive({
    sortName: [
       { required: true, message: '请输入类型名称', trigger: 'blur' },
@@ -264,14 +304,14 @@ const editSort = () => {
 
 //完成
 const finish = (type) => {
-   addDialogVisible.value=false
-   if (type== 'add') {
+   addDialogVisible.value = false
+   if (type == 'add') {
       ElMessage({
          message: '新建成功',
          type: 'success',
       })
    }
-   if (type== 'edit') {
+   if (type == 'edit') {
       ElMessage({
          message: '修改成功',
          type: 'success',
@@ -279,12 +319,18 @@ const finish = (type) => {
    }
 }
 //删除
-const delItem=()=>{
+const delItem = () => {
    ElMessage({
-         message: '删除成功',
-         type: 'success',
-      })
+      message: '删除成功',
+      type: 'success',
+   })
 }
+
+onMounted(() => {
+   document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
+
+})
+
 </script>
   
 <style scoped lang="scss">
@@ -310,5 +356,32 @@ const delItem=()=>{
       align-items: center;
       justify-content: space-between;
    }
+}
+
+:deep(.avatar-uploader .el-upload) {
+   border: 1px dashed #d9d9d9;
+   border-radius: 6px;
+   cursor: pointer;
+   position: relative;
+   overflow: hidden;
+}
+
+:deep(.avatar-uploader .el-upload:hover) {
+   border-color: #409EFF;
+}
+
+:deep(.avatar-uploader-icon) {
+   font-size: 28px;
+   color: #8c939d;
+   width: 178px;
+   height: 178px;
+   line-height: 178px;
+   text-align: center;
+}
+
+:deep(.avatar) {
+   width: 178px;
+   height: 178px;
+   display: block;
 }
 </style>

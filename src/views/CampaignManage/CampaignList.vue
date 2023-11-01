@@ -7,42 +7,59 @@
     </div>
 
     <div class="card-content">
-      <div style="display: flex; font-size: 15px; align-items: center+;">
-        <div style="display: flex; align-items: center;">
-          <span style="margin: 0 10px">关键字</span>
-          <el-input v-model="keyword" placeholder="请输入ID/手机号" style="width: 200px" />
+      <div style=" font-size: 15px; ">
+        <div style="display: flex; font-size: 15px; align-items: center;">
+          <div style="display: flex; align-items: center;">
+            <span style="margin: 0 10px">关键字</span>
+            <el-input v-model="keyword" placeholder="请输入ID/手机号" style="width: 200px" />
+          </div>
+          <div style="display: flex; align-items: center;font-size: 15px;">
+            <span style="line-height:32px;width:64px;margin: 0 12px;vertical-align: middle;">订单状态</span>
+            <el-select v-model="orderStateSelect" class="m-2" placeholder="不限">
+              <el-option label="待支付" value="0" />
+              <el-option label="进行中" value="1" />
+              <el-option label="已完成" value="2" />
+              <el-option label="取消" value="3" />
+              <el-option label="超时" value="4" />
+            </el-select>
+          </div>
+          <div style="display: flex;align-items: center;font-size: 15px;">
+            <span style="line-height:32px;width:64px;margin: 0 12px;vertical-align: middle;">进行状态</span>
+            <el-select v-model="doingStateSelect" class="m-2" placeholder="不限">
+              <el-option label="进行中" value="0" />
+              <el-option label="上传方案（投稿中）" value="1" />
+              <el-option label="待评选" value="2" />
+              <el-option label="方案上传中" value="3" />
+              <el-option label="评选中" value="4" />
+            </el-select>
+          </div>
         </div>
-        <div style="display: flex; align-items: center;font-size: 15px;">
-          <span style="line-height:32px;width:64px;margin: 0 12px;vertical-align: middle;">订单状态</span>
-          <el-select v-model="orderStateSelect" class="m-2" placeholder="不限" >
-            <el-option label="待支付" value="0" />
-            <el-option label="进行中" value="1" />
-            <el-option label="已完成" value="2" />
-            <el-option label="取消" value="3" />
-            <el-option label="超时" value="4" />
-          </el-select>
-        </div>
-        <div style="display: flex;align-items: center;font-size: 15px;">
-          <span style="line-height:32px;width:64px;margin: 0 12px;vertical-align: middle;">进行状态</span>
 
-          <el-select v-model="doingStateSelect" class="m-2" placeholder="不限">
-            <el-option label="进行中" value="0" />
-            <el-option label="上传方案（投稿中）" value="1" />
-            <el-option label="待评选" value="2" />
-            <el-option label="方案上传中" value="3" />
-            <el-option label="评选中" value="4" />
-          </el-select>
+        <div style="display:flex;align-items:center;margin-top:20px;">
+          <div class="" style="line-height:32px;width:70px;margin: 0 12px;vertical-align: middle;">
+            提交时间
+          </div>
+          <el-date-picker v-model="time" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期" width="300px"
+            format="YYYY-MM-DD" value-format="YYYY-MM-DD" />
+          <div class="dateOption">
+            <p @click="setTimeByDays(0)">今天</p>
+            <p @click="setTimeByDays(1)">昨天</p>
+            <p @click="setTimeByDays(7)">最近7天</p>
+            <p @click="setTimeByDays(30)">最近30天</p>
+          </div>
+          <el-button type="primary" style="margin:0 20px">查询</el-button>
+          <el-button>重置</el-button>
         </div>
 
-        <div class="" style="line-height:32px;width:64px;margin: 0 12px;vertical-align: middle;">
-          提交时间
-        </div>
-        <el-date-picker v-model="pickTime" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期" width="300px"
-          />
-        <el-button type="primary" style="margin:0 20px" >查询</el-button>
-        <el-button>重置</el-button>
+
       </div>
     </div>
+
+
+
+
+
+
     <div style="padding: 30px; background-color: white;">
       <el-table ref="multipleTableDevice" :data="tableData" style="width: 100%;"
         :header-cell-style="{ background: '#F2F3F8' }" max-height="380" :row-style="{ height: 40 + 'px' }"
@@ -84,16 +101,17 @@
           </template>
         </el-table-column>
       </el-table>
-      <div style="margin-top: 40px;display: flex;justify-content: flex-end;">
-        <el-pagination v-model:current-page="currentPage4" v-model:page-size="pageSize4" :page-sizes="[10, 20, 30, 40]"
-          :small="small" :disabled="disabled" background layout="total, sizes, prev, pager, next, jumper" :total="400"
-          @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+      <div style="margin-top: 40px;display: flex;justify-content: flex-end;align-items: center;">
+        <div style="margin-right: 15px;">
+          共<span>{{ pages.total }}</span>条
+        </div>
+        <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" :small="small"
+          :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
+          @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
       </div>
 
-      <!-- <el-pagination style="float:right;margin-right:15px;" v-model:current-page="page.current"
-        v-model:page-size="page.limit" :page-sizes="[10, 20, 30, 40]" :small="small" :disabled="disabled"
-        :background="background" layout=" sizes, prev, pager, next, jumper" :total="page.total"
-        @size-change="handleSizeChange" @current-change="handleCurrentChange" /> -->
+
+
     </div>
 
 
@@ -102,15 +120,17 @@
 </template>
   
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-const router=useRouter()
+const router = useRouter()
 
-// const  page=ref({
-//         current: 1,
-//         limit: 10,
-//         total: 1000,
-//       })
+//分页条数据
+const pages = ref({
+  total: 1000,
+  currentPage: 1,
+  limit: 10
+
+})
 
 const tableData = ref([
   {
@@ -169,7 +189,36 @@ const tableData = ref([
   },
 ])
 const keyword = ref('') //关键字
-const pickTime = ref('')
+const time = ref(null)
+
+const formatDate1 = (time) => {
+  const y = time.getFullYear();
+  const yy = y < 10 ? '0' + y : y
+  const m = time.getMonth() + 1;
+  const mm = m < 10 ? '0' + m : m
+  const d = time.getDate();
+  const dd = d < 10 ? '0' + d : d
+  return `${yy}-${mm}-${dd}`;
+}
+
+const setTimeByDays = (value) => {
+  console.log('点击日期', value);
+  const end = new Date()
+  const start = new Date()
+  if (value == 1) {
+    // const date = new Date()
+    start.setTime(start.getTime() - 3600 * 1000 * 24)
+    end.setTime(end.getTime() - 3600 * 1000 * 24)
+  } else if (value == 7) {
+    start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+  } else if (value == 30) {
+    start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+  }
+  //对获取到的时间进行格式化
+  time.value = [formatDate1(start), formatDate1(end)]
+  // console.log('form的time', formData.time);
+}
+
 
 
 //格式化时间
@@ -229,6 +278,10 @@ const showDetail = (row) => {
   })
 }
 
+onMounted(() => {
+  document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
+
+})
 </script>
   
 <style lang="scss" scoped>
@@ -243,5 +296,18 @@ const showDetail = (row) => {
   //   align-items: center;
   //   justify-content: space-between;
   // }
+}
+
+.dateOption {
+  // transform: translate(-40px);
+  display: flex;
+  align-items: center;
+  width: 70%;
+  margin-left: 20px;
+  cursor: pointer;
+
+  p{
+    margin-left: 20px;
+  }
 }
 </style>

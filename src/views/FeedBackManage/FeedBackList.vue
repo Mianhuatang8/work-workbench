@@ -12,7 +12,7 @@
             <div style="display: flex; justify-content: space-between;">
                <div style="display: flex;align-items: center;">
                   <div style="margin-right: 10px;">平台内容</div>
-                  <el-select placeholder="请选择平台内容" style="width:270px"  v-model="formData.QState">
+                  <el-select placeholder="请选择平台内容" style="width:270px" v-model="formData.QState">
                      <el-option label="质量" value="0"></el-option>
                      <el-option label="风格" value="1"></el-option>
                      <el-option label="数量" value="2"></el-option>
@@ -27,7 +27,7 @@
 
                <div style="display: flex;align-items: center;">
                   <div style="margin-right: 10px;">问题类型</div>
-                  <el-select placeholder="请选择问题类型" style="width:270px"  v-model="formData.QState">
+                  <el-select placeholder="请选择问题类型" style="width:270px" v-model="formData.QState">
                      <el-option label="使用咨询" value="0"></el-option>
                      <el-option label="需求建议" value="1"></el-option>
                      <el-option label="BUG" value="2"></el-option>
@@ -39,8 +39,9 @@
                <div style="display: flex;align-items: center; ">
                   <div style="margin-right: 10px;">反馈日期</div>
                   <!-- style="width:270px;" -->
-                  <el-date-picker v-model="time" @change="changeTime" value-format="yyyy-MM-dd"
-                     type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+                  <el-date-picker v-model="formData.time" @change="changeTime" format="YYYY-MM-DD" value-format="YYYY-MM-DD"
+                   type="daterange"
+                     range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
                   </el-date-picker>
                   <div class="dateOption">
                      <p @click="setTimeByDays(0)">今天</p>
@@ -52,8 +53,8 @@
 
 
                <div style="display: flex;align-items: center;">
-                  <el-button type="primary" style="margin-right:12px"  @click="getList()">查询</el-button>
-                  <el-button  @click="reset()">重置</el-button>
+                  <el-button type="primary" style="margin-right:12px" @click="getList()">查询</el-button>
+                  <el-button @click="reset()">重置</el-button>
                </div>
             </div>
 
@@ -123,12 +124,15 @@
             </el-tabs>
 
 
-            <div class="foot-pages">
-               <el-pagination v-model:current-page="currentPage4" v-model:page-size="pageSize4"
-                  :page-sizes="[10, 20, 30, 40]" :small="small" :disabled="disabled" background
-                  layout="total, sizes, prev, pager, next, jumper" :total="400" @size-change="handleSizeChange"
-                  @current-change="handleCurrentChange" />
+            <div style="margin-top: 40px;display: flex;justify-content: flex-end;align-items: center;">
+               <div style="margin-right: 15px;">
+                  共<span>{{ pages.total }}</span>条
+               </div>
+               <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" :small="small"
+                  :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
+                  @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
             </div>
+
          </div>
       </div>
    </div>
@@ -143,6 +147,14 @@ import { reactive, toRefs, ref, onMounted, nextTick, getCurrentInstance } from '
 // 依赖引入
 import FileSaver from "file-saver";
 import * as XLSX from 'xlsx'
+
+//分页条数据
+const pages = ref({
+   total: 1000,
+   currentPage: 1,
+   limit: 10
+
+})
 
 const router = useRouter()
 
@@ -189,17 +201,44 @@ const tableData = ref([
    },
 ])
 //收集表单数据
-const formData = ref({
+const formData = reactive({
    UniqueCode: "",
    Title: "",
    Role: "",
    CollectId: "",
    QState: null,
    PageIndex: 1,
-   PageSize: 8
+   PageSize: 8,
+   time:null
 })
+const formatDate = (time) => {
+  const y = time.getFullYear();
+  const yy = y < 10 ? '0' + y : y
+  const m = time.getMonth() + 1;
+  const mm = m < 10 ? '0' + m : m
+  const d = time.getDate();
+  const dd = d < 10 ? '0' + d : d
+  return `${yy}-${mm}-${dd}`;
+}
 
-const time = ref(null)
+const setTimeByDays = (value) => {
+  console.log('点击日期', value);
+  const end = new Date()
+  const start = new Date()
+  if (value == 1) {
+    // const date = new Date()
+    start.setTime(start.getTime() - 3600 * 1000 * 24)
+    end.setTime(end.getTime() - 3600 * 1000 * 24)
+  } else if (value == 7) {
+    start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+  } else if (value == 30) {
+    start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+  }
+  //对获取到的时间进行格式化
+  formData.time = [formatDate(start), formatDate(end)]
+  // console.log('form的time', formData.time);
+}
+
 
 const activeName = ref('all')
 const getStateColor = (row) => {
@@ -253,11 +292,11 @@ function close() {
 //确定导出excel文件
 const file_name = ref('')
 function save() {
-   dialog.value=false
+   dialog.value = false
    ElMessage({
       message: '导出成功',
       type: 'success',
-    })
+   })
    nextTick(function () {
       let filename = ''
       const xlsxParam = { raw: true } //转化成Excel使用原始格式
@@ -266,7 +305,7 @@ function save() {
          // 默认导出文件名
          filename = '反馈列表.xlsx'
       } else {
-         filename =file_name.value += '.xlsx'
+         filename = file_name.value += '.xlsx'
       }
       const wbout = XLSX.write(elTable, { bookType: 'xlsx', bookSST: true, type: 'array' })
       try {
@@ -279,6 +318,14 @@ function save() {
       return wbout
    })
 }
+
+
+
+
+onMounted(() => {
+   document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
+
+})
 
 </script>
    

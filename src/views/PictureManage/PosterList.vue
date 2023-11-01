@@ -12,7 +12,7 @@
             <el-button type="primary" style="margin-right: 8px;" @click="addPhoto()">+&nbsp;新建</el-button>
             <div style="display: flex;">
                <el-button type="primary" plain>批量操作</el-button>
-               <el-button type="danger" plain @click="delSome()">删除</el-button>
+               <el-button type="danger" plain @click="delSome">删除</el-button>
             </div>
          </div>
 
@@ -48,12 +48,14 @@
          </el-table>
 
 
-         <div style="margin-top: 40px;display: flex;justify-content: flex-end;">
-            <el-pagination v-model:current-page="currentPage4" v-model:page-size="pageSize4" :page-sizes="[10, 20, 30, 40]"
-               :small="small" :disabled="disabled" background layout="total, sizes, prev, pager, next, jumper" :total="400"
-               @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+         <div style="margin-top: 40px;display: flex;justify-content: flex-end;align-items: center;">
+            <div style="margin-right: 15px;">
+               共<span>{{ pages.total }}</span>条
+            </div>
+            <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" :small="small"
+               :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
+               @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
          </div>
-
       </div>
    </div>
 
@@ -63,33 +65,21 @@
       :before-close="handleClose">
       <div>
          <div style="font-size: 16px;margin-bottom: 20px;" v-if="type != 'look'">上传图片</div>
-         <el-upload v-if="type == 'add'" class="upload-demo" drag
-            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" multiple>
-            <el-icon class="el-icon--upload">
-               <Plus />
-            </el-icon>
-            <div class="el-upload__text">
-               点击上传图片
-            </div>
-         </el-upload>
 
-         <!-- 照片墙 -->
-         <el-upload v-if="type == 'edit'" v-model:file-list="fileList"
-            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" list-type="picture-card"
-            :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
-            <el-icon>
+         <el-upload class="avatar-uploader" action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+            :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload"
+            v-if="type != 'look'">
+            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+            <el-icon v-else class="avatar-uploader-icon">
                <Plus />
             </el-icon>
          </el-upload>
-         <!-- 预览图片 -->
-         <el-dialog v-model="dialogVisible">
-            <img w-full :src="dialogImageUrl" alt="Preview Image" />
-         </el-dialog>
-
          <!-- 查看图片 -->
-         <div style="margin: 0 auto;width: 250px;">
-            <img :src="form.imgSrc" alt="" style="width: 250px;height: 250px;" v-if="type == 'look'">
+         <div v-else style="margin: 0 auto;width: 250px;">
+            <img :src="form.imgSrc" style="width: 250px;height: 250px;" v-if="type == 'look'"
+               @click="lookBigPhoto(form.imgSrc)">
          </div>
+
       </div>
 
       <div>
@@ -103,12 +93,34 @@
          </span>
       </template>
    </el-dialog>
+
+
+   <!-- 三种模式查看图片 -->
+   <el-dialog v-model="bigImgDialogVisible" width="50%">
+      <div style=" margin-bottom: 10px;">
+         <el-button @click="one">默认（1：1）</el-button>
+         <el-button @click="fourThree">默认（4：3）</el-button>
+         <el-button @click="threeFour">默认（3：4）</el-button>
+         <el-button @click="big">放大</el-button>
+         <el-button @click="all">全屏</el-button>
+      </div>
+      <img :src="form.imgSrc" alt="Preview Image" />
+   </el-dialog>
 </template>
   
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { UploadFilled, Plus, Select } from '@element-plus/icons-vue'
+
+
+//分页条数据
+const pages = ref({
+   total: 1000,
+   currentPage: 1,
+   limit: 10
+
+})
 
 const tableData = ref([
    {
@@ -166,8 +178,6 @@ const lookPhoto = () => {
 
 }
 
-const fileList = ref([])
-
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
 
@@ -175,24 +185,24 @@ const dialogVisible = ref(false)
 const handleRemove = (uploadFile, uploadFiles) => {
    console.log(uploadFile, uploadFiles)
 }
-
 const handlePictureCardPreview = (uploadFile) => {
    dialogImageUrl.value = uploadFile.url
    dialogVisible.value = true
 }
+
 //完成
 const finish = (type) => {
    addDialogVisible.value = false
 
    if (type == 'add') {
       ElMessageBox.alert('新建成功', '提示', {
-         icon:Select,
+         icon: Select,
          confirmButtonText: 'OK',
       })
    }
    if (type == 'edit') {
       ElMessageBox.alert('修改成功', '提示', {
-         icon:Select,
+         icon: Select,
          confirmButtonText: 'OK',
       })
    }
@@ -200,11 +210,55 @@ const finish = (type) => {
 }
 //批量删除
 const delSome = () => {
-  ElMessageBox.alert('批量删除成功', '提示', {
-    icon: Select,
-    confirmButtonText: 'OK',
-  })
+   ElMessageBox.alert('批量删除成功', '提示', {
+      icon: Select,
+      confirmButtonText: 'OK',
+   })
 }
+
+
+
+const bigImgDialogVisible = ref(false)
+
+//点击图片查看大图
+const lookBigPhoto = (imgSrc) => {
+
+   form.imgSrc = imgSrc
+   bigImgDialogVisible.value = true
+
+}
+
+onMounted(() => {
+   document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
+})
+
 </script>
   
-<style></style>
+<style lang="less" scoped>
+:deep(.avatar-uploader .el-upload) {
+   border: 1px dashed #d9d9d9;
+   border-radius: 6px;
+   cursor: pointer;
+   position: relative;
+   overflow: hidden;
+}
+
+:deep(.avatar-uploader .el-upload:hover) {
+   border-color: #409EFF;
+}
+
+:deep(.avatar-uploader-icon) {
+   font-size: 28px;
+   color: #8c939d;
+   width: 178px;
+   height: 178px;
+   line-height: 178px;
+   text-align: center;
+}
+
+:deep(.avatar) {
+   width: 178px;
+   height: 178px;
+   display: block;
+}
+</style>

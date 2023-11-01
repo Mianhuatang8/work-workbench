@@ -43,11 +43,14 @@
         </el-table-column>
       </el-table>
 
-      <div style="margin-top: 40px;display: flex;justify-content: flex-end;">
-        <el-pagination v-model:current-page="currentPage4" v-model:page-size="pageSize4" :page-sizes="[10, 20, 30, 40]"
-          :small="small" :disabled="disabled" background layout="total, sizes, prev, pager, next, jumper" :total="400"
-          @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-      </div>
+      <div style="margin-top: 40px;display: flex;justify-content: flex-end;align-items: center;">
+            <div style="margin-right: 15px;">
+               共<span>{{ pages.total }}</span>条
+            </div>
+            <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" :small="small"
+               :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
+               @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
+         </div>
 
     </div>
   </div>
@@ -82,9 +85,17 @@
 </template>
   
 <script setup>
-import { ref } from 'vue'
+import { ref,onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { UploadFilled, Plus, Select, WarningFilled } from '@element-plus/icons-vue'
+
+//分页条数据
+const pages = ref({
+   total: 1000,
+   currentPage: 1,
+   limit: 10
+
+})
 
 const tableData = ref([
   {
@@ -183,6 +194,12 @@ const delSome = () => {
     confirmButtonText: 'OK',
   })
 }
+
+
+onMounted(() => {
+   document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
+
+})
 
 </script>
   

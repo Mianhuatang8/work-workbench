@@ -1,18 +1,13 @@
 <template>
     <div class="leftNav">
-        <!-- <el-scrollbar height="100%"> -->
-        <!-- <div class="leftNav_name">
-            <el-icon style="margin-right: 8px; font-size: 18px">
-                <Monitor />
-            </el-icon>工作台
-        </div> -->
-        <!-- active-text-color="#6ea2f5" -->
         <el-menu :default-active='activePath' class="el-menu-vertical-demo" active-text-color="#6ea2f5"
             style="border: 0px;font-size: 14px;">
             <template v-for="(item, index) in router.options.routes.slice(0, 10)" :key="index">
                 <el-sub-menu :index="index + ''" v-if="item.children">
                     <template #title>
-                        <span style="padding-left: 20px">{{ item.name }}</span>
+                        <img :src="getAssetsFile(index)" style="width: 20px;height: 20px;" />
+                        <!-- <img :src="getAssetsFile_active(index)" style="width: 20px;height: 20px;" v-show="item.active"/> -->
+                        <span style="padding-left: 10px">{{ item.name }}</span>
                     </template>
                     <el-menu-item-group>
                         <el-menu-item style="padding-left: 56px" @click="goToPurpose(item2.path)" :index="item2.path"
@@ -21,7 +16,9 @@
                 </el-sub-menu>
 
                 <el-menu-item :index="index + ''" @click="goToPurpose(item.path)" v-if="!item.children">
-                    <span style="padding-left: 20px"> {{ item.name }}</span>
+                    <img :src="getAssetsFile(index)" style="width: 20px;height: 20px;" v-show="item.path!=activePath" />
+                    <img :src="getAssetsFile_active(index)" style="width: 20px;height: 20px;" v-show="item.path==activePath"/>
+                    <span style="padding-left: 10px" :style="{'color':item.path==activePath?'#6ea2f5':''}"> {{ item.name }}</span>
                 </el-menu-item>
             </template>
 
@@ -41,6 +38,13 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const activePath = ref('/')
 
+//获取图片资源
+const getAssetsFile = (index) => {
+    return new URL(`../assets/img/${index}.png`, import.meta.url).href
+}
+const getAssetsFile_active=(index)=>{
+    return new URL(`../assets/img/${index}_active.png`, import.meta.url).href
+}
 
 const currentPath = window.sessionStorage.getItem('activePath')
 if (currentPath) {
@@ -71,6 +75,7 @@ onMounted(() => {
     width: 165px;
     height: calc(100vh - 64px);
     background-color: #f5f9fc;
+    overflow-x: hidden;
     // background: url(../assets/img/bg_cebiandaohang@2.png);
     // background-size: cover;
     // background-position-y: 64px;

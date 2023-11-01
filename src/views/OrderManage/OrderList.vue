@@ -45,7 +45,8 @@
             <div style="display: flex;align-items: center;margin-top: 15px; margin-left: 20px;">
                <div style="margin-right: 10px;">下单日期</div>
                <!-- style="width:270px;" -->
-               <el-date-picker v-model="time" @change="changeTime" value-format="yyyy-MM-dd" type="daterange"
+               <el-date-picker v-model="formData.time" @change="changeTime" format="YYYY-MM-DD" value-format="YYYY-MM-DD"
+                type="daterange"
                   range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
                </el-date-picker>
                <div class="dateOption">
@@ -122,12 +123,15 @@
 
             <!-- </div> -->
 
-            <div class="foot-pages">
-               <el-pagination v-model:current-page="currentPage4" v-model:page-size="pageSize4"
-                  :page-sizes="[10, 20, 30, 40]" :small="small" :disabled="disabled" background
-                  layout="total, sizes, prev, pager, next, jumper" :total="400" @size-change="handleSizeChange"
-                  @current-change="handleCurrentChange" />
+            <div style="margin-top: 40px;display: flex;justify-content: flex-end;align-items: center;">
+            <div style="margin-right: 15px;">
+               共<span>{{ pages.total }}</span>条
             </div>
+            <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" :small="small"
+               :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
+               @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
+         </div>
+
          </div>
       </div>
    </div>
@@ -136,10 +140,15 @@
 <script setup>
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Select } from '@element-plus/icons-vue'
-import { ref, markRaw } from "vue";
+import { ref, markRaw ,onMounted,reactive} from "vue";
 import { useRouter } from 'vue-router';
 const router = useRouter()
-
+//分页条数据
+const pages = ref({
+   total: 1000,
+   currentPage: 1,
+   limit: 10
+})
 
 const options = ref([])
 const value = ref('')
@@ -199,22 +208,54 @@ const tableData = ref([
 const currentPage = ref(1)
 const userLength = ref(0)
 const TotalPage = ref(0)
-const formData = ref({
+const formData = reactive({
    UniqueCode: "",
    Title: "",
    Role: "",
    CollectId: "",
    QState: null,
    PageIndex: 1,
-   PageSize: 8
+   PageSize: 8,
+   time:null
 })
-const time = ref(null)
 const handleList = ref([])
 const traslate2APIState = ref({
    // 待处理: 1,
    // 已下架: 2,
    // 已驳回: 3,
 })
+
+const formatDate = (time) => {
+  const y = time.getFullYear();
+  const yy = y < 10 ? '0' + y : y
+  const m = time.getMonth() + 1;
+  const mm = m < 10 ? '0' + m : m
+  const d = time.getDate();
+  const dd = d < 10 ? '0' + d : d
+  return `${yy}-${mm}-${dd}`;
+}
+
+const setTimeByDays = (value) => {
+  console.log('点击日期', value);
+  const end = new Date()
+  const start = new Date()
+  if (value == 1) {
+    // const date = new Date()
+    start.setTime(start.getTime() - 3600 * 1000 * 24)
+    end.setTime(end.getTime() - 3600 * 1000 * 24)
+  } else if (value == 7) {
+    start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+  } else if (value == 30) {
+    start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+  }
+  //对获取到的时间进行格式化
+  formData.time = [formatDate(start), formatDate(end)]
+  // console.log('form的time', formData.time);
+}
+
+
+
+
 const activeName = ref('all')
 const getStateColor = (row) => {
    if (row == 0) {
@@ -277,6 +318,10 @@ const reject = () => {
    })
 
 }
+onMounted(() => {
+   document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
+
+})
 
 </script>
    

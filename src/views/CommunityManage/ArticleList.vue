@@ -11,32 +11,32 @@
       <div class="articleSearchBox">
         <el-descriptions class="margin-top" :colon="false" :column="4">
           <el-descriptions-item label="文章编号">
-            <el-input placeholder="请输入内容" size="small" style="width:270px" v-model="formData.UniqueCode"></el-input>
+            <el-input placeholder="请输入内容" style="width:270px" v-model="formData.UniqueCode"></el-input>
           </el-descriptions-item>
           <el-descriptions-item label="文章名称">
-            <el-input placeholder="请输入内容" size="small" style="width:270px" v-model="formData.Title"></el-input>
+            <el-input placeholder="请输入内容"  style="width:270px" v-model="formData.Title"></el-input>
           </el-descriptions-item>
           <el-descriptions-item label="角色">
-            <el-select placeholder="请选择" style="width:270px" size="small" v-model="formData.Role">
+            <el-select placeholder="请选择" style="width:270px"  v-model="formData.Role">
             </el-select>
           </el-descriptions-item>
           <el-descriptions-item>
-            <el-button type="primary" icon="search" style="margin-right:12px" size="small"
+            <el-button type="primary" icon="search" style="margin-right:12px" 
               @click="getList()">搜索</el-button>
-            <el-button size="small" icon="refresh" @click="reset()">重置</el-button>
+            <el-button  icon="refresh" @click="reset()">重置</el-button>
           </el-descriptions-item>
           <el-descriptions-item label="合辑分类">
-            <el-select placeholder="请选择" size="small" style="width:270px" v-model="formData.CollectId">
+            <el-select placeholder="请选择"  style="width:270px" v-model="formData.CollectId">
               <el-option v-for="item in collectionList" :key="item.id" :label="item.name" :value="item.id"></el-option>
             </el-select>
           </el-descriptions-item>
           <el-descriptions-item label="创建时间">
-            <el-date-picker v-model="time" @change="changeTime" value-format="yyyy-MM-dd" size="small" style="width:270px"
+            <el-date-picker v-model="formData.createTime" @change="changeTime" value-format="yyyy-MM-dd"  style="width:270px"
               type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
             </el-date-picker>
           </el-descriptions-item>
           <el-descriptions-item label="状态">
-            <el-select placeholder="请选择" size="small" style="width:270px" v-model="formData.QType">
+            <el-select placeholder="请选择" style="width:270px" v-model="formData.QType">
               <el-option label="已发布" :value="1"></el-option>
               <el-option label="草稿箱" :value="2"></el-option>
               <el-option label="回收站" :value="3"></el-option>
@@ -49,16 +49,16 @@
         <div class="articleContentBox_head">
           <div>
 
-            <el-button type="primary" size="small" icon="plus" @click="addArticle">新建</el-button>
+            <el-button type="primary" icon="plus" @click="addArticle">新建</el-button>
           </div>
           <div>
-            <el-button type="primary" size="small" plain @click="openMoveDl()">本页全选</el-button>
-            <el-button type="danger" size="small" plain @click="delInfo()">删除</el-button>
+            <el-button type="primary"  plain @click="openMoveDl()">批量操作</el-button>
+            <el-button type="danger"  plain @click="delSome()">删除</el-button>
           </div>
         </div>
 
-
-        <el-table height="540px" ref="multipleTableDevice" :data="tableData"
+        <!-- height="540px" -->
+        <el-table  ref="multipleTableDevice" :data="tableData"
           :header-cell-style="{ background: '#F2F3F8' }" :row-style="{ height: 40 + 'px' }"
           @selection-change="handleSelectionChange" :cell-style="iCellStyle">
           <el-table-column type="selection" width="60">
@@ -80,7 +80,7 @@
           </el-table-column>
           <el-table-column prop="title" align="center" header-align="center" show-overflow-tooltip label="文章名称">
           </el-table-column>
-       
+
           <el-table-column prop="scanCount" align="center" header-align="center" label="浏览量">
           </el-table-column>
           <el-table-column prop="likeCount" align="center" header-align="center" label="点赞量">
@@ -102,28 +102,53 @@
               <p class="openPicBtn">
                 <el-button type="text" @click="LookArticleListInfo(scope.row.id)">查看</el-button>
                 <el-button type="text" @click="editArticle(scope.row.id)">编辑</el-button>
-                <el-button type="text" @click="delItem(scope.row.id)">更多</el-button>
+                <el-dropdown @command="handleCommand"  style="vertical-align: middle; margin-left: 7px;cursor: pointer;">
+                  <span class="el-dropdown-link" style="color: #40aaff;">
+                    更多
+                  </span>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item command="publish" v-if="scope.row.cType == 2">发布</el-dropdown-item>
+                      <el-dropdown-item command="up" v-if="scope.row.cType != 2">上移</el-dropdown-item>
+                      <el-dropdown-item command="down" v-if="scope.row.cType != 2">下移</el-dropdown-item>
+                      <el-dropdown-item command="del" style="color: red;"
+                        @click="delItem(scope.row.id)">删除</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
               </p>
             </template>
           </el-table-column>
         </el-table>
 
         <!-- 分页条 -->
-        <div style="display: flex;flex-direction: row-reverse;">
-          <el-pagination v-if="tableData.length > 0" @current-change="getList" :page-size="20" background
-            layout="total,prev, pager, next, jumper" :total="totalCount">
-          </el-pagination>
-        </div>
+        <div style="margin-top: 40px;display: flex;justify-content: flex-end;align-items: center;">
+            <div style="margin-right: 15px;">
+               共<span>{{ pages.total }}</span>条
+            </div>
+            <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" :small="small"
+               :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
+               @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
+         </div>
+
       </div>
     </div>
   </div>
 </template>
   
 <script setup>
-import { ref } from "vue";
-import{useRouter} from 'vue-router'
+import { ref,onMounted } from "vue";
+import { useRouter } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
+const router = useRouter()
 
-const router=useRouter()
+//分页条数据
+const pages = ref({
+   total: 1000,
+   currentPage: 1,
+   limit: 10
+
+})
 
 const recommendDialog = ref(false)
 const recommendForm = ref({
@@ -135,36 +160,36 @@ const moveDialog = ref(false)
 const options = ref([])
 const value = ref('')
 const input = ref('')
-const params = ref({
-  startTime: "",
-  endTime: "",
-  date: "",
+// const params = ref({
+//   startTime: "",
+//   endTime: "",
+//   date: "",
 
-})
+// })
 const tableData = ref([
   {
-    hotListOrder:1,
-    uniqueCode:'121',//文章编号
-    userRole:'后台用户',//角色
-    id:'123',//用户id
-    userName:'User',
-    title:'好设计是沉思的',
-    scanCount:'11131',
-    likeCount:'110',
-    cType:1,// 1-已发布 2-草稿 3-回收 4-下架
-    createTime:'2023/09/10 12:54',
+    hotListOrder: 1,
+    uniqueCode: '121',//文章编号
+    userRole: '后台用户',//角色
+    id: '123',//用户id
+    userName: 'User',
+    title: '好设计是沉思的',
+    scanCount: '11131',
+    likeCount: '110',
+    cType: 1,// 1-已发布 2-草稿 3-回收 4-下架
+    createTime: '2023/09/10 12:54',
   },
   {
-    hotListOrder:1,
-    uniqueCode:'121',//文章编号
-    userRole:'后台用户',//角色
-    id:'123',//用户id
-    userName:'User',
-    title:'好设计是沉思的',
-    scanCount:'11131',
-    likeCount:'110',
-    cType:2,// 1-已发布 2-草稿 3-回收 4-下架
-    createTime:'2023/09/10 12:54',
+    hotListOrder: 1,
+    uniqueCode: '121',//文章编号
+    userRole: '后台用户',//角色
+    id: '123',//用户id
+    userName: 'User',
+    title: '好设计是沉思的',
+    scanCount: '11131',
+    likeCount: '110',
+    cType: 2,// 1-已发布 2-草稿 3-回收 4-下架
+    createTime: '2023/09/10 12:54',
   },
 ])
 const currentPage = ref(1)
@@ -179,13 +204,13 @@ const formData = ref({
   CollectId: "",
   CreateBeginDt: "",
   CreateEndDt: "",
-  // createTime: "",
+  createTime:null,
   QType: null,
   PageIndex: 1,
   PageSize: 20,
 
 })
-const time = ref(null)
+// const time = ref(null)
 const delList = ref([])
 const collectionList = ([])
 
@@ -230,23 +255,87 @@ const getSort = (row, scope) => {
 const addArticle = () => {
   router.push({
     path: "/articleListInfo",
+    query:{
+      type:'add'
+    }
   });
-
 }
 
 
 //查看
 const LookArticleListInfo = (id) => {
+  router.push({
+    path: "/articleListInfo",
+    query:{
+      type:'look'
+    }
+  });
 
 }
 //编辑
 const editArticle = (id) => {
+  router.push({
+    path: "/articleListInfo",
+    query:{
+      type:'edit'
+    }
+  });
 
 }
 //删除
 const delItem = (id) => {
-
+  ElMessageBox.confirm(
+    '是否确认删除该文章?',
+    {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      ElMessage({
+        type: 'success',
+        message: '删除成功',
+      })
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '取消删除',
+      })
+    })
 }
+
+//批量删除
+const delSome = () => {
+  ElMessageBox.confirm(
+    '是否确认删除选中的所有文章?',
+    {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      ElMessage({
+        type: 'success',
+        message: '删除成功',
+      })
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '取消删除',
+      })
+    })
+}
+
+
+onMounted(() => {
+   document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
+
+})
+
 
 
 </script>
@@ -258,24 +347,25 @@ const delItem = (id) => {
   margin-bottom: 20px;
 }
 
-.articleContentBox{
+.articleContentBox {
   margin-top: 30px;
-    background-color: white;
-    // border-radius: 15px;
-    padding: 30px;
-}
-.articleSearchBox{
   background-color: white;
-    padding: 20px;
-    // border-radius: 15px;
-}
-.stateIcon{
-    width: 8px;
-    height: 8px;
-    background-color: black;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 5px;
+  // border-radius: 15px;
+  padding: 30px;
 }
 
+.articleSearchBox {
+  background-color: white;
+  padding: 20px;
+  // border-radius: 15px;
+}
+
+.stateIcon {
+  width: 8px;
+  height: 8px;
+  background-color: black;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
 </style>
