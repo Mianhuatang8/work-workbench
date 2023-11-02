@@ -25,11 +25,9 @@
                     </el-form-item>
 
                     <el-form-item label="封面" prop="cover" style="position: relative;">
-                        <el-upload class="avatar-uploader" :show-file-list="false"
-                            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+                        <el-upload class="avatar-uploader" :show-file-list="false" action="#" :http-request="uploadFile"
                             :before-upload="beforeAvatarUpload" :on-preview="handlePictureCardPreview"
                             v-if="route.query.type != 'look'">
-
                             <!-- :http-request="uploadFile" action="#"-->
                             <img v-if="addForm.cover" :src="addForm.cover" class="avatar" />
                             <el-icon v-else class="avatar-uploader-icon">
@@ -38,7 +36,6 @@
                             <template #tip>
                                 <div class="el-upload__tip">
                                     <div class="el-upload__tip">建议小于20M的JPG、PNG格式图片</div>
-
                                 </div>
                             </template>
                         </el-upload>
@@ -93,7 +90,9 @@ import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import { ref, reactive, onMounted, onBeforeUnmount, shallowRef, } from "vue"
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
+
 import $ from 'jquery'
+
 const router = useRouter()
 const route = useRoute()
 console.log('1111', route.query);
@@ -102,10 +101,10 @@ console.log('1111', route.query);
 let TxtHtml;
 
 const state = ref('add')
-const addForm = ref({
+const addForm = reactive({
     title: '',
     desc: '',
-    cover: null,
+    cover: '',
     labels: [],
     content: null,
     draft: null,
@@ -155,6 +154,37 @@ const beforeAvatarUpload = (file) => {
 //预览图片
 const handlePictureCardPreview = (file) => {
     console.log(file);
+}
+//上传图片
+const uploadFile = (file) => {
+    let json;
+    addForm.cover = null;
+    let formData = new FormData();
+    formData.append("fil1", file.file);
+    $.ajax({
+        url: "https://3dapi.shixianjia.com/api/file/upload",
+        type: "POST",
+        contentType: false,
+        processData: false,
+        async: false,
+        headers: {
+            token:
+                "F45BD6CCB4BF39394DDC58F8C4B125D5271D9A11D4B1E9BB67F53FDBFB1A547B",
+        },
+        data: formData,
+        success: function (data) {
+            console.log(data.Data, 8888);
+            let url = JSON.parse(data.Data);
+            json = url;
+            // addForm.cover = url;
+        },
+    });
+    addForm.cover = json[0];
+    console.log('json[0]',json[0]);
+    console.log(addForm.cover);
+
+    console.log('11111-------');
+    console.log('点击上传图片',addForm);
 }
 
 //发布文章/保存为草稿
@@ -239,7 +269,8 @@ editorConfig.MENU_CONF['uploadImage'] = {
     server: "#",
     // 自定义上传
     async customUpload(file, insertFn) {
-        console.log(file, insertFn, "file, insertFn");
+        console.log(file, "file");
+        console.log(insertFn, 'insertFn');
         let url;
         let formData = new FormData();
         formData.append("fil1", file);

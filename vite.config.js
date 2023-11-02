@@ -13,5 +13,14 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  proxy:{
+    // '/api01':{
+    //     target:'https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15',
+    //     changeOrigin:true,
+    //     pathRewrite:{
+    //         '^/api01':''
+    //     }
+    // },
   }
 })
