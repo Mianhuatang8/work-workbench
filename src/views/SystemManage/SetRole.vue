@@ -64,11 +64,11 @@
             <el-table-column prop="id" align="center" header-align="center" label="角色ID">
             </el-table-column>
             <el-table-column prop="role" align="center" header-align="center" label="角色类型">
-               <template #default="scope">
+               <!-- <template #default="scope">
                   <div style="color: #009fff;">
                      {{ scope.row.role }}
                   </div>
-               </template>
+               </template> -->
             </el-table-column>
             <el-table-column prop="roleCode" align="center" header-align="center" label="角色编号">
             </el-table-column>
@@ -133,7 +133,6 @@
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { onMounted, ref ,reactive} from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-
 import { Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
 //分页条数据
 const pages = ref({
@@ -280,6 +279,7 @@ const delSome = () => {
       message: '删除成功',
       type: 'success',
    })
+
 }
 
 

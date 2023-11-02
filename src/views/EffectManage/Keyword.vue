@@ -22,7 +22,7 @@
 
         <el-table-column type="selection" width="60">
         </el-table-column>
-        <el-table-column prop="descWord" align="center" header-align="center" label="描述词">
+        <el-table-column prop="descWord" align="center" header-align="center" label="描述词" show-overflow-tooltip>
         </el-table-column>
         <el-table-column prop="type" align="center" header-align="center" label="类型">
         </el-table-column>

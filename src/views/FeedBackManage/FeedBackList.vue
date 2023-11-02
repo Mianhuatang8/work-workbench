@@ -78,7 +78,7 @@
                      </el-table-column>
                      <el-table-column prop="userID" align="center" header-align="center" label="用户ID" width="250">
                      </el-table-column>
-                     <el-table-column prop="title" align="center" header-align="center" label="反馈标题">
+                     <el-table-column prop="title" align="center" header-align="center" label="反馈标题" show-overflow-tooltip>
                      </el-table-column>
                      <el-table-column prop="content" align="center" header-align="center" label="平台内容">
                      </el-table-column>
@@ -88,8 +88,12 @@
                      </el-table-column>
                      <el-table-column prop="state" align="center" header-align="center" label="反馈状态">
                         <template #default="scope">
+                           <div style="display: flex;align-items: center;justify-content:center">
+                              <div :style="{ 'background-color': getStateColor(scope.row.state) }" class="stateIcon"></div>
                            <span :style="{ 'color': getStateColor(scope.row.state) }"> {{
                               getStateText(scope.row.state) }}</span>
+                           </div>
+                           
                         </template>
                      </el-table-column>
                      <el-table-column prop="time" align="center" header-align="center" label="反馈时间" width="200">
@@ -330,6 +334,15 @@ onMounted(() => {
 </script>
    
 <style lang="scss" scoped>
+
+.stateIcon {
+  width: 8px;
+  margin-left: 10px;
+  height: 8px;
+  background-color: black;
+  border-radius: 50%;
+  margin-right: 8px;
+}
 .reportSearchBox {
    // border-radius: 15px;
    background-color: #fff;

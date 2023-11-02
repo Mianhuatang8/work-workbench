@@ -1,10 +1,8 @@
 <template>
     <div class="Container" style="padding: 17px 44px;overflow: auto;">
-
         <div style="margin-bottom: 30px; font-size: 17px;">
             <span>社区管理</span>
             <span style="margin:0 5px">/</span>
-            <!-- {{ router.currentRoute.query.CollName ? router.currentRoute.query.CollName : '文章' }} -->
             <span @click="goback" style="cursor: pointer;">文章</span>
             <span style="margin:0 5px;">/</span>
             <span style="font-weight: bold;"> {{ route.query.type == 'add' ? '新增文章' : route.query.type ==
@@ -43,24 +41,30 @@
 
                                 </div>
                             </template>
-                            <!-- <div class="el-upload__tip">建议小于20M的JPG、PNG格式图片</div> -->
                         </el-upload>
+
                         <div v-else style="display: flex;flex-wrap: wrap;">
                             <img :src="addForm.cover" style="width: 146px; height: 146px;border-radius: 7px;">
                         </div>
-
                     </el-form-item>
-                    <el-form-item label="图文详情" style="width:770px" required prop="content">
-                        <div style="display:flex">
-                            <div id="editor—wrapper">
-                                <!-- <div id="toolbar-container"></div> -->
-                                <div id="editor-container">
-                                    <!-- 富文本编辑器 -->
-                                </div>
-                                <el-input id="in" type="hidden"></el-input><!--绑定输入--editor输入的绑定到这个里-->
-                            </div>
-                        </div>
 
+                    <el-form-item label="图文详情" style="width:770px" required prop="content">
+                        <div v-if="route.query.type != 'look'">
+                            <div style="width:600px">
+                                <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef"
+                                    :defaultConfig="toolbarConfig" :mode="mode" />
+                                <Editor style="height: 400px; overflow-y: hidden;" v-model="addForm.valueHtml"
+                                    :defaultConfig="editorConfig" :mode="mode" @onCreated="handleCreated" />
+                            </div>
+
+                        </div>
+                        <!-- 查看 -->
+                        <div v-else style="width: 100%; background-color: #f5f7fa;
+                             min-height: 300px;overflow-y: scroll;display: flex;flex-wrap: wrap;">
+                            <!-- <img :src="form.detailImgSrc" style="width: 200px;height: 200px;margin: 0 auto;margin-top: 10px;"> -->
+                            <div style="line-height: 20px;padding: 15px;">{{ addForm.detailText }}</div>
+
+                        </div>
 
                     </el-form-item>
 
@@ -70,7 +74,7 @@
                         <el-button type="primary" @click="publishArticle(0)" v-if="route.query.type != 'look'">{{
                             route.query.type == 'edit' ? '提交' : '发布'
                         }}</el-button>
-                        <el-button plain v-if="route.query.type == 'look'" @click="router.back()">返回</el-button>
+                        <el-button plain v-if="route.query.type == 'look'" @click="goToList()">返回</el-button>
                         <el-button @click="gotoEdit()" v-if="route.query.type == 'look'" type="primary">去编辑</el-button>
                     </el-form-item>
 
@@ -84,25 +88,17 @@
 </template>
     
 <script setup>
-import { ref, reactive, onMounted } from "vue"
+import '@wangeditor/editor/dist/css/style.css' // 引入 css
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+import { ref, reactive, onMounted, onBeforeUnmount, shallowRef, } from "vue"
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import EWangEditor from "wangeditor";
-//富文本编辑器
-// import Vue3Tinymce from '@jsdawn/vue3-tinymce';
-
 import $ from 'jquery'
 const router = useRouter()
 const route = useRoute()
 console.log('1111', route.query);
 
-// const textState = reactive({
-//     content: 'hello vue3-tinymce!',
-//     // editor 配置项
-//     setting: {
-//         height: 400 // editor 高度
-//     }
-// });
+
 let TxtHtml;
 
 const state = ref('add')
@@ -115,6 +111,8 @@ const addForm = ref({
     draft: null,
     audit: 0,
     collectId: null,
+    detailText: '',
+    valueHtml: '<p>hello</p>'
 })
 
 var validateContent = (rule, value, callback) => {
@@ -158,34 +156,6 @@ const beforeAvatarUpload = (file) => {
 const handlePictureCardPreview = (file) => {
     console.log(file);
 }
-//上传图片发起请求
-const uploadFile = (file) => {
-    let json;
-    addForm.cover = null;
-    let formData = new FormData();
-    formData.append("fil1", file.file);
-    $.ajax({
-        url: "https://3dapi.shixianjia.com/api/file/upload",
-        type: "POST",
-        contentType: false,
-        processData: false,
-        async: false,
-        headers: {
-            token:
-                "F45BD6CCB4BF39394DDC58F8C4B125D5271D9A11D4B1E9BB67F53FDBFB1A547B",
-        },
-        data: formData,
-        success: function (data) {
-            console.log(data.Data, 8888);
-            let url = JSON.parse(data.Data);
-            json = url;
-            // this.addForm.cover = url;
-        },
-    });
-    addForm.cover = json[0];
-    console.log(json);
-}
-
 
 //发布文章/保存为草稿
 const publishArticle = async (val) => {
@@ -228,190 +198,108 @@ const gotoEdit = () => {
         }
     });
 }
+const goToList = () => {
+    router.push({
+        path: '/communityManage/articleList'
+    })
+}
 
 
+// 编辑器实例
+const editorRef = shallowRef()
+//模式
+const mode = ref('simple')
+
+// // 模拟 ajax 异步获取内容
 // onMounted(() => {
-//     TxtHtml = null;
-//     // this.getCollectionList();
-//     // this.getArticleInfo();
-//     const { createEditor, createToolbar } = window.wangEditor;
-//     const editorConfig = ref({
-//         placeholder: "请输入",
-//         onChange(editor) {
-//             console.log(editor, "12321321");
-//             const html = editor.getHtml();
-//             TxtHtml = html;
-//         },
-
-//         MENU_CONF: {},
-//     })
-
-//     editorConfig.MENU_CONF["uploadImage"] = {
-//         server: "#",
-//         // 自定义上传
-//         async customUpload(file, insertFn) {
-//             console.log(file, insertFn, "file, insertFn");
-//             let url;
-//             let formData = new FormData();
-//             formData.append("fil1", file);
-//             $.ajax({
-//                 url: "https://3dapi.shixianjia.com/api/file/upload",
-//                 type: "POST",
-//                 contentType: false,
-//                 processData: false,
-//                 async: false,
-//                 headers: {
-//                     token:
-//                         "F45BD6CCB4BF39394DDC58F8C4B125D5271D9A11D4B1E9BB67F53FDBFB1A547B",
-//                 },
-//                 data: formData,
-//                 success: function (data) {
-//                     url = JSON.parse(data.Data);
-//                     console.log(url[0]);
-//                     insertFn(url[0]);
-//                 },
-//             });
-//         },
-//     };
-
-//     editorConfig.MENU_CONF["uploadVideo"] = {
-//         // 上传视频的配置
-//         server: "#",
-//         async customUpload(file, insertFn) {
-//             console.log(file, insertFn, "file, insertFn");
-//             let url;
-//             let formData = new FormData();
-//             formData.append("fil1", file);
-//             $.ajax({
-//                 url: "https://3dapi.shixianjia.com/api/file/upload",
-//                 type: "POST",
-//                 contentType: false,
-//                 processData: false,
-//                 async: false,
-//                 headers: {
-//                     token:
-//                         "F45BD6CCB4BF39394DDC58F8C4B125D5271D9A11D4B1E9BB67F53FDBFB1A547B",
-//                 },
-//                 data: formData,
-//                 success: function (data) {
-//                     url = JSON.parse(data.Data);
-//                     console.log(url[0]);
-//                     insertFn(url[0]);
-//                 },
-//             });
-//         },
-//     };
-
 //     setTimeout(() => {
-//         const editor = createEditor({
-//             selector: "#editor-container",
-//             html: TxtHtml1 ? TxtHtml1 : "<p><br></p>",
-//             config: editorConfig,
-//             mode: "default", // or 'simple'
-//         });
-
-//         const toolbar = createToolbar({
-//             editor,
-//             selector: "#toolbar-container",
-//             config: toolbarConfig,
-//             mode: "default", // or 'simple'
-//             editorConfig: editorConfig,
-//             insertKeys: {
-//                 keys: ["uploadAttachment"], // 查看名称
-//             },
-//         });
-//     }, 1);
-//     /* 工具栏... */
-//     const toolbarConfig = {
-//         toolbarKeys: [
-//             "undo",
-//             "redo",
-//             "justifyCenter",
-//             "justifyLeft",
-//             "justifyRight",
-//             "uploadImage",
-//             "uploadVideo",
-//         ],
-//     };
-
-
-
-
+//         valueHtml.value = '<p>模拟 Ajax 异步设置内容</p>'
+//     }, 1500)
 // })
 
+//工具栏
+const toolbarConfig = {
+    toolbarKeys: [
+        "undo",
+        "redo",
+        "justifyCenter",
+        "justifyLeft",
+        "justifyRight",
+        "uploadImage",
+        "uploadVideo",
+    ]
+}
+const editorConfig = {
+    placeholder: '请输入内容...',
+    MENU_CONF: {}
+}
 
 
-//
+editorConfig.MENU_CONF['uploadImage'] = {
+    server: "#",
+    // 自定义上传
+    async customUpload(file, insertFn) {
+        console.log(file, insertFn, "file, insertFn");
+        let url;
+        let formData = new FormData();
+        formData.append("fil1", file);
+        $.ajax({
+            url: "https://3dapi.shixianjia.com/api/file/upload",
+            type: "POST",
+            contentType: false,
+            processData: false,
+            async: false,
+            headers: {
+                token:
+                    "F45BD6CCB4BF39394DDC58F8C4B125D5271D9A11D4B1E9BB67F53FDBFB1A547B",
+            },
+            data: formData,
+            success: function (data) {
+                url = JSON.parse(data.Data);
+                console.log(url[0]);
+                insertFn(url[0]);
+            },
+        });
+    },
+}
+editorConfig.MENU_CONF['uploadVideo'] = {
+    // 上传视频的配置
+    server: "#",
+    async customUpload(file, insertFn) {
+        console.log(file, insertFn, "file, insertFn");
+        let url;
+        let formData = new FormData();
+        formData.append("fil1", file);
+        $.ajax({
+            url: "https://3dapi.shixianjia.com/api/file/upload",
+            type: "POST",
+            contentType: false,
+            processData: false,
+            async: false,
+            headers: {
+                token:
+                    "F45BD6CCB4BF39394DDC58F8C4B125D5271D9A11D4B1E9BB67F53FDBFB1A547B",
+            },
+            data: formData,
+            success: function (data) {
+                url = JSON.parse(data.Data);
+                console.log(url[0]);
+                insertFn(url[0]);
+            },
+        });
+    },
+}
 
+// 组件销毁时，也及时销毁编辑器
+onBeforeUnmount(() => {
+    const editor = editorRef.value
+    if (editor == null) return
+    editor.destroy()
+})
+const handleCreated = (editor) => {
+    editorRef.value = editor // 记录 editor 实例
+}
 
-let data = reactive({});
-onMounted(() => {
-    let editor = new EWangEditor("#editor-container");
-    editor.config.uploadImgShowBase64 = true;
-    editor.config.onchangeTimeout = 400;
-
-    editor.config.customAlert = (err) => {
-        console.log(err);
-
-    };
-    editor.customConfig = editor.customConfig
-        ? editor.customConfig
-        : editor.config;
-
-    editor.customConfig.onchange = (html) => {
-        data.editorContent = html;
-        document.getElementById('in').value = html;
-        console.log(html);
-
-    };
-    //以下为新增
-    const menuItem = [  //工具栏里有哪些工具
-        'undo',  //撤销
-        'redo', //恢复
-        'justify',  // 对齐方式
-        'image',  //插入图片
-        'video',  //插入视频
-    ];
-
-    editor.config.menus = [...menuItem]; /* 应用设置好的工具栏 */
-
-    // editor.config.colors = ["#000000", "#eeece0", "#1c487f", "#4d80bf"];  /* 文字颜色、背景色可以选择哪些颜色? */
-
-    // editor.config.fontNames = [ /* 字体工具提供哪些字体? */
-    //     "黑体",
-    //     "仿宋",
-    //     "楷体",
-    //     "标楷体",
-    //     "华文仿宋",
-    //     "华文楷体",
-    //     "宋体",
-    //     "微软雅黑",
-    // ];
-    editor.config.height = 337;  //你可能发现这个编辑器是没法用样式调高度的?
-
-
-    editor.customConfig.customUploadImg = function (files, insert) {
-        // files 是 input 中选中的文件列表
-        // insert 是获取图片 url 后，插入到编辑器的方法
-        // 在这里进行一系列的校验
-        const formData = new FormData();
-        formData.append("file", files[0]);
-        // axios.post('http://localhost:8080/itkb/square/article/uploadArticleImage', formData, {
-        //     'Content-type': 'multipart/form-data'
-        // }).then(res => {
-        //     // 上传成功后的处理
-        //     // 上传代码返回结果之后，将图片插入到编辑器中
-        //     insert(res.data)
-
-        // }, err => {
-        //     // 出现错误时的处理
-        //     console.log('上传图片失败' + err.data)
-        // })
-    }
-    //新增至此
-    editor.create();
-
-});
 </script>
     
 <style lang="less" scoped>
@@ -475,15 +363,6 @@ onMounted(() => {
     width: 764px;
 }
 
-// .articleInfoBox .el-upload__tip {
-//     margin-top: -15px;
-//     color: #BFBFBF;
-//     font-size: 12px;
-//     font-weight: 400;
-//     position: absolute;
-//     bottom: 8px;
-// }
-
 .w-e-toolbar {
     background-color: #ccc;
 }
@@ -536,7 +415,6 @@ onMounted(() => {
 :deep(.w-e-text-container) {
     border: 1px solid #dcdfe6;
     border-top: none;
-    height: 297px;
     z-index: 10000;
 }
 </style>

@@ -96,8 +96,14 @@
                      </el-table-column>
                      <el-table-column prop="orderState" align="center" header-align="center" label="订单状态">
                         <template #default="scope">
-                           <span :style="{ 'color': getStateColor(scope.row.orderState) }"> {{
+                           <div style="display: flex;align-items: center;justify-content:center">
+                              <div :style="{ 'background-color': getStateColor(scope.row.orderState) }" class="stateIcon"></div>
+                              <span :style="{ 'color': getStateColor(scope.row.orderState) }"> {{
                               getOrderStateText(scope.row.orderState) }}</span>
+                           </div>
+
+
+                          
                         </template>
                      </el-table-column>
                      <el-table-column prop="time" align="center" header-align="center" label="下单时间" width="200">
@@ -290,9 +296,12 @@ const getOrderStateText = (row) => {
 
 
 //点击查看举报详情
-const lookDetail = () => {
+const lookDetail = (row) => {
    router.push({
-      path: '/orderDetail'
+      path: '/orderDetail',
+      query:{
+         ...row
+      }
    })
 
 }
@@ -326,6 +335,15 @@ onMounted(() => {
 </script>
    
 <style lang="scss" scoped>
+.stateIcon {
+  width: 8px;
+  margin-left: 10px;
+  height: 8px;
+  background-color: black;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
 .reportSearchBox {
    // border-radius: 15px;
    background-color: #fff;

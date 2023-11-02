@@ -78,9 +78,14 @@
                             <div style="margin-bottom: 15px;">总价</div>
                             <el-input v-model="value" disabled style="margin-bottom: 10px;width: 350px;"></el-input>
                         </div>
-                        <div>
+                        <div style="width: 48%;">
                             <div style="margin-bottom: 15px;">订单状态</div>
-                            <el-input v-model="value" disabled style="margin-bottom: 10px;width: 350px;"></el-input>
+                            <div style="display: flex;align-items: center;background-color: #f5f7fa;width: 100%;height: 31px;
+                                 border: 1px solid #e4e7ed;border-radius: 5px;">
+                                <div :style="{ 'background-color': getStateColor(form.orderState) }" class="stateIcon">
+                                </div>
+                                <div>{{ getOrderStateText(form.orderState) }}</div>
+                            </div>
                         </div>
                     </div>
 
@@ -118,8 +123,10 @@
 <script setup>
 import { ElMessage } from 'element-plus'
 import { Search ,CopyDocument} from '@element-plus/icons-vue'
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import { reactive } from 'vue';
 const router = useRouter()
+const route=useRoute()
 
 const goback = () => {
     router.back();
@@ -132,9 +139,57 @@ const copyOrderCode=(value)=>{
     type: 'success',
   })
 }
+const form=reactive({
+    orderState:0,
+})
+//接收路由传递过来的参数
+console.log('订单传递过来',route);
+form.orderState=route.query.orderState
+
+const getStateColor = (row) => {
+   if (row == 0) {
+      return "#0adf0a";
+   } else if (row == 1) {
+      return "orange";
+   } else if (row == 2) {
+      return "red";
+   }
+   else if (row == 3) {
+      return "gray";
+   }
+   else if (row == 4) {
+      return "gray";
+   }
+}
+
+const getOrderStateText = (row) => {
+   if (row == 0) {
+      return "已完成";
+   } else if (row == 1) {
+      return "待付款";
+   } else if (row == 2) {
+      return "退款中";
+   } else if (row == 3) {
+      return "已关闭";
+   } else if (row == 4) {
+      return "已退款";
+   }
+}
+
+
 </script>
 
 <style lang="scss" scoped>
+
+.stateIcon {
+  width: 8px;
+  margin-left: 10px;
+  height: 8px;
+  background-color: black;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
 .main-content {
     .title {
         font-size: 17px;

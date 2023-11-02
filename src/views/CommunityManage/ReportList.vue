@@ -3,9 +3,9 @@
 
     <div>
       <div style="margin-bottom: 30px; font-size: 17px;">
-        <span style="font-weight: bold;">社区管理</span>
+        <span >社区管理</span>
         <span style="margin:0 5px;">/</span>
-        <span>举报</span>
+        <span style="font-weight: bold;">举报</span>
       </div>
 
       <div class="reportSearchBox">
@@ -48,56 +48,52 @@
             举报列表
           </div>
           <div>
-            <el-button @click="updateState(handleList, '已驳回')">批量驳回</el-button>
-            <el-button @click="updateState(handleList, '已下架')">批量下架</el-button>
+            <el-button @click="downSome()">批量驳回</el-button>
+            <el-button @click="rejectSome()">批量下架</el-button>
           </div>
         </div>
 
-        <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
-          <el-tab-pane label="全部" name="all">
+        <!-- <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick"> -->
+        <!-- <el-tab-pane label="全部" name="all"> -->
 
-            <!-- <el-table ref="multipleTableDevice" :data="tableData" :header-cell-style="{ background: '#F2F3F8' }"
-              :row-style="{ height: 40 + 'px' }" @selection-change="handleSelectionChange" :cell-style="iCellStyle"
-              style="margin-top: 10px;">
-             
+        <!-- :row-style="{ height: 40 + 'px' }" :cell-style="iCellStyle"-->
+        <el-table ref="multipleTableDevice" :data="tableData" :header-cell-style="{ background: '#F2F3F8' }"
+          @selection-change="handleSelectionChange" style="margin-top: 10px;">
+          <el-table-column type="selection" :selectable="checkSelectable" width="60">
+          </el-table-column>
+          <el-table-column prop="uniqueCode" label="举报编号">
+          </el-table-column>
+          <el-table-column prop="content" label="举报信息" show-overflow-tooltip>
 
-              <el-table-column type="selection" :selectable="checkSelectable" width="60">
-              </el-table-column> -->
-            <!-- <el-table-column prop="uniqueCode" label="举报编号">
-              </el-table-column> -->
-            <!-- <el-table-column prop="content" label="举报信息">
-                
-              </el-table-column>
-              <el-table-column prop="userInfo.userName" label="用户信息">
-              </el-table-column> -->
-            <!-- <el-table-column prop="phoneNumber" label="手机号">
-              </el-table-column> -->
-            <!-- <el-table-column prop="mAiContent.title" show-overflow-tooltip label="文章名称">
-              </el-table-column> -->
-            <!-- <el-table-column prop="QType" label="举报状态">
-                <template v-slot="scope">
-                  <div style="display: flex;flex-direction: row;align-items: center;">
-                    <div :style="{ 'background-color': getStateColor(scope.row) }" class="stateIcon"></div>
-                    <div>{{ getStateFont(scope.row) }}</div>
-                  </div>
-                </template>
-              </el-table-column> -->
-            <!-- <el-table-column prop="createTime" label="创建时间">
-              </el-table-column> -->
-            <!-- <el-table-column prop="caozuo" label="操作">
-                <template v-slot="scope">
-                  <p class="openPicBtn">
-                    <el-button @click="detail(scope.row.id)" type="text">详情</el-button>
-                    <el-button @click="updateState([scope.row], '已下架')" type="text"
-                      :disabled="scope.row.state !== 1">下架</el-button>
-                    <el-button @click="updateState([scope.row], '已驳回')" type="text"
-                      :disabled="scope.row.state !== 1">驳回</el-button>
-                  </p>
-                </template>
-              </el-table-column>
-            </el-table> -->
+          </el-table-column>
+          <el-table-column prop="userInfo.userName" label="用户信息">
+          </el-table-column>
+          <el-table-column prop="phoneNumber" label="手机号">
+          </el-table-column>
+          <el-table-column prop="mAiContent.title" show-overflow-tooltip label="文章名称">
+          </el-table-column>
+          <el-table-column prop="QType" label="举报状态">
+            <template v-slot="scope">
+              <div style="display: flex;flex-direction: row;align-items: center;">
+                <div :style="{ 'background-color': getStateColor(scope.row) }" class="stateIcon"></div>
+                <div>{{ getStateFont(scope.row) }}</div>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="createTime" label="创建时间">
+          </el-table-column>
+          <el-table-column prop="caozuo" label="操作">
+            <template v-slot="scope">
+              <p class="openPicBtn">
+                <el-button @click="detail(scope.row)" type="text">详情</el-button>
+                <el-button @click="down(scope.row)" type="text" :disabled="scope.row.state !== 1">下架</el-button>
+                <el-button @click="reject(scope.row)" type="text" :disabled="scope.row.state !== 1">驳回</el-button>
+              </p>
+            </template>
+          </el-table-column>
+        </el-table>
 
-            <div class="main-table-title">
+        <!-- <div class="main-table-title">
               <div style="width:30%;font-weight: bold;">举报信息</div>
               <div style="width: 42%;font-weight: bold;">用户信息</div>
               <div style="width: 8%;font-weight: bold;">举报状态</div>
@@ -253,14 +249,11 @@
                 </div>
               </div>
             </div>
-
-
-
           </el-tab-pane>
           <el-tab-pane label="待处理" name="wait">待处理</el-tab-pane>
           <el-tab-pane label="已下架" name="removed">已下架</el-tab-pane>
           <el-tab-pane label="已驳回" name="dismissed">已驳回</el-tab-pane>
-        </el-tabs>
+        </el-tabs> -->
 
 
         <div style="margin-top: 40px;display: flex;justify-content: flex-end;align-items: center;">
@@ -340,24 +333,53 @@ const setTimeByDays = (value) => {
 
 const tableData = ref([
   {
+    id: 1,
     uniqueCode: '123456456755',
     content: "文章标题按哟i都多愁善感v哈佛i他就是是的咯是",
     userInfo: {
       userName: '张三'
     },
     phoneNumber: '12121212121',
-    state: 1,
+    mAiContent: {
+      title: '好设计是诚实的'
+    },
+    state: 1,//1-待处理 2-已下架 3-已驳回
+    createTime: '2025/08/12 13:54'
+  },
+  {
+    id: 2,
+    uniqueCode: '123456456755',
+    content: "文章标题按哟i都多愁善感v哈佛i他就是是的咯是",
+    userInfo: {
+      userName: '张三'
+    },
+    phoneNumber: '12121212121',
+    mAiContent: {
+      title: '好设计是诚实的'
+    },
+    state: 2,
+    createTime: '2025/08/12 13:54'
+  },
+  {
+    id: 3,
+    uniqueCode: '123456456755',
+    content: "文章标题按哟i都多愁善感v哈佛i他就是是的咯是",
+    userInfo: {
+      userName: '张三'
+    },
+    phoneNumber: '12121212121',
+    mAiContent: {
+      title: '好设计是诚实的'
+    },
+    state: 3,
+    createTime: '2025/08/12 13:54'
   }
 ])
 
 
 // const time = ref(null)
 const handleList = ref([])
-const traslate2APIState = ref({
-  // 待处理: 1,
-  // 已下架: 2,
-  // 已驳回: 3,
-})
+
 const activeName = ref('all')
 const getStateFont = (row) => {
   if (row.state == 1) {
@@ -381,35 +403,52 @@ const getStateColor = (row) => {
 
 
 //点击查看举报详情
-const gotoReportDetail = () => {
+const detail = (row) => {
+  console.log('row',row);
   router.push({
-    path: '/reportDetail'
+    path: '/reportDetail',
+    query: {
+      id:row.id,
+      state:row.state
+    }
   })
 
 }
 
-//上架
-const add = () => {
 
-}
 //下架
-const remove = () => {
+const down = (row) => {
+  //修改表单数据
+  row.state=2
+  //向后台发起请求修改后台数据状态
   ElMessageBox.alert('下架成功', '提示', {
-    // center:true,
     icon: markRaw(Select),
   })
 
 }
-
 //驳回
-const reject = () => {
+const reject = (row) => {
+  //修改表单数据
+  row.state=3
+  //向后台发起请求修改后台数据状态
   ElMessageBox.alert('驳回举报信息', '提示', {
-    // center:true,
+    icon: markRaw(Select),
+  })
+}
+
+//批量驳回
+const rejectSome=()=>{
+  ElMessageBox.alert('批量驳回成功', '提示', {
+    icon: markRaw(Select),
+  })
+}
+//批量下架
+const downSome=()=>{
+  ElMessageBox.alert('批量下架成功', '提示', {
     icon: markRaw(Select),
   })
 
 }
-
 
 onMounted(() => {
   document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";

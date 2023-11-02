@@ -76,8 +76,11 @@
          </el-upload>
          <!-- 查看图片 -->
          <div v-else style="margin: 0 auto;width: 250px;">
-            <img :src="form.imgSrc" style="width: 250px;height: 250px;" v-if="type == 'look'"
-               @click="lookBigPhoto(form.imgSrc)">
+            <!-- <img :src="form.imgSrc" style="width: 250px;height: 250px;" v-if="type == 'look'"
+               @click="lookBigPhoto(form.imgSrc)"> -->
+            <el-image style="width: 200px; height: 200px" :src="form.imgSrcList[0]" :zoom-rate="1.2" :max-scale="7"
+               :min-scale="0.2" :preview-src-list="form.imgSrcList" fit="cover" />
+
          </div>
 
       </div>
@@ -95,16 +98,15 @@
    </el-dialog>
 
 
-   <!-- 三种模式查看图片 -->
-   <el-dialog v-model="bigImgDialogVisible" width="50%">
-      <div style=" margin-bottom: 10px;">
-         <el-button @click="one">默认（1：1）</el-button>
-         <el-button @click="fourThree">默认（4：3）</el-button>
-         <el-button @click="threeFour">默认（3：4）</el-button>
-         <el-button @click="big">放大</el-button>
-         <el-button @click="all">全屏</el-button>
-      </div>
-      <img :src="form.imgSrc" alt="Preview Image" />
+   <!-- 图片预览 -->
+   <el-dialog v-model="bigImgDialogVisible" width="50%" :before-close="handleClose" class="bigImgDialog">
+      <!-- v-if="showBigImg" -->
+      <!-- style="z-index: 99999;" -->
+      <!-- <viewer> -->
+      <!-- style="width: 250px;height: 250px;" -->
+      <img :src="form.imgSrc">
+      <!-- </viewer> -->
+
    </el-dialog>
 </template>
   
@@ -124,28 +126,28 @@ const pages = ref({
 
 const tableData = ref([
    {
-      imgSrc: 'D:\obj\workbench\src\assets\img\email.png',
+      imgSrc: 'https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg',
       desc: 'User',
       upLoadUser: '后台用户',
       upLoadTime: '2020/09/10 12:23:33',
       changePermission: false
    },
    {
-      imgSrc: 'D:\obj\workbench\src\assets\img\email.png',
+      imgSrc: 'https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg',
       desc: 'abd',
       upLoadUser: '后台用户',
       upLoadTime: '2020/09/10 12:23:33',
       changePermission: true,
    },
    {
-      imgSrc: 'D:\obj\workbench\src\assets\img\email.png',
+      imgSrc: 'https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg',
       desc: '1213',
       upLoadUser: '后台用户',
       upLoadTime: '2020/09/10 12:23:33',
       changePermission: false
    },
    {
-      imgSrc: 'D:\obj\workbench\src\assets\img\email.png',
+      imgSrc: 'https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg',
       desc: 'djsf',
       upLoadUser: '后台用户',
       upLoadTime: '2020/09/10 12:23:33',
@@ -157,8 +159,9 @@ const tableData = ref([
 const addDialogVisible = ref(false)
 const type = ref('add')
 const form = ref({
-   imgSrc: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
+   imgSrc: 'https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg',
    desc: '',
+   imgSrcList: ['https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg']
 })
 //新增图片
 const addPhoto = () => {
@@ -219,12 +222,13 @@ const delSome = () => {
 
 
 const bigImgDialogVisible = ref(false)
-
+// const showBigImg = ref(false)
 //点击图片查看大图
 const lookBigPhoto = (imgSrc) => {
 
    form.imgSrc = imgSrc
    bigImgDialogVisible.value = true
+   // showBigImg.value = true
 
 }
 
@@ -260,5 +264,15 @@ onMounted(() => {
    width: 178px;
    height: 178px;
    display: block;
+}
+
+.bigImgDialog {
+   :deep(.el-dialog__header) {
+      padding: 0;
+   }
+}
+
+:deep(.el-image-viewer__wrapper) {
+   margin-top: 64px;
 }
 </style>
