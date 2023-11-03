@@ -234,9 +234,9 @@ const editItem = (row) => {
 
 
 //完成新建修改
-const finish = () => {
+const finish = (type) => {
    dialogVisible.value = false
-   if (type = 'add') {
+   if (type == 'add') {
       ElMessage({
          message: '新建成功',
          type: 'success',

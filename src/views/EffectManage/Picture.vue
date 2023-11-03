@@ -64,21 +64,17 @@
     :before-close="handleClose">
     <div>
       <div style="font-size: 16px;margin-bottom: 20px;" v-if="type != 'look'">上传图片</div>
-      <el-upload class="avatar-uploader" action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-        :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload"
-        v-if="type != 'look'">
-        <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+      <el-upload class="avatar-uploader" action="#" :http-request="uploadFile" :show-file-list="false"
+        :on-change="handleAvatarChange" v-if="type != 'look'">
+        <img v-if="form.imgSrc" :src="form.imgSrc" class="avatar" />
         <el-icon v-else class="avatar-uploader-icon">
           <Plus />
         </el-icon>
       </el-upload>
       <!-- 查看图片 -->
       <div v-else style="margin: 0 auto;width: 250px;">
-        <!-- <img :src="form.imgSrc" style="width: 250px;height: 250px;" v-if="type == 'look'"
-          @click="lookBigPhoto(form.imgSrc)"> -->
-          <el-image style="width: 200px; height: 200px" :src="form.imgSrcList[0]" :zoom-rate="1.2" :max-scale="7" :min-scale="0.2"
-               :preview-src-list="form.imgSrcList"  fit="cover" />
-
+        <el-image style="width: 200px; height: 200px" :src="form.imgSrcList[0]" :zoom-rate="1.2" :max-scale="7"
+          :min-scale="0.2" :preview-src-list="form.imgSrcList" fit="cover" />
       </div>
     </div>
 
@@ -96,7 +92,8 @@
 </template>
   
 <script setup>
-import { ref, onMounted } from 'vue'
+import $ from 'jquery'
+import { ref, onMounted, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { UploadFilled, Plus, Select } from '@element-plus/icons-vue'
 
@@ -140,10 +137,10 @@ const tableData = ref([
 
 const addDialogVisible = ref(false)
 const type = ref('add')
-const form = ref({
-   imgSrc: 'https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg',
-   desc: '',
-   imgSrcList:['https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg']
+const form = reactive({
+  imgSrc: 'https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg',
+  desc: '',
+  imgSrcList: ['https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg']
 })
 //新增图片
 const addPhoto = () => {
@@ -163,20 +160,40 @@ const lookPhoto = () => {
 
 }
 
-const fileList = ref([])
 
-const dialogImageUrl = ref('')
-const dialogVisible = ref(false)
-
-//是否删除图片
-const handleRemove = (uploadFile, uploadFiles) => {
-  console.log(uploadFile, uploadFiles)
+//上传图片
+const uploadFile = (file) => {
+  let json;
+  form.imgSrc = null;
+  let formData = new FormData();
+  formData.append("fil1", file.file);
+  $.ajax({
+    url: "https://3dapi.shixianjia.com/api/file/upload",
+    type: "POST",
+    contentType: false,
+    processData: false,
+    async: false,
+    headers: {
+      token:
+        "F45BD6CCB4BF39394DDC58F8C4B125D5271D9A11D4B1E9BB67F53FDBFB1A547B",
+    },
+    data: formData,
+    success: function (data) {
+      console.log(data.Data, 8888);
+      let url = JSON.parse(data.Data);
+      json = url;
+      // addForm.cover = url;
+    },
+  });
+  form.imgSrc = json[0];
+  console.log('json[0]', json[0]);
+  console.log(form.imgSrc);
+  console.log('点击上传图片', form.imgSrc);
 }
+// const handleAvatarChange = (file, filelist) => {
+//     form.imgSrc = URL.createObjectURL(file.raw);
+// }
 
-const handlePictureCardPreview = (uploadFile) => {
-  dialogImageUrl.value = uploadFile.url
-  dialogVisible.value = true
-}
 //完成
 const finish = (type) => {
   addDialogVisible.value = false
@@ -261,7 +278,8 @@ onMounted(() => {
   height: 178px;
   display: block;
 }
-:deep(.el-image-viewer__wrapper){
+
+:deep(.el-image-viewer__wrapper) {
   margin-top: 64px;
 }
 </style>

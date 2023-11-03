@@ -17,7 +17,7 @@
             :picker-options="pickerOptions" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
             style="float:left">
           </el-date-picker>
-          <div class=" " v-for="(item, index) in daysArr" :key="index"  style="cursor: pointer;">
+          <div class=" " v-for="(item, index) in daysArr" :key="index" style="cursor: pointer;">
             <div @click="setTimeByDays(index)"
               style="margin:0 12px;width: 60px;line-height: 32px;font-size: 14px;margin:0 15px">
               {{ item }}
@@ -76,19 +76,19 @@
 
 
       <div style="margin-top: 40px;display: flex;justify-content: flex-end;align-items: center;">
-            <div style="margin-right: 15px;">
-               共<span>{{ pages.total }}</span>条
-            </div>
-            <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" :small="small"
-               :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
-               @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
-         </div>
+        <div style="margin-right: 15px;">
+          共<span>{{ pages.total }}</span>条
+        </div>
+        <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" :small="small"
+          :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
+          @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
+      </div>
     </div>
   </div>
 
 
   <!-- 新增用户等级 -->
-  <el-dialog v-model="addDialogVisible" :title="type == 'add' ? '新增用户等级' : '编辑功能配置'" width="35%"
+  <el-dialog v-model="addDialogVisible" :title="operationType== 'add' ? '新增用户等级' : '编辑功能配置'" width="35%"
     :before-close="handleClose">
     <div>
       <el-form :model="form" label-width="120px">
@@ -100,7 +100,7 @@
         </el-form-item>
 
 
-        <el-form-item label="获得灵感值配置" style="margin-top: 30px;" v-if="type == 'setFun'">
+        <el-form-item label="获得灵感值配置" style="margin-top: 30px;" v-if="operationType == 'setFun'">
           <el-checkbox-group v-model="form.getInspiration" @change="handleCheckAllChange"
             style="display: flex; flex-direction: column;">
             <el-checkbox label="0">
@@ -119,7 +119,7 @@
         </el-form-item>
 
 
-        <el-form-item label="消耗灵感值配置" style="margin:30px 0;" v-if="type == 'setFun'">
+        <el-form-item label="消耗灵感值配置" style="margin:30px 0;" v-if="operationType == 'setFun'">
           <el-checkbox-group v-model="form.useInspiration" @change="handleCheckAllChange"
             style="display: flex; flex-direction: column;">
             <el-checkbox label="4">专属标识</el-checkbox>
@@ -170,7 +170,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="addDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="finish(type)">确认 </el-button>
+        <el-button type="primary" @click="finish()">确认 </el-button>
       </span>
     </template>
   </el-dialog>
@@ -205,14 +205,15 @@
 </template>
   
 <script setup>
-import { ref, watch ,onMounted,reactive} from 'vue'
+import { ref, watch, onMounted, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+
 
 //分页条数据
 const pages = ref({
-   total: 1000,
-   currentPage: 1,
-   limit: 10
+  total: 1000,
+  currentPage: 1,
+  limit: 10
 
 })
 
@@ -261,13 +262,13 @@ const form = reactive({
   vipDay: null,
   inspiration: null,
   checkList: [],//['1', '5', '8']
-  getInspiration:[],// ['1',]
+  getInspiration: [],// ['1',]
   useInspiration: [],//['1', '3']
   homeSign: '',
   vxCount: '',
   generate: '',
   downLoad: '',
-  time:null
+  time: null
 
 })
 
@@ -300,16 +301,16 @@ const setTimeByDays = (value) => {
 }
 
 
-const type = ref('add')//默认类型为新建等级 setFun为功能配置
+const operationType = ref('add')//默认类型为新建等级 setFun为功能配置
 const addDialogVisible = ref(false)
 //新增用户等级
 const addUserRank = () => {
-  type.value = 'add'
+  operationType.value = 'add'
   addDialogVisible.value = true
 }
 //功能配置
 const setFunction = (row) => {
-  type.value = 'setFun'
+  operationType.value = 'setFun'
   addDialogVisible.value = true
 
 }
@@ -332,15 +333,17 @@ const updatePermission = (val) => {
 }
 
 //完成
-const finish = (type) => {
+const finish = () => {
+  console.log('点击完成，查看type',operationType.value);
   addDialogVisible.value = false
-  if (type == 'add') {
+  console.log("type == 'add'",operationType.value == 'add');
+  if (operationType.value == 'add') {
     ElMessage({
       message: '新建成功',
       type: 'success',
     })
   }
-  if (type == 'setFun') {
+  if (operationType.value == 'setFun') {
     ElMessage({
       message: '修改成功',
       type: 'success',
@@ -359,7 +362,7 @@ const delSome = () => {
 
 
 onMounted(() => {
-   document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
+  document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
 })
 
 

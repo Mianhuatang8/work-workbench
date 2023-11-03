@@ -108,9 +108,9 @@
                   </span>
                   <template #dropdown>
                     <el-dropdown-menu>
-                      <el-dropdown-item command="publish" v-if="scope.row.cType == 2">发布</el-dropdown-item>
-                      <el-dropdown-item command="up" v-if="scope.row.cType != 2">上移</el-dropdown-item>
-                      <el-dropdown-item command="down" v-if="scope.row.cType != 2">下移</el-dropdown-item>
+                      <el-dropdown-item command="publish" v-if="scope.row.cType == 2" @click="publish(scope.row.id)">发布</el-dropdown-item>
+                      <el-dropdown-item command="up" v-if="scope.row.cType != 2" @click="upHot(scope.row)">上移</el-dropdown-item>
+                      <el-dropdown-item command="down" v-if="scope.row.cType != 2" @click="downHot(scope.row)">下移</el-dropdown-item>
                       <el-dropdown-item command="del" style="color: red;"
                         @click="delItem(scope.row.id)">删除</el-dropdown-item>
                     </el-dropdown-menu>
@@ -150,22 +150,7 @@ const pages = ref({
 
 })
 
-const recommendDialog = ref(false)
-const recommendForm = ref({
-  recommend: null,
-  title: "",
-  id: "",
-})
-const moveDialog = ref(false)
-const options = ref([])
-const value = ref('')
-const input = ref('')
-// const params = ref({
-//   startTime: "",
-//   endTime: "",
-//   date: "",
 
-// })
 const tableData = ref([
   {
     hotListOrder: 1,
@@ -180,7 +165,7 @@ const tableData = ref([
     createTime: '2023/09/10 12:54',
   },
   {
-    hotListOrder: 1,
+    hotListOrder: 2,
     uniqueCode: '121',//文章编号
     userRole: '后台用户',//角色
     id: '123',//用户id
@@ -192,11 +177,7 @@ const tableData = ref([
     createTime: '2023/09/10 12:54',
   },
 ])
-const currentPage = ref(1)
-const userLength = ref(0)
-const showArr = ref([])
-const picArr = ref([])
-const TotalPage = ref(0)
+
 const formData = ref({
   UniqueCode: "",
   Title: "",
@@ -210,8 +191,7 @@ const formData = ref({
   PageSize: 20,
 
 })
-// const time = ref(null)
-const delList = ref([])
+
 const collectionList = ([])
 
 //文章状态的文本及其文本颜色
@@ -260,8 +240,6 @@ const addArticle = () => {
     }
   });
 }
-
-
 //查看
 const LookArticleListInfo = (id) => {
   router.push({
@@ -305,7 +283,6 @@ const delItem = (id) => {
       })
     })
 }
-
 //批量删除
 const delSome = () => {
   ElMessageBox.confirm(
@@ -330,10 +307,22 @@ const delSome = () => {
     })
 }
 
+//发布文章
+const publish=(id)=>{
+
+}
+//上移
+const upHot=(row)=>{
+
+}
+
+//下移
+const downHot=(row)=>{
+
+}
 
 onMounted(() => {
    document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
-
 })
 
 
