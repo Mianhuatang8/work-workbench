@@ -52,14 +52,12 @@
             </div>
          </div>
 
-
          <!-- 实现数据可拖拽 -->
          <div style="width:100%" class="draggable">
             <el-table :data="tableData" style="width: 100%;margin-left: 15px; margin-bottom: 20px" row-key="id"
-            :key="tableKey"
-               :header-cell-style="{ background: '#F2F3F8' }" max-height="380"
-               :row-style="{ height: 40 + 'px' }" :cell-style="{ padding: 0 + 'px' }">
-               <!-- sortable  -->
+               :header-cell-style="{ background: '#F2F3F8' }" max-height="380" :row-style="{ height: 40 + 'px' }"
+               :cell-style="{ padding: 0 + 'px' }"
+               :key="tableKey">
                <el-table-column type="selection" width="60">
                </el-table-column>
                <el-table-column prop="id" label="类别ID" />
@@ -84,7 +82,6 @@
                </el-table-column>
             </el-table>
          </div>
-
          <div style="margin-top: 40px;display: flex;justify-content: flex-end;align-items: center;">
             <div style="margin-right: 15px;">
                共<span>{{ pages.total }}</span>条
@@ -93,7 +90,6 @@
                :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
                @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
          </div>
-
       </div>
    </div>
 
@@ -138,7 +134,7 @@
 </template>
   
 <script setup>
-import { ref, reactive, onMounted, nextTick } from 'vue'
+import { ref, reactive, onMounted, nextTick, proxyRefs } from 'vue'
 import { ElMessage } from 'element-plus'
 import draggable from "vuedraggable";
 import Sortable from 'sortablejs'
@@ -159,7 +155,7 @@ const changeIndex = (index) => {
    selectRankIndex.value = index
 }
 
-const tableKey = ref('')
+const tableKey = ref('')//更新dom
 var tableData = reactive([
    {
       id: 1,
@@ -181,7 +177,7 @@ var tableData = reactive([
             updateTime: '2022/09/12 12:34:33',
             changePermission: false,
             parentId: 1,
-            level:2,
+            level: 2,
             children: [
                {
                   id: 111,
@@ -292,7 +288,7 @@ const changeToTree = (list, parentId = 0) => {
          //判断是否有子节点
          const children = changeToTree(list, item.id)
          if (children.length != 0) {
-            item.children= children
+            item.children = children
          }
          tree.push(item)
       }
@@ -392,9 +388,7 @@ const addSort = () => {
 const editSort = () => {
    type.value = 'edit'
    addDialogVisible.value = true
-
 }
-
 //完成
 const finish = async (type) => {
    addFormRef.value.validate((valid, fields) => {
@@ -420,7 +414,6 @@ const finish = async (type) => {
    })
 }
 
-
 //删除
 const delItem = () => {
    ElMessage({
@@ -443,8 +436,8 @@ const rowDrop = () => {
          // evt.related; // 被替换的对象
          const oldRow = activeRows[dragged.rowIndex]
          const newRow = activeRows[related.rowIndex]
-         console.log('newRow',newRow);
-         console.log('oldRow',oldRow);
+         // console.log('newRow', newRow);
+         // console.log('oldRow', oldRow);
          //限制只能同级别之间移动
          if (oldRow.level !== newRow.level || oldRow.parentId !== newRow.parentId) {
             return false
@@ -458,24 +451,29 @@ const rowDrop = () => {
          const currRow = activeRows.splice(oldIndex, 1)[0]
          console.log('currRow', currRow);
          const aa = activeRows.splice(newIndex, 0, currRow)
-         console.log('修改后activeRows的数据', activeRows);
-         const newTabledata = changeToTree(activeRows, 0)
+         console.log('拖拽后activeRows的数据', activeRows);
+         //对activerows进行排序
          //修改table的数据
          // nextTick(() => {
-            tableData = newTabledata
-            tableKey.value = new Date().getTime()
-            console.log('新表单数据', newTabledata);
+         const newTbaleData=changeToTree(activeRows, 0)
+         tableData = newTbaleData
+         tableKey.value = new Date().getTime()
+         console.log('新表单数据', tableData);
+         // console.log('newTbaleData',newTbaleData.splice(0));
          // })
       }
    })
 }
 
+
 onMounted(() => {
    document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
    activeRows = treeToTile(tableData)
-   console.log("树结构转化成列表", activeRows);
+   console.log("树结构转化成列表,修改前的数据", activeRows);
    rowDrop()
 })
+
+
 
 </script>
   
