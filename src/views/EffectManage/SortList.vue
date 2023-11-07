@@ -56,8 +56,7 @@
          <div style="width:100%" class="draggable">
             <el-table :data="tableData" style="width: 100%;margin-left: 15px; margin-bottom: 20px" row-key="id"
                :header-cell-style="{ background: '#F2F3F8' }" max-height="380" :row-style="{ height: 40 + 'px' }"
-               :cell-style="{ padding: 0 + 'px' }"
-               :key="tableKey">
+               :cell-style="{ padding: 0 + 'px' }">
                <el-table-column type="selection" width="60">
                </el-table-column>
                <el-table-column prop="id" label="类别ID" />
@@ -134,9 +133,8 @@
 </template>
   
 <script setup>
-import { ref, reactive, onMounted, nextTick, proxyRefs } from 'vue'
+import { ref, reactive, onMounted, nextTick, proxyRefs, getCurrentInstance } from 'vue'
 import { ElMessage } from 'element-plus'
-import draggable from "vuedraggable";
 import Sortable from 'sortablejs'
 import $ from 'jquery'
 
@@ -452,17 +450,17 @@ const rowDrop = () => {
          console.log('currRow', currRow);
          const aa = activeRows.splice(newIndex, 0, currRow)
          console.log('拖拽后activeRows的数据', activeRows);
-         //对activerows进行排序
          //修改table的数据
-         // nextTick(() => {
-         const newTbaleData=changeToTree(activeRows, 0)
+         const newTbaleData = changeToTree(activeRows, 0)
          tableData = newTbaleData
          tableKey.value = new Date().getTime()
          console.log('新表单数据', tableData);
-         // console.log('newTbaleData',newTbaleData.splice(0));
-         // })
+         //拖拽完成之后再次请求接口数据
       }
    })
+   //强制刷新
+   const internalInstance = getCurrentInstance();
+   internalInstance.ctx.$forceUpdate();
 }
 
 

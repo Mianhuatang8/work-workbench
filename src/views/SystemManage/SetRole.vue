@@ -123,7 +123,7 @@
       <template #footer>
          <span class="dialog-footer">
             <el-button @click="dialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="finish(type)">完成 </el-button>
+            <el-button type="primary" @click="finish()">完成 </el-button>
          </span>
       </template>
    </el-dialog>
@@ -234,15 +234,15 @@ const editItem = (row) => {
 
 
 //完成新建修改
-const finish = (type) => {
+const finish = () => {
    dialogVisible.value = false
-   if (type == 'add') {
+   if (type.value == 'add') {
       ElMessage({
          message: '新建成功',
          type: 'success',
       })
    }
-   if (type == 'edit') {
+   if (type.value == 'edit') {
       ElMessage({
          message: '修改成功',
          type: 'success',
