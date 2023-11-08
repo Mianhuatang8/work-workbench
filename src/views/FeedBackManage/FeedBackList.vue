@@ -39,9 +39,9 @@
                <div style="display: flex;align-items: center; ">
                   <div style="margin-right: 10px;">反馈日期</div>
                   <!-- style="width:270px;" -->
-                  <el-date-picker v-model="formData.time" @change="changeTime" format="YYYY-MM-DD" value-format="YYYY-MM-DD"
-                   type="daterange"
-                     range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+                  <el-date-picker v-model="formData.time" @change="changeTime" format="YYYY-MM-DD"
+                     value-format="YYYY-MM-DD" type="daterange" range-separator="至" start-placeholder="开始日期"
+                     end-placeholder="结束日期">
                   </el-date-picker>
                   <div class="dateOption">
                      <p @click="setTimeByDays(0)">今天</p>
@@ -90,10 +90,10 @@
                         <template #default="scope">
                            <div style="display: flex;align-items: center;justify-content:center">
                               <div :style="{ 'background-color': getStateColor(scope.row.state) }" class="stateIcon"></div>
-                           <span :style="{ 'color': getStateColor(scope.row.state) }"> {{
-                              getStateText(scope.row.state) }}</span>
+                              <span :style="{ 'color': getStateColor(scope.row.state) }"> {{
+                                 getStateText(scope.row.state) }}</span>
                            </div>
-                           
+
                         </template>
                      </el-table-column>
                      <el-table-column prop="time" align="center" header-align="center" label="反馈时间" width="200">
@@ -107,20 +107,6 @@
                         </template>
                      </el-table-column>
                   </el-table>
-
-                  <!-- 模态框 -->
-                  <el-dialog v-model="dialog" title="表格导出" width="30%" @close="close">
-                     <el-input v-model="file_name" placeholder="请输入导出文件的文件名"></el-input>
-                     <template #footer>
-                        <span class="dialog-footer">
-                           <el-button @click="dialog = false">取消</el-button>
-                           <el-button type="primary" @click="save">
-                              确定
-                           </el-button>
-                        </span>
-                     </template>
-                  </el-dialog>
-
                </el-tab-pane>
                <el-tab-pane label="待处理" name="wait">待处理</el-tab-pane>
                <el-tab-pane label="已完成" name="finish">已完成</el-tab-pane>
@@ -213,34 +199,44 @@ const formData = reactive({
    QState: null,
    PageIndex: 1,
    PageSize: 8,
-   time:null
+   time: null
 })
 const formatDate = (time) => {
-  const y = time.getFullYear();
-  const yy = y < 10 ? '0' + y : y
-  const m = time.getMonth() + 1;
-  const mm = m < 10 ? '0' + m : m
-  const d = time.getDate();
-  const dd = d < 10 ? '0' + d : d
-  return `${yy}-${mm}-${dd}`;
+   const y = time.getFullYear();
+   const yy = y < 10 ? '0' + y : y
+   const m = time.getMonth() + 1;
+   const mm = m < 10 ? '0' + m : m
+   const d = time.getDate();
+   const dd = d < 10 ? '0' + d : d
+   return `${yy}-${mm}-${dd}`;
+}
+
+const formatDate2 = (time) => {
+   const y = time.getFullYear();
+   const yy = y < 10 ? '0' + y : y
+   const m = time.getMonth() + 1;
+   const mm = m < 10 ? '0' + m : m
+   const d = time.getDate();
+   const dd = d < 10 ? '0' + d : d
+   return `${yy}${mm}${dd}`;
 }
 
 const setTimeByDays = (value) => {
-  console.log('点击日期', value);
-  const end = new Date()
-  const start = new Date()
-  if (value == 1) {
-    // const date = new Date()
-    start.setTime(start.getTime() - 3600 * 1000 * 24)
-    end.setTime(end.getTime() - 3600 * 1000 * 24)
-  } else if (value == 7) {
-    start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-  } else if (value == 30) {
-    start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-  }
-  //对获取到的时间进行格式化
-  formData.time = [formatDate(start), formatDate(end)]
-  // console.log('form的time', formData.time);
+   console.log('点击日期', value);
+   const end = new Date()
+   const start = new Date()
+   if (value == 1) {
+      // const date = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24)
+      end.setTime(end.getTime() - 3600 * 1000 * 24)
+   } else if (value == 7) {
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+   } else if (value == 30) {
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+   }
+   //对获取到的时间进行格式化
+   formData.time = [formatDate(start), formatDate(end)]
+   // console.log('form的time', formData.time);
 }
 
 
@@ -285,16 +281,9 @@ function roleLeadingOut() {
    if (selectList.length) {
       tableData.value = proxy?.$refs.tableRef.getSelectionRows()
    }
-   dialog.value = true
+   save()
 }
 
-//关闭对话框 取消导出
-function close() {
-   dialog.value = false
-}
-
-//确定导出excel文件
-const file_name = ref('')
 function save() {
    dialog.value = false
    ElMessage({
@@ -302,15 +291,9 @@ function save() {
       type: 'success',
    })
    nextTick(function () {
-      let filename = ''
+      let filename = '草堂画里用户反馈' + formatDate2(new Date()) + '.xlsx'
       const xlsxParam = { raw: true } //转化成Excel使用原始格式
       const elTable = XLSX.utils.table_to_book(document.getElementById('el-table'), xlsxParam)
-      if (file_name.value === '') {
-         // 默认导出文件名
-         filename = '反馈列表.xlsx'
-      } else {
-         filename = file_name.value += '.xlsx'
-      }
       const wbout = XLSX.write(elTable, { bookType: 'xlsx', bookSST: true, type: 'array' })
       try {
          FileSaver.saveAs(new Blob([wbout], { type: 'application/octet-stream' }), filename)
@@ -334,15 +317,15 @@ onMounted(() => {
 </script>
    
 <style lang="scss" scoped>
-
 .stateIcon {
-  width: 8px;
-  margin-left: 10px;
-  height: 8px;
-  background-color: black;
-  border-radius: 50%;
-  margin-right: 8px;
+   width: 8px;
+   margin-left: 10px;
+   height: 8px;
+   background-color: black;
+   border-radius: 50%;
+   margin-right: 8px;
 }
+
 .reportSearchBox {
    // border-radius: 15px;
    background-color: #fff;

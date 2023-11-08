@@ -107,6 +107,14 @@
                <el-option label="二级" value="1" />
             </el-select>
          </el-form-item>
+         <el-form-item label="绑定分类" prop="bindingSort" v-if="Number(form.sortRank)==1">
+            <el-select v-model="form.bindingSort" placeholder="请选择">
+               <el-option label="建筑" value="0" />
+               <el-option label="公共室内" value="1" />
+               <el-option label="住宅设计" value="2" />
+               <el-option label="公共空间" value="3" />
+            </el-select>
+         </el-form-item>
          <el-form-item label="类别底图" prop="backImg">
             <el-upload class="avatar-uploader" action="#" :http-request="uploadFile" :show-file-list="false"
                :on-change="handleAvatarChange">
@@ -300,6 +308,7 @@ const addDialogVisible = ref(false)
 const form = reactive({
    sortName: '',
    sortRank: null,
+   bindingSort:null,
    backImg: '',
    desc: '',
    time: null,
