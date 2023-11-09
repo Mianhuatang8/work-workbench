@@ -26,7 +26,7 @@
                   :picker-options="pickerOptions" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
                   style="float:left">
                </el-date-picker>
-               <div class=" " v-for="(item, index) in daysArr" :key="index"  style="cursor: pointer;">
+               <div class=" " v-for="(item, index) in daysArr" :key="index" style="cursor: pointer;">
                   <div @click="setTimeByDays(index)"
                      style="margin:0 12px;width: 60px;line-height: 32px;font-size: 14px;margin:0 15px">
                      {{ item }}
@@ -131,9 +131,14 @@
   
 <script setup>
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { onMounted, ref ,reactive} from 'vue'
+import { onMounted, ref, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
+
+const defaultProps = ref({
+   children: 'children',
+   label: 'name',
+})
 //分页条数据
 const pages = ref({
    total: 1000,
@@ -182,35 +187,35 @@ const form = reactive({
    role: '',
    roleCode: '',
    permission: [],
-   time:null
+   time: null
 })
 
 const formatDate = (time) => {
-  const y = time.getFullYear();
-  const yy = y < 10 ? '0' + y : y
-  const m = time.getMonth() + 1;
-  const mm = m < 10 ? '0' + m : m
-  const d = time.getDate();
-  const dd = d < 10 ? '0' + d : d
-  return `${yy}-${mm}-${dd}`;
+   const y = time.getFullYear();
+   const yy = y < 10 ? '0' + y : y
+   const m = time.getMonth() + 1;
+   const mm = m < 10 ? '0' + m : m
+   const d = time.getDate();
+   const dd = d < 10 ? '0' + d : d
+   return `${yy}-${mm}-${dd}`;
 }
 
 const setTimeByDays = (value) => {
-  console.log('点击日期', value);
-  const end = new Date()
-  const start = new Date()
-  if (value == 1) {
-    // const date = new Date()
-    start.setTime(start.getTime() - 3600 * 1000 * 24)
-    end.setTime(end.getTime() - 3600 * 1000 * 24)
-  } else if (value == 2) {
-    start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-  } else if (value == 3) {
-    start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-  }
-  //对获取到的时间进行格式化
-  form.time = [formatDate(start), formatDate(end)]
-  // console.log('form的time', formData.time);
+   console.log('点击日期', value);
+   const end = new Date()
+   const start = new Date()
+   if (value == 1) {
+      // const date = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24)
+      end.setTime(end.getTime() - 3600 * 1000 * 24)
+   } else if (value == 2) {
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+   } else if (value == 3) {
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+   }
+   //对获取到的时间进行格式化
+   form.time = [formatDate(start), formatDate(end)]
+   // console.log('form的time', formData.time);
 }
 
 const type = ref('add')
