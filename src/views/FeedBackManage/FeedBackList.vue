@@ -12,7 +12,7 @@
             <div style="display: flex; justify-content: space-between;">
                <div style="display: flex;align-items: center;">
                   <div style="margin-right: 10px;">平台内容</div>
-                  <el-select placeholder="请选择平台内容" style="width:270px" v-model="formData.QState">
+                  <el-select placeholder="请选择平台内容" style="width:270px" v-model="formData.PageQueryParam.PlatformContentId">
                      <el-option label="质量" value="0"></el-option>
                      <el-option label="风格" value="1"></el-option>
                      <el-option label="数量" value="2"></el-option>
@@ -27,7 +27,7 @@
 
                <div style="display: flex;align-items: center;">
                   <div style="margin-right: 10px;">问题类型</div>
-                  <el-select placeholder="请选择问题类型" style="width:270px" v-model="formData.QState">
+                  <el-select placeholder="请选择问题类型" style="width:270px" v-model="formData.PageQueryParam.ProblemContentId">
                      <el-option label="使用咨询" value="0"></el-option>
                      <el-option label="需求建议" value="1"></el-option>
                      <el-option label="BUG" value="2"></el-option>
@@ -39,7 +39,7 @@
                <div style="display: flex;align-items: center; ">
                   <div style="margin-right: 10px;">反馈日期</div>
                   <!-- style="width:270px;" -->
-                  <el-date-picker v-model="formData.time" @change="changeTime" format="YYYY-MM-DD"
+                  <el-date-picker v-model="time" @change="changeTime" format="YYYY-MM-DD"
                      value-format="YYYY-MM-DD" type="daterange" range-separator="至" start-placeholder="开始日期"
                      end-placeholder="结束日期">
                   </el-date-picker>
@@ -57,8 +57,6 @@
                   <el-button @click="reset()">重置</el-button>
                </div>
             </div>
-
-
          </div>
 
          <div class="reportContentBox" style="margin-top:30px;">
@@ -133,6 +131,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Select } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router';
 import { reactive, toRefs, ref, onMounted, nextTick, getCurrentInstance } from 'vue'
+import { getFeedBackList, getListById, closeFeedBack, exportExcel, finishFeedBack } from '../../api/feedBack.js'
 
 // 依赖引入
 import FileSaver from "file-saver";
@@ -140,7 +139,7 @@ import * as XLSX from 'xlsx'
 
 //分页条数据
 const pages = ref({
-   total: 1000,
+   total:10,
    currentPage: 1,
    limit: 10
 
@@ -190,17 +189,33 @@ const tableData = ref([
       time: '2020/02/12 12:33:11'
    },
 ])
+
+//日期选择器的时间
+const time=ref([])
 //收集表单数据
 const formData = reactive({
-   UniqueCode: "",
-   Title: "",
-   Role: "",
-   CollectId: "",
-   QState: null,
-   PageIndex: 1,
-   PageSize: 8,
-   time: null
+   PageIndex: 1,//第几页
+   PageSize: 10,//总页数
+   PageQueryParam: {//分页查询参数
+      PlatformContentId: "",//平台内容id
+      ProblemContentId: "",//问题类型id
+      FeedBackStartTime: null,//反馈时间
+      FeedBackEndTime: null,//反馈时间（需要取选中当天则要传多一天）
+      FeedBackStatus: null//反馈状态
+   }
 })
+
+//时间选择器发生变化
+const changeTime=(date)=>{
+   console.log('时间选择器发生变化',date);
+   //修改表单数据里面的反馈时间
+   formData.PageQueryParam.FeedBackStartTime=date[0]
+   const newDate=date[1].split('-')
+   newDate[2]=(Number(newDate[2])+1).toString()
+   formData.PageQueryParam.FeedBackEndTime=newDate.join('-')
+   // console.log('修改时间查看表单数据的反馈时间变化',formData.PageQueryParam);
+}
+
 const formatDate = (time) => {
    const y = time.getFullYear();
    const yy = y < 10 ? '0' + y : y
@@ -220,13 +235,11 @@ const formatDate2 = (time) => {
    const dd = d < 10 ? '0' + d : d
    return `${yy}${mm}${dd}`;
 }
-
 const setTimeByDays = (value) => {
    console.log('点击日期', value);
    const end = new Date()
    const start = new Date()
    if (value == 1) {
-      // const date = new Date()
       start.setTime(start.getTime() - 3600 * 1000 * 24)
       end.setTime(end.getTime() - 3600 * 1000 * 24)
    } else if (value == 7) {
@@ -235,8 +248,17 @@ const setTimeByDays = (value) => {
       start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
    }
    //对获取到的时间进行格式化
-   formData.time = [formatDate(start), formatDate(end)]
-   // console.log('form的time', formData.time);
+   time.value = [formatDate(start), formatDate(end)]
+}
+
+//重置
+const reset=()=>{
+   time.value=[]
+   formData.PageQueryParam.FeedBackStartTime=null
+   formData.PageQueryParam.FeedBackEndTime=null
+   formData.PageQueryParam.PlatformContentId=""
+   formData.PageQueryParam.ProblemContentId=""
+   formData.PageQueryParam.FeedBackStatus=null
 }
 
 

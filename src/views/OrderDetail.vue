@@ -55,7 +55,7 @@
                             <div style="margin-bottom: 10px;">订单编号</div>
                             <el-input v-model="value" disabled style="margin-bottom: 10px;width: 350px;">
                                 <template #append>
-                                    <el-button :icon="CopyDocument"  @click="copyOrderCode(value)"/>
+                                    <el-button :icon="CopyDocument" @click="copyOrderCode(value)" />
                                 </template></el-input>
                         </div>
                         <div>
@@ -111,7 +111,7 @@
                             <el-input v-model="value" disabled style="margin-bottom: 10px;width: 350px;"></el-input>
                         </div>
                     </div>
-                    <el-button type="danger">退款</el-button>
+                    <el-button type="danger" @click="refund()">退款</el-button>
                 </div>
 
             </div>
@@ -122,72 +122,81 @@
 
 <script setup>
 import { ElMessage } from 'element-plus'
-import { Search ,CopyDocument} from '@element-plus/icons-vue'
+import { Search, CopyDocument } from '@element-plus/icons-vue'
 import { useRoute, useRouter } from 'vue-router';
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 const router = useRouter()
-const route=useRoute()
+const route = useRoute()
 
 const goback = () => {
     router.back();
 }
+
+
+const value = ref('241345647685687')
 //复制订单编号
-const copyOrderCode=(value)=>{
+const copyOrderCode = (value) => {
+    // window.getSelection().selectAllChildren(val);
+    document.execCommand("Copy");
     ElMessage({
-    showClose: true,
-    message: '成功复制订单编号',
-    type: 'success',
-  })
+        showClose: true,
+        message: '成功复制订单编号',
+        type: 'success',
+    })
 }
-const form=reactive({
-    orderState:0,
+const form = reactive({
+    orderState: 0,
 })
 //接收路由传递过来的参数
-console.log('订单传递过来',route);
-form.orderState=route.query.orderState
+console.log('订单传递过来', route);
+form.orderState = route.query.orderState
 
 const getStateColor = (row) => {
-   if (row == 0) {
-      return "#0adf0a";
-   } else if (row == 1) {
-      return "orange";
-   } else if (row == 2) {
-      return "red";
-   }
-   else if (row == 3) {
-      return "gray";
-   }
-   else if (row == 4) {
-      return "gray";
-   }
+    if (row == 0) {
+        return "#0adf0a";
+    } else if (row == 1) {
+        return "orange";
+    } else if (row == 2) {
+        return "red";
+    }
+    else if (row == 3) {
+        return "gray";
+    }
+    else if (row == 4) {
+        return "gray";
+    }
 }
 
 const getOrderStateText = (row) => {
-   if (row == 0) {
-      return "已完成";
-   } else if (row == 1) {
-      return "待付款";
-   } else if (row == 2) {
-      return "退款中";
-   } else if (row == 3) {
-      return "已关闭";
-   } else if (row == 4) {
-      return "已退款";
-   }
+    if (row == 0) {
+        return "已完成";
+    } else if (row == 1) {
+        return "待付款";
+    } else if (row == 2) {
+        return "退款中";
+    } else if (row == 3) {
+        return "已关闭";
+    } else if (row == 4) {
+        return "已退款";
+    }
 }
 
+
+//退款
+const refund = () => {
+
+}
 
 </script>
 
 <style lang="scss" scoped>
-
 .stateIcon {
-  width: 8px;
-  margin-left: 10px;
-  height: 8px;
-  background-color: black;
-  border-radius: 50%;
-  margin-right: 8px;
+    width: 8px;
+    margin-left: 10px;
+    height: 8px;
+    background-color: black;
+    border-radius: 50%;
+    margin-right: 8px;
 }
 
 .main-content {

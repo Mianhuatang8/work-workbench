@@ -12,16 +12,17 @@
             <div style="display: flex; margin-left: 20px;">
                <div style="display: flex;align-items: center;margin-top: 15px;">
                   <div style="margin-right: 10px;width: 99px;">精确查询</div>
-                  <el-select placeholder="请选择" style="width:270px" v-model="formData.QState">
+                  <el-select placeholder="请选择" style="width:270px" v-model="accurateSearch">
                      <el-option label="用户ID" value="0"></el-option>
                      <el-option label="订单编号" value="1"></el-option>
                   </el-select>
-                  <el-input placeholder="请输入" style="margin-left: 10px;"></el-input>
+                  <el-input v-if="accurateSearch=='0'" v-model="formData.PageQueryParam.UserCode" placeholder="请输入用户ID" style="margin-left: 10px;"></el-input>
+                  <el-input v-else placeholder="请输入" v-model="formData.PageQueryParam.OrderCode" style="margin-left: 10px;"></el-input>
                </div>
 
                <div style="display: flex;align-items: center;margin-top: 15px;margin-left: 20px;">
                   <div style="margin-right: 10px;">订单类型</div>
-                  <el-select placeholder="请选择订单类型" style="width:270px" v-model="formData.QState">
+                  <el-select placeholder="请选择订单类型" style="width:270px" v-model="formData.PageQueryParam.OrderTypeCode">
                      <el-option label="年度会员" value="0"></el-option>
                      <el-option label="月度会员" value="1"></el-option>
                      <el-option label="普通会员" value="2"></el-option>
@@ -30,24 +31,22 @@
                <div style="margin-left: 20px;">
                   <div style="display: flex;align-items: center;margin-top: 15px;">
                      <div style="margin-right: 10px;">付款方式</div>
-                     <el-select placeholder="请选择付款方式" style="width:270px" v-model="formData.QState">
+                     <el-select placeholder="请选择付款方式" style="width:270px" v-model="formData.PageQueryParam.PayChannelCode">
                         <el-option label="微信支付" value="0"></el-option>
                         <el-option label="支付宝支付" value="1"></el-option>
                      </el-select>
                   </div>
                </div>
                <div style="display: flex;margin-left: 20px;align-items: center;margin-top: 15px;">
-                  <el-button type="primary" style="margin-right:12px" @click="getList()">查询</el-button>
+                  <el-button type="primary" style="margin-right:12px" @click="serach()">查询</el-button>
                   <el-button @click="reset()">重置</el-button>
                </div>
             </div>
 
             <div style="display: flex;align-items: center;margin-top: 15px; margin-left: 20px;">
                <div style="margin-right: 10px;">下单日期</div>
-               <!-- style="width:270px;" -->
-               <el-date-picker v-model="formData.time" @change="changeTime" format="YYYY-MM-DD" value-format="YYYY-MM-DD"
-                type="daterange"
-                  range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+               <el-date-picker v-model="time" @change="changeTime" format="YYYY-MM-DD" value-format="YYYY-MM-DD"
+                  type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
                </el-date-picker>
                <div class="dateOption">
                   <p @click="setTimeByDays(0)">今天</p>
@@ -64,7 +63,7 @@
             <!-- <div style="display: flex;justify-content: space-between;"> -->
             <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
                <div style="display: flex;justify-content: end; margin-bottom: 10px;">
-                  <el-button type="primary" plain >批量操作</el-button>
+                  <el-button type="primary" plain>批量操作</el-button>
                </div>
                <el-tab-pane label="全部订单" name="all">
                   <el-table ref="multipleTableDevice" :data="tableData" @select="selectTab"
@@ -97,13 +96,11 @@
                      <el-table-column prop="orderState" align="center" header-align="center" label="订单状态">
                         <template #default="scope">
                            <div style="display: flex;align-items: center;justify-content:center">
-                              <div :style="{ 'background-color': getStateColor(scope.row.orderState) }" class="stateIcon"></div>
+                              <div :style="{ 'background-color': getStateColor(scope.row.orderState) }" class="stateIcon">
+                              </div>
                               <span :style="{ 'color': getStateColor(scope.row.orderState) }"> {{
-                              getOrderStateText(scope.row.orderState) }}</span>
+                                 getOrderStateText(scope.row.orderState) }}</span>
                            </div>
-
-
-                          
                         </template>
                      </el-table-column>
                      <el-table-column prop="time" align="center" header-align="center" label="下单时间" width="200">
@@ -130,13 +127,13 @@
             <!-- </div> -->
 
             <div style="margin-top: 40px;display: flex;justify-content: flex-end;align-items: center;">
-            <div style="margin-right: 15px;">
-               共<span>{{ pages.total }}</span>条
+               <div style="margin-right: 15px;">
+                  共<span>{{ pages.total }}</span>条
+               </div>
+               <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" :small="small"
+                  :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
+                  @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
             </div>
-            <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" :small="small"
-               :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
-               @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
-         </div>
 
          </div>
       </div>
@@ -146,8 +143,10 @@
 <script setup>
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Select } from '@element-plus/icons-vue'
-import { ref, markRaw ,onMounted,reactive} from "vue";
+import { ref, markRaw, onMounted, reactive } from "vue";
 import { useRouter } from 'vue-router';
+import { getOrderList, getOrderInfoById } from '../../api/order';
+
 const router = useRouter()
 //分页条数据
 const pages = ref({
@@ -156,14 +155,7 @@ const pages = ref({
    limit: 10
 })
 
-const options = ref([])
-const value = ref('')
-const input = ref('')
-const params = ref({
-   startTime: "",
-   endTime: "",
-   date: "",
-})
+
 const tableData = ref([
    {
       orderID: '121323433333311111111354',
@@ -211,56 +203,76 @@ const tableData = ref([
       time: '2020/02/12 12:33:11'
    }
 ])
-const currentPage = ref(1)
-const userLength = ref(0)
-const TotalPage = ref(0)
+
+//日期选择器的时间
+const time = ref([])
+//精确查询
+const accurateSearch=ref(null)
 const formData = reactive({
-   UniqueCode: "",
-   Title: "",
-   Role: "",
-   CollectId: "",
-   QState: null,
-   PageIndex: 1,
-   PageSize: 8,
-   time:null
-})
-const handleList = ref([])
-const traslate2APIState = ref({
-   // 待处理: 1,
-   // 已下架: 2,
-   // 已驳回: 3,
+   PageIndex: 1,//第几页
+   PageSize: 10,//总页数
+   PageQueryParam: {//分页查询参数
+      OrderTypeCode: "",//订单类型编号
+      OrderStartTime: null,//下单时间
+      OrderEndTime: null,//下单时间（需要取选中当天则要传多一天）
+      PayChannelCode: "",//支付渠道编号
+      UserCode: "",//用户编号
+      OrderCode: "",//订单编号
+      UserPhone: "",//用户手机号
+      OrderStatus: null//订单状态
+   }
 })
 
+//时间选择器发生变化
+const changeTime = (date) => {
+   console.log('时间选择器发生变化', date);
+   //修改表单数据里面的反馈时间
+   formData.PageQueryParam.OrderStartTime = date[0]
+   const newDate = date[1].split('-')
+   newDate[2] = (Number(newDate[2]) + 1).toString()
+   formData.PageQueryParam.OrderEndTime = newDate.join('-')
+}
+
+
+//重置
+const reset=()=>{
+   time.value=[]
+   formData.PageQueryParam.OrderTypeCode=''
+   formData.PageQueryParam.OrderStartTime=null
+   formData.PageQueryParam.OrderEndTime=null
+   formData.PageQueryParam.PayChannelCode=''
+   formData.PageQueryParam.UserCode=''
+   formData.PageQueryParam.OrderCode=''
+   formData.PageQueryParam.UserPhone=''
+   formData.PageQueryParam,OrderStatus=null
+}
+
 const formatDate = (time) => {
-  const y = time.getFullYear();
-  const yy = y < 10 ? '0' + y : y
-  const m = time.getMonth() + 1;
-  const mm = m < 10 ? '0' + m : m
-  const d = time.getDate();
-  const dd = d < 10 ? '0' + d : d
-  return `${yy}-${mm}-${dd}`;
+   const y = time.getFullYear();
+   const yy = y < 10 ? '0' + y : y
+   const m = time.getMonth() + 1;
+   const mm = m < 10 ? '0' + m : m
+   const d = time.getDate();
+   const dd = d < 10 ? '0' + d : d
+   return `${yy}-${mm}-${dd}`;
 }
 
 const setTimeByDays = (value) => {
-  console.log('点击日期', value);
-  const end = new Date()
-  const start = new Date()
-  if (value == 1) {
-    // const date = new Date()
-    start.setTime(start.getTime() - 3600 * 1000 * 24)
-    end.setTime(end.getTime() - 3600 * 1000 * 24)
-  } else if (value == 7) {
-    start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-  } else if (value == 30) {
-    start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-  }
-  //对获取到的时间进行格式化
-  formData.time = [formatDate(start), formatDate(end)]
-  // console.log('form的time', formData.time);
+   console.log('点击日期', value);
+   const end = new Date()
+   const start = new Date()
+   if (value == 1) {
+      // const date = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24)
+      end.setTime(end.getTime() - 3600 * 1000 * 24)
+   } else if (value == 7) {
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+   } else if (value == 30) {
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+   }
+   //对获取到的时间进行格式化
+   time.value = [formatDate(start), formatDate(end)]
 }
-
-
-
 
 const activeName = ref('all')
 const getStateColor = (row) => {
@@ -294,54 +306,40 @@ const getOrderStateText = (row) => {
 }
 
 
+//查询
+const serach=()=>{
+
+}
+
 
 //点击查看举报详情
 const lookDetail = (row) => {
    router.push({
       path: '/orderDetail',
-      query:{
+      query: {
          ...row
       }
    })
 
 }
 
-//上架
-const add = () => {
 
-}
-//下架
-const remove = () => {
-   ElMessageBox.alert('下架成功', '提示', {
-      // center:true,
-      icon: markRaw(Select),
-   })
-
-}
-
-//驳回
-const reject = () => {
-   ElMessageBox.alert('驳回举报信息', '提示', {
-      // center:true,
-      icon: markRaw(Select),
-   })
-
-}
 onMounted(() => {
    document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
 
 })
 
+
 </script>
    
 <style lang="scss" scoped>
 .stateIcon {
-  width: 8px;
-  margin-left: 10px;
-  height: 8px;
-  background-color: black;
-  border-radius: 50%;
-  margin-right: 8px;
+   width: 8px;
+   margin-left: 10px;
+   height: 8px;
+   background-color: black;
+   border-radius: 50%;
+   margin-right: 8px;
 }
 
 .reportSearchBox {

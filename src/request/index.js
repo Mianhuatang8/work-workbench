@@ -30,7 +30,7 @@ request.interceptors.request.use(
             config.headers.Authorization = `Bearer ${tokenStr}`;
         } else {
             //开发环境
-            config.headers.Authorization = `Bearer 404C0C8C680C00E957E499B5BE1D5D087A42BD235047B521CF683D85D7FF32DF`;
+            config.headers.Authorization = `Bearer 0A3AB8CEF92C90537E8C4EEAD7BA79B448CDA0110875D817612501ED5C148F5F`;
         }
         config.headers['Content-Type'] = 'application/json';
 
