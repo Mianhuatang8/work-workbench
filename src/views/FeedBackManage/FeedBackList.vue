@@ -13,35 +13,24 @@
                <div style="display: flex;align-items: center;">
                   <div style="margin-right: 10px;">平台内容</div>
                   <el-select placeholder="请选择平台内容" style="width:270px" v-model="formData.PageQueryParam.PlatformContentId">
-                     <el-option label="质量" value="0"></el-option>
-                     <el-option label="风格" value="1"></el-option>
-                     <el-option label="数量" value="2"></el-option>
-                     <el-option label="产出时间" value="3"></el-option>
-                     <el-option label="版权" value="4"></el-option>
-                     <el-option label="应用场景-类型" value="5"></el-option>
-                     <el-option label="应用场景-会员" value="6"></el-option>
-                     <el-option label="订单问题" value="7"></el-option>
-                     <el-option label="其他" value="8"></el-option>
+                     <el-option v-for="item in platformSelect" :key="item.Id" :label="item.Name"
+                        :value="item.Id"></el-option>
                   </el-select>
                </div>
 
                <div style="display: flex;align-items: center;">
                   <div style="margin-right: 10px;">问题类型</div>
                   <el-select placeholder="请选择问题类型" style="width:270px" v-model="formData.PageQueryParam.ProblemContentId">
-                     <el-option label="使用咨询" value="0"></el-option>
-                     <el-option label="需求建议" value="1"></el-option>
-                     <el-option label="BUG" value="2"></el-option>
-                     <el-option label="其他" value="3"></el-option>
+                     <el-option v-for="item in problemSelect" :key="item.Id" :label="item.Name"
+                        :value="item.Id"></el-option>
                   </el-select>
                </div>
-
 
                <div style="display: flex;align-items: center; ">
                   <div style="margin-right: 10px;">反馈日期</div>
                   <!-- style="width:270px;" -->
-                  <el-date-picker v-model="time" @change="changeTime" format="YYYY-MM-DD"
-                     value-format="YYYY-MM-DD" type="daterange" range-separator="至" start-placeholder="开始日期"
-                     end-placeholder="结束日期">
+                  <el-date-picker v-model="time" @change="changeTime" format="YYYY-MM-DD" value-format="YYYY-MM-DD"
+                     type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
                   </el-date-picker>
                   <div class="dateOption">
                      <p @click="setTimeByDays(0)">今天</p>
@@ -51,7 +40,6 @@
                   </div>
                </div>
 
-
                <div style="display: flex;align-items: center;">
                   <el-button type="primary" style="margin-right:12px" @click="getList()">查询</el-button>
                   <el-button @click="reset()">重置</el-button>
@@ -60,65 +48,77 @@
          </div>
 
          <div class="reportContentBox" style="margin-top:30px;">
-            <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
-               <div style="display: flex;justify-content: end; margin-bottom: 10px;">
+            <div style="display: flex;justify-content: space-between; margin-bottom: 10px;position: relative;">
+               <el-tabs v-model="activeName" class="demo-tabs" @tab-change="handleChange" style="flex:1">
+                  <el-tab-pane label="全部订单" name="all"></el-tab-pane>
+                  <el-tab-pane label="待处理" name="wait"></el-tab-pane>
+                  <el-tab-pane label="已完成" name="finish"></el-tab-pane>
+                  <el-tab-pane label="已关闭" name="close"></el-tab-pane>
+               </el-tabs>
+               <div style="position: absolute;bottom:25px;right: 0;">
                   <el-button type="primary" plain @click="roleLeadingOut">导出为Excel</el-button>
                </div>
-               <el-tab-pane label="全部订单" name="all">
-                  <el-table ref="tableRef" :data="tableData" id="el-table" @select="selectTab"
-                     style="width: 100%;margin-left: 15px;" :header-cell-style="{ background: '#F2F3F8' }" max-height="380"
-                     :row-style="{ height: 40 + 'px' }" :cell-style="{ padding: 0 + 'px' }">
+            </div>
 
-                     <el-table-column type="selection" width="60">
-                     </el-table-column>
 
-                     <el-table-column prop="orderID" align="center" header-align="center" label="反馈编号" width="250">
-                     </el-table-column>
-                     <el-table-column prop="userID" align="center" header-align="center" label="用户ID" width="250">
-                     </el-table-column>
-                     <el-table-column prop="title" align="center" header-align="center" label="反馈标题" show-overflow-tooltip>
-                     </el-table-column>
-                     <el-table-column prop="content" align="center" header-align="center" label="平台内容">
-                     </el-table-column>
-                     <el-table-column prop="problemType" align="center" header-align="center" label="问题类型">
-                     </el-table-column>
-                     <el-table-column prop="feedBackFrom" align="center" header-align="center" label="反馈来源">
-                     </el-table-column>
-                     <el-table-column prop="state" align="center" header-align="center" label="反馈状态">
-                        <template #default="scope">
-                           <div style="display: flex;align-items: center;justify-content:center">
-                              <div :style="{ 'background-color': getStateColor(scope.row.state) }" class="stateIcon"></div>
-                              <span :style="{ 'color': getStateColor(scope.row.state) }"> {{
-                                 getStateText(scope.row.state) }}</span>
+            <div>
+               <el-table ref="tableRef" :data="tableData" id="el-table" style="width: 100%;margin-left: 15px;"
+                  :header-cell-style="{ background: '#F2F3F8' }" max-height="380" :row-style="{ height: 40 + 'px' }"
+                  :cell-style="{ padding: 0 + 'px' }">
+
+                  <el-table-column type="selection" width="60">
+                  </el-table-column>
+
+                  <el-table-column prop="FeedBackCode" align="center" header-align="center" label="反馈编号" width="200">
+                  </el-table-column>
+                  <el-table-column prop="FeedBackUserName" align="center" header-align="center" label="用户ID" width="200">
+                  </el-table-column>
+                  <el-table-column prop="FeedBackPhone" align="center" header-align="center" label="手机号码">
+                  </el-table-column>
+                  <el-table-column prop="FeedBackTitle" align="center" header-align="center" label="反馈标题"
+                     show-overflow-tooltip>
+                  </el-table-column>
+                  <el-table-column prop="FeedBackContent" align="center" header-align="center" label="反馈内容"
+                     show-overflow-tooltip>
+                  </el-table-column>
+                  <el-table-column prop="PlatformContent" align="center" header-align="center" show-overflow-tooltip
+                     label="平台内容">
+                  </el-table-column>
+                  <el-table-column prop="ProblemContent" align="center" header-align="center" label="问题类型">
+                  </el-table-column>
+                  <el-table-column prop="FeedBackSourceText" align="center" header-align="center" label="反馈来源">
+                  </el-table-column>
+                  <el-table-column prop="FeedBackStatus" align="center" header-align="center" label="反馈状态">
+                     <template #default="scope">
+                        <div style="display: flex;align-items: center;justify-content:center">
+                           <div :style="{ 'background-color': getStateColor(scope.row.FeedBackStatus) }" class="stateIcon">
                            </div>
+                           <span :style="{ 'color': getStateColor(scope.row.FeedBackStatus) }">
+                              {{ scope.row.FeedBackStatusText }}</span>
+                        </div>
 
-                        </template>
-                     </el-table-column>
-                     <el-table-column prop="time" align="center" header-align="center" label="反馈时间" width="200">
-                     </el-table-column>
-
-                     <el-table-column align="center" header-align="center" label="操作">
-                        <template #default="scope">
-                           <div style="display: flex;justify-content: space-around; cursor: pointer;align-items: center;">
-                              <div style="color: #009fff; " @click="lookDetail(scope.row)">详情</div>
-                           </div>
-                        </template>
-                     </el-table-column>
-                  </el-table>
-               </el-tab-pane>
-               <el-tab-pane label="待处理" name="wait">待处理</el-tab-pane>
-               <el-tab-pane label="已完成" name="finish">已完成</el-tab-pane>
-               <el-tab-pane label="已关闭" name="close">已关闭</el-tab-pane>
-            </el-tabs>
+                     </template>
+                  </el-table-column>
+                  <el-table-column prop="FeedBackTimeStr" align="center" header-align="center" label="反馈时间" width="200">
+                  </el-table-column>
+                  <el-table-column align="center" header-align="center" label="操作">
+                     <template #default="scope">
+                        <div style="display: flex;justify-content: space-around; cursor: pointer;align-items: center;">
+                           <div style="color: #009fff; " @click="lookDetail(scope.row)">详情</div>
+                        </div>
+                     </template>
+                  </el-table-column>
+               </el-table>
+            </div>
 
 
             <div style="margin-top: 40px;display: flex;justify-content: flex-end;align-items: center;">
                <div style="margin-right: 15px;">
                   共<span>{{ pages.total }}</span>条
                </div>
-               <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" :small="small"
-                  :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
-                  @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
+               <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" background
+                  layout=" prev, pager, next, jumper" :total="pages.total"
+                  @current-change="handleCurrentChange"></el-pagination>
             </div>
 
          </div>
@@ -127,71 +127,87 @@
 </template>
    
 <script setup>
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox, valueEquals } from 'element-plus'
 import { Select } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router';
 import { reactive, toRefs, ref, onMounted, nextTick, getCurrentInstance } from 'vue'
-import { getFeedBackList, getListById, closeFeedBack, exportExcel, finishFeedBack } from '../../api/feedBack.js'
+import { getFeedBackList, getListById, closeFeedBack, exportExcel, finishFeedBack, getSelectionType } from '../../api/feedBack.js'
 
 // 依赖引入
 import FileSaver from "file-saver";
 import * as XLSX from 'xlsx'
 
 //分页条数据
-const pages = ref({
-   total:10,
+const pages = reactive({
+   total: 100,
    currentPage: 1,
    limit: 10
-
 })
 
 const router = useRouter()
 
-const tableData = ref([
-   {
-      orderID: '121323433333311111111354',
-      userID: '121323433333311111111354',
-      title: '我是反馈标题我是反馈标题',
-      content: '产出时间',
-      problemType: '需求建议',
-      feedBackFrom: 'web',
-      state: 0,//0-待处理 1-已完成 2-已关闭
-      time: '2020/02/12 12:33:11'
-   },
-   {
-      orderID: '121323433333311111111354',
-      userID: '121323433333311111111354',
-      title: '我是反馈标题我是反馈标题',
-      content: '产出时间',
-      problemType: '需求建议',
-      feedBackFrom: 'web',
-      state: 1,//0-待处理 1-已完成 2-已关闭
-      time: '2020/02/12 12:33:11'
-   },
-   {
-      orderID: '121323433333311111111354',
-      userID: '121323433333311111111354',
-      title: '我是反馈标题我是反馈标题',
-      content: '产出时间',
-      problemType: '需求建议',
-      feedBackFrom: 'web',
-      state: 2,//0-待处理 1-已完成 2-已关闭
-      time: '2020/02/12 12:33:11'
-   },
-   {
-      orderID: '121323433333311111111354',
-      userID: '121323433333311111111354',
-      title: '我是反馈标题我是反馈标题',
-      content: '产出时间',
-      problemType: '需求建议',
-      feedBackFrom: 'web',
-      state: 0,//0-待处理 1-已完成 2-已关闭
-      time: '2020/02/12 12:33:11'
-   },
-])
+
+let platformSelect = ref([])
+let problemSelect = ref([])
+//获取平台内容、问题类型
+const getSelectType = async () => {
+   const res1 = await getSelectionType({ key: 'PlatformContentType' })
+   platformSelect.value = res1.data.Result
+   // console.log('平台内容选择', platformSelect.value);
+   const res2 = await getSelectionType({ key: "ProblemType" })
+   problemSelect.value = res2.data.Result
+   // console.log('问题类型选择', problemSelect.value);
+}
+getSelectType()
+
+// const tableData = ref([
+//    {
+//       orderID: '121323433333311111111354',
+//       userID: '121323433333311111111354',
+//       title: '我是反馈标题我是反馈标题',
+//       content: '产出时间',
+//       problemType: '需求建议',
+//       feedBackFrom: 'web',
+//       state: 0,//0-待处理 1-已完成 2-已关闭
+//       time: '2020/02/12 12:33:11'
+//    },
+//    {
+//       orderID: '121323433333311111111354',
+//       userID: '121323433333311111111354',
+//       title: '我是反馈标题我是反馈标题',
+//       content: '产出时间',
+//       problemType: '需求建议',
+//       feedBackFrom: 'web',
+//       state: 1,//0-待处理 1-已完成 2-已关闭
+//       time: '2020/02/12 12:33:11'
+//    },
+//    {
+//       orderID: '121323433333311111111354',
+//       userID: '121323433333311111111354',
+//       title: '我是反馈标题我是反馈标题',
+//       content: '产出时间',
+//       problemType: '需求建议',
+//       feedBackFrom: 'web',
+//       state: 2,//0-待处理 1-已完成 2-已关闭
+//       time: '2020/02/12 12:33:11'
+//    },
+//    {
+//       orderID: '121323433333311111111354',
+//       userID: '121323433333311111111354',
+//       title: '我是反馈标题我是反馈标题',
+//       content: '产出时间',
+//       problemType: '需求建议',
+//       feedBackFrom: 'web',
+//       state: 0,//0-待处理 1-已完成 2-已关闭
+//       time: '2020/02/12 12:33:11'
+//    },
+// ])
 
 //日期选择器的时间
-const time=ref([])
+
+
+const tableData = ref([])
+const time = ref([])
 //收集表单数据
 const formData = reactive({
    PageIndex: 1,//第几页
@@ -205,14 +221,58 @@ const formData = reactive({
    }
 })
 
+
+//分页获取查询反馈列表
+const getList = async () => {
+   // console.log('分页查询', formData);
+   let res = await getFeedBackList(formData)
+   console.log('获取反馈信息列表', res);
+   tableData.value = res.data.Result.Datas
+   pages.total = res.data.Result.totalCount
+   pages.currentPage = res.data.Result.pageCount
+}
+getList()
+
+
+//tab菜单选项发生变化
+const handleChange = (value) => {
+   console.log('当前激活的activename', value)
+   //修改反馈状态后重新发起数据请求
+   if (value == 'wait') {
+      formData.PageQueryParam.FeedBackStatus = 0
+
+   } else if (value == 'finish') {
+      formData.PageQueryParam.FeedBackStatus = 1
+
+   } else if (value = 'close') {
+      formData.PageQueryParam.FeedBackStatus = 2
+
+   } else {
+      formData.PageQueryParam.FeedBackStatus = null
+   }
+   //重新获取数据
+   // getList
+
+
+}
+//点击分页条
+const handleCurrentChange = (currentPage) => {
+   // console.log('当前页面',currentPage);
+   formData.PageIndex = currentPage
+   //修改当前页数后重新发起数据请求
+
+}
+
+
+
 //时间选择器发生变化
-const changeTime=(date)=>{
-   console.log('时间选择器发生变化',date);
+const changeTime = (date) => {
+   console.log('时间选择器发生变化', date);
    //修改表单数据里面的反馈时间
-   formData.PageQueryParam.FeedBackStartTime=date[0]
-   const newDate=date[1].split('-')
-   newDate[2]=(Number(newDate[2])+1).toString()
-   formData.PageQueryParam.FeedBackEndTime=newDate.join('-')
+   formData.PageQueryParam.FeedBackStartTime = date[0]
+   const newDate = date[1].split('-')
+   newDate[2] = (Number(newDate[2]) + 1).toString()
+   formData.PageQueryParam.FeedBackEndTime = newDate.join('-')
    // console.log('修改时间查看表单数据的反馈时间变化',formData.PageQueryParam);
 }
 
@@ -249,16 +309,27 @@ const setTimeByDays = (value) => {
    }
    //对获取到的时间进行格式化
    time.value = [formatDate(start), formatDate(end)]
+   //修改表单里面的数据
+   formData.PageQueryParam.FeedBackStartTime = formatDate(start)
+   const newDate = formatDate(end).split('-')
+   newDate[2] = (Number(newDate[2]) + 1).toString()
+   formData.PageQueryParam.FeedBackEndTime = newDate.join('-')
+   // console.log('点击按钮-查看表单数据的反馈时间变化',formData.PageQueryParam);
 }
 
+
+
 //重置
-const reset=()=>{
-   time.value=[]
-   formData.PageQueryParam.FeedBackStartTime=null
-   formData.PageQueryParam.FeedBackEndTime=null
-   formData.PageQueryParam.PlatformContentId=""
-   formData.PageQueryParam.ProblemContentId=""
-   formData.PageQueryParam.FeedBackStatus=null
+const reset = () => {
+   time.value = []
+   formData.PageQueryParam.FeedBackStartTime = null
+   formData.PageQueryParam.FeedBackEndTime = null
+   formData.PageQueryParam.PlatformContentId = ""
+   formData.PageQueryParam.ProblemContentId = ""
+   formData.PageQueryParam.FeedBackStatus = null
+   formData.PageIndex = 1
+   //重新获取数据
+   getList()
 }
 
 
@@ -273,20 +344,15 @@ const getStateColor = (row) => {
    }
 }
 
-const getStateText = (row) => {
-   if (row == 0) {
-      return "待处理";
-   } else if (row == 1) {
-      return "已完成";
-   } else if (row == 2) {
-      return "已关闭";
-   }
-}
-
 //点击查看举报详情
-const lookDetail = () => {
+const lookDetail = async (row) => {
+   //根据id发起请求查看详情数据
+   const res = await getListById({ id: row.id })
+   console.log('根据id查看详情数据', res);
+
    router.push({
-      path: '/feedBackDetail'
+      path: '/feedBackDetail',
+      // params:
    })
 
 }
@@ -333,7 +399,6 @@ function save() {
 
 onMounted(() => {
    document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
-
 })
 
 </script>

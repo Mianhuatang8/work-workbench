@@ -30,10 +30,9 @@ request.interceptors.request.use(
             config.headers.Authorization = `Bearer ${tokenStr}`;
         } else {
             //开发环境
-            config.headers.Authorization = `Bearer 0A3AB8CEF92C90537E8C4EEAD7BA79B448CDA0110875D817612501ED5C148F5F`;
+            // config.headers.Authorization = `Bearer 0A3AB8CEF92C90537E8C4EEAD7BA79B448CDA0110875D817612501ED5C148F5F`;
         }
         config.headers['Content-Type'] = 'application/json';
-
         return config;
     },
     function (error) {
@@ -42,20 +41,4 @@ request.interceptors.request.use(
     }
 );
 
-
-
-
-
-
-
-
-
-
-
-
-
 export default request
-
-
-
-

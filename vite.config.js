@@ -5,7 +5,7 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  
+
   plugins: [
     vue(),
   ],
@@ -14,7 +14,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  proxy:{
+  proxy: {
     // '/api01':{
     //     target:'https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15',
     //     changeOrigin:true,
@@ -24,3 +24,6 @@ export default defineConfig({
     // },
   }
 })
+
+
+

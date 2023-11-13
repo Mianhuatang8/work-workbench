@@ -152,6 +152,14 @@ const router = useRouter()
 const sortRole = ref(['不限', '管理员'])
 const selectRoleSortIndex = ref(0)
 
+//改变被选中的角色分类样式index
+const changeIndex = (index) => {
+  selectRoleSortIndex.value = index
+}
+
+
+
+
 const pickerOptions = ref({
    disabledDate(time) {
       // 设置选择今天及今天之后的日期
@@ -287,7 +295,6 @@ const delSome = () => {
 
 }
 
-
 onMounted(() => {
    console.log('route-permission', router.options.routes);
    document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
@@ -302,7 +309,7 @@ onMounted(() => {
    display: flex;
    justify-content: center;
    background-color: #06a6ff;
-   width: 100px;
+   width:60px;
    line-height: 30px;
    height: 30px;
    border-radius: 25px;

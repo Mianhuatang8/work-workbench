@@ -1,13 +1,13 @@
 import request from "../request"
 
-const commonUrl = 'http://www.caotanghuali.com:9002/app/admin'
+const commonUrl = 'http://www.caotanghuali.com:9003/app/admin'
 
 //分页查询反馈信息列表
-export function getFeedBackList(limit){
+export function getFeedBackList(searchForm){
     return request({
         url: `${commonUrl}/feedback/getbypage`,
-        methods: 'post',
-        data:limit
+        method: 'post',
+        data:searchForm
     })
 }
 
@@ -15,7 +15,7 @@ export function getFeedBackList(limit){
 export function getListById(id){
     return request({
         url:`${commonUrl}/feedback/getbyid`,
-        methods:'post',
+        method:'post',
         data:id
     })
 }
@@ -24,7 +24,7 @@ export function getListById(id){
 export function closeFeedBack(id){
     return request({
         url:`${commonUrl}/feedback/close`,
-        methods:'post',
+        method:'post',
         data:id
     })
 }
@@ -33,7 +33,7 @@ export function closeFeedBack(id){
 export function exportExcel(data){
     return request({
         url:`${commonUrl}/feedback/exportexcel`,
-        methods:'post',
+        method:'post',
         data:data
     })
 }
@@ -42,7 +42,17 @@ export function exportExcel(data){
 export function finishFeedBack(id){
     return request({
         url:`${commonUrl}/feedback/complete`,
-        methods:'post',
+        method:'post',
         data:id
+    })
+}
+
+
+//获取平台内容/问题类型选择项
+export function getSelectionType(code){
+    return request({
+        url:`${commonUrl}/dictionary/getaidicitembytype`,
+        method:'post',
+        data:code
     })
 }

@@ -1,6 +1,6 @@
 import request from "../request";
 
-const commonUrl = 'http://www.caotanghuali.com:9002/app/admin'
+const commonUrl = 'http://www.caotanghuali.com:9003/app/admin'
 
 //分页查询订单列表
 export function getOrderList(data){

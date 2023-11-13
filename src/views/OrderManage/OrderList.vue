@@ -66,7 +66,7 @@
                   <el-button type="primary" plain>批量操作</el-button>
                </div>
                <el-tab-pane label="全部订单" name="all">
-                  <el-table ref="multipleTableDevice" :data="tableData" @select="selectTab"
+                  <el-table ref="multipleTableDevice" :data="tableData"
                      style="width: 100%;margin-left: 15px;" :header-cell-style="{ background: '#F2F3F8' }" max-height="380"
                      :row-style="{ height: 40 + 'px' }" :cell-style="{ padding: 0 + 'px' }">
 
