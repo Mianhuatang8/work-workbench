@@ -168,6 +168,7 @@
 import { ref ,onMounted, reactive} from 'vue'
 import { Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { getAllRole } from '../../api/user'
 
 //分页条数据
 const pages = ref({
@@ -227,6 +228,18 @@ const form = reactive({
   checkList: [],
   time:null
 })
+
+
+//获取vip用户列表
+const getList = async () => {
+  let res = await getAllRole({
+    PageIndex: pages.currentPage,//页码
+    PageSize: pages.limit,//页数
+    GroupCode: "VIP"
+  })
+  console.log('获取vip用户列表',res);
+}
+getList()
 
 const formatDate = (time) => {
   const y = time.getFullYear();

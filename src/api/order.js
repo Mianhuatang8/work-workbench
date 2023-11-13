@@ -6,7 +6,7 @@ const commonUrl = 'http://www.caotanghuali.com:9003/app/admin'
 export function getOrderList(data){
     return request({
         url: `${commonUrl}/order/getbypage`,
-        methods: 'post',
+        method: 'post',
         data:data
     })
 }
@@ -16,7 +16,7 @@ export function getOrderList(data){
 export function getOrderInfoById(id){
     return request({
         url:`${commonUrl}/order/getbyid`,
-        methods:'post',
+        method:'post',
         data:id
     })
 }

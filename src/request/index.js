@@ -2,7 +2,7 @@ import axios from "axios";
 import { ElMessage } from 'element-plus';
 
 const request = axios.create({
-    baseURL: 'http://localhost:3000/',
+    baseURL: 'http://www.caotanghuali.com:9003',
     timeout: 5000,
 })
 

@@ -56,14 +56,15 @@
                   <el-tab-pane label="已关闭" name="close"></el-tab-pane>
                </el-tabs>
                <div style="position: absolute;bottom:25px;right: 0;">
-                  <el-button type="primary" plain @click="roleLeadingOut">导出为Excel</el-button>
+                  <!-- roleLeadingOut -->
+                  <el-button type="primary" plain @click="exportExcelFile()">导出为Excel</el-button>
                </div>
             </div>
 
 
             <div>
                <el-table ref="tableRef" :data="tableData" id="el-table" style="width: 100%;margin-left: 15px;"
-                  :header-cell-style="{ background: '#F2F3F8' }" max-height="380" :row-style="{ height: 40 + 'px' }"
+                  :header-cell-style="{ background: '#F2F3F8' }" max-height="680" :row-style="{ height: 40 + 'px' }"
                   :cell-style="{ padding: 0 + 'px' }">
 
                   <el-table-column type="selection" width="60">
@@ -100,6 +101,9 @@
                      </template>
                   </el-table-column>
                   <el-table-column prop="FeedBackTimeStr" align="center" header-align="center" label="反馈时间" width="200">
+                     <template #default="scope">
+                        {{ scope.row.FeedBackTimeStr.split('.')[0] }}
+                     </template>
                   </el-table-column>
                   <el-table-column align="center" header-align="center" label="操作">
                      <template #default="scope">
@@ -132,6 +136,7 @@ import { Select } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router';
 import { reactive, toRefs, ref, onMounted, nextTick, getCurrentInstance } from 'vue'
 import { getFeedBackList, getListById, closeFeedBack, exportExcel, finishFeedBack, getSelectionType } from '../../api/feedBack.js'
+// import { exportExcelMethod } from '../../utils/excel'
 
 // 依赖引入
 import FileSaver from "file-saver";
@@ -143,6 +148,7 @@ const pages = reactive({
    currentPage: 1,
    limit: 10
 })
+const activeName = ref('all')
 
 const router = useRouter()
 
@@ -159,51 +165,6 @@ const getSelectType = async () => {
    // console.log('问题类型选择', problemSelect.value);
 }
 getSelectType()
-
-// const tableData = ref([
-//    {
-//       orderID: '121323433333311111111354',
-//       userID: '121323433333311111111354',
-//       title: '我是反馈标题我是反馈标题',
-//       content: '产出时间',
-//       problemType: '需求建议',
-//       feedBackFrom: 'web',
-//       state: 0,//0-待处理 1-已完成 2-已关闭
-//       time: '2020/02/12 12:33:11'
-//    },
-//    {
-//       orderID: '121323433333311111111354',
-//       userID: '121323433333311111111354',
-//       title: '我是反馈标题我是反馈标题',
-//       content: '产出时间',
-//       problemType: '需求建议',
-//       feedBackFrom: 'web',
-//       state: 1,//0-待处理 1-已完成 2-已关闭
-//       time: '2020/02/12 12:33:11'
-//    },
-//    {
-//       orderID: '121323433333311111111354',
-//       userID: '121323433333311111111354',
-//       title: '我是反馈标题我是反馈标题',
-//       content: '产出时间',
-//       problemType: '需求建议',
-//       feedBackFrom: 'web',
-//       state: 2,//0-待处理 1-已完成 2-已关闭
-//       time: '2020/02/12 12:33:11'
-//    },
-//    {
-//       orderID: '121323433333311111111354',
-//       userID: '121323433333311111111354',
-//       title: '我是反馈标题我是反馈标题',
-//       content: '产出时间',
-//       problemType: '需求建议',
-//       feedBackFrom: 'web',
-//       state: 0,//0-待处理 1-已完成 2-已关闭
-//       time: '2020/02/12 12:33:11'
-//    },
-// ])
-
-//日期选择器的时间
 
 
 const tableData = ref([])
@@ -229,7 +190,6 @@ const getList = async () => {
    console.log('获取反馈信息列表', res);
    tableData.value = res.data.Result.Datas
    pages.total = res.data.Result.totalCount
-   pages.currentPage = res.data.Result.pageCount
 }
 getList()
 
@@ -244,25 +204,25 @@ const handleChange = (value) => {
    } else if (value == 'finish') {
       formData.PageQueryParam.FeedBackStatus = 1
 
-   } else if (value = 'close') {
+   } else if (value == 'close') {
       formData.PageQueryParam.FeedBackStatus = 2
 
+   } else if (value == 'all') {
+      formData.PageQueryParam.FeedBackStatus = null
    } else {
       formData.PageQueryParam.FeedBackStatus = null
    }
    //重新获取数据
-   // getList
-
+   getList()
 
 }
 //点击分页条
 const handleCurrentChange = (currentPage) => {
-   // console.log('当前页面',currentPage);
    formData.PageIndex = currentPage
    //修改当前页数后重新发起数据请求
+   getList()
 
 }
-
 
 
 //时间选择器发生变化
@@ -333,7 +293,6 @@ const reset = () => {
 }
 
 
-const activeName = ref('all')
 const getStateColor = (row) => {
    if (row == 0) {
       return "orange";
@@ -346,55 +305,56 @@ const getStateColor = (row) => {
 
 //点击查看举报详情
 const lookDetail = async (row) => {
-   //根据id发起请求查看详情数据
-   const res = await getListById({ id: row.id })
+   console.log('查看举报详情', row);
+   const res = await getListById({ ID: row.FeedBackId })
    console.log('根据id查看详情数据', res);
-
    router.push({
       path: '/feedBackDetail',
-      // params:
+      query: {
+         ...res.data.Result
+      }
    })
-
 }
 
-// 用来访问内部组件实例
-const { proxy } = getCurrentInstance()
-
-const dialog = ref(false)
-// 表格导出excel
-function roleLeadingOut() {
-   // getSelectionRows() 是el-table官方提供的方法（返回当前表格选中的行）
-   // 表格没有指定导出数据时是全部导出（否则是替换表格数据）
-   const selectList = proxy?.$refs.tableRef.getSelectionRows()
-   if (selectList.length) {
-      tableData.value = proxy?.$refs.tableRef.getSelectionRows()
-   }
-   save()
+const exportCsv = (data,title) => {
+   const filename = `${title}.csv` // 拼接文件名
+   const blob = new Blob([data])  //创建一个新的 Blob 对象
+   const url = window.URL.createObjectURL(blob)  //  把一个blob对象转化为一个Blob URL，创建下载链接
+   const downloadLink = document.createElement('a')  // 生成一个a标签
+   downloadLink.href = url
+   downloadLink.download = filename  // // dowload属性指定下载后文件名
+   document.body.appendChild(downloadLink) //将a标签添加到body中
+   downloadLink.click() // 点击下载
+   document.body.removeChild(downloadLink)  // 下载完成后移除元素
+   window.URL.revokeObjectURL(url); // 释放掉blob对象
 }
 
-function save() {
-   dialog.value = false
-   ElMessage({
+//导出excel
+const exportExcelFile = () => {
+   exportExcel({
+      PageQueryParam: { //分页查询参数
+         PlatformContentId: formData.PageQueryParam.PlatformContentId, //平台内容id
+         ProblemContentId: formData.PageQueryParam.ProblemContentId, //问题类型id
+         FeedBackStartTime: formData.PageQueryParam.FeedBackStartTime, //反馈时间
+         FeedBackEndTime: formData.PageQueryParam.FeedBackEndTime, //反馈时间（需要取选中当天则要传多一天）
+         FeedBackStatus: formData.PageQueryParam.FeedBackStatus //反馈状态
+      }
+   }).then(res => {
+      // 传入二进制流data和文件名
+      exportCsv(res.data, '草堂画里用户反馈' + formatDate2(new Date()))
+      ElMessage({
       message: '导出成功',
       type: 'success',
    })
-   nextTick(function () {
-      let filename = '草堂画里用户反馈' + formatDate2(new Date()) + '.xlsx'
-      const xlsxParam = { raw: true } //转化成Excel使用原始格式
-      const elTable = XLSX.utils.table_to_book(document.getElementById('el-table'), xlsxParam)
-      const wbout = XLSX.write(elTable, { bookType: 'xlsx', bookSST: true, type: 'array' })
-      try {
-         FileSaver.saveAs(new Blob([wbout], { type: 'application/octet-stream' }), filename)
-      } catch (e) {
-         if (typeof console !== 'undefined') {
-            console.log(e, wbout)
-         }
-      }
-      return wbout
+
+   }).catch(error => {
+      console.log(error)
+      ElMessage({
+      message: '导出失败',
+      type: 'error',
+   })
    })
 }
-
-
 
 
 onMounted(() => {

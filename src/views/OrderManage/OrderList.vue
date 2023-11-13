@@ -16,8 +16,10 @@
                      <el-option label="用户ID" value="0"></el-option>
                      <el-option label="订单编号" value="1"></el-option>
                   </el-select>
-                  <el-input v-if="accurateSearch=='0'" v-model="formData.PageQueryParam.UserCode" placeholder="请输入用户ID" style="margin-left: 10px;"></el-input>
-                  <el-input v-else placeholder="请输入" v-model="formData.PageQueryParam.OrderCode" style="margin-left: 10px;"></el-input>
+                  <el-input v-if="accurateSearch == '0'" v-model="formData.PageQueryParam.UserCode" placeholder="请输入用户ID"
+                     style="margin-left: 10px;"></el-input>
+                  <el-input v-else placeholder="请输入" v-model="formData.PageQueryParam.OrderCode"
+                     style="margin-left: 10px;"></el-input>
                </div>
 
                <div style="display: flex;align-items: center;margin-top: 15px;margin-left: 20px;">
@@ -60,79 +62,85 @@
          </div>
 
          <div class="reportContentBox" style="margin-top:30px;">
-            <!-- <div style="display: flex;justify-content: space-between;"> -->
-            <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
-               <div style="display: flex;justify-content: end; margin-bottom: 10px;">
-                  <el-button type="primary" plain>批量操作</el-button>
+
+            <div style="display: flex;justify-content: space-between;margin-bottom: 10px;position: relative;">
+               <el-tabs v-model="activeName" class="demo-tabs" @tab-change="handleChange" style="flex:1">
+                  <el-tab-pane label="全部订单" name="all"> </el-tab-pane>
+                  <el-tab-pane label="待付款" name="wait"></el-tab-pane>
+                  <el-tab-pane label="退款中" name="refunding"></el-tab-pane>
+                  <el-tab-pane label="已完成" name="finish"></el-tab-pane>
+                  <el-tab-pane label="已关闭" name="close"></el-tab-pane>
+                  <el-tab-pane label="已退款" name="refunded"></el-tab-pane>
+               </el-tabs>
+               <div style="position: absolute;bottom:25px;right: 0;">
+                  <el-button type="primary" plain @click="refundedSome()">批量退款</el-button>
                </div>
-               <el-tab-pane label="全部订单" name="all">
-                  <el-table ref="multipleTableDevice" :data="tableData"
-                     style="width: 100%;margin-left: 15px;" :header-cell-style="{ background: '#F2F3F8' }" max-height="380"
-                     :row-style="{ height: 40 + 'px' }" :cell-style="{ padding: 0 + 'px' }">
+            </div>
+            <div>
+               <el-table ref="multipleTableDevice" :data="tableData" style="width: 100%;margin-left: 15px;"
+                  :header-cell-style="{ background: '#F2F3F8' }" max-height="380" :row-style="{ height: 40 + 'px' }"
+                  :cell-style="{ padding: 0 + 'px' }">
 
-                     <el-table-column type="selection" width="60">
-                     </el-table-column>
+                  <el-table-column type="selection" width="60">
+                  </el-table-column>
 
-                     <el-table-column prop="orderID" align="center" header-align="center" label="订单编号" width="300">
-                     </el-table-column>
-                     <el-table-column prop="userID" align="center" header-align="center" label="用户ID" width="300">
-                     </el-table-column>
-                     <el-table-column prop="orderType" align="center" header-align="center" label="订单类型">
-                        <template #default="scope">
-                           <span>{{ scope.row.orderType == 0 ? '年度会员' : '月度会员' }}</span>
-                        </template>
-                     </el-table-column>
-                     <el-table-column prop="orderFrom" align="center" header-align="center" label="订单来源">
-                        <template #default="scope">
-                           <span>{{ scope.row.orderFrom == 0 ? '微信支付' : '支付宝支付' }}</span>
-                        </template>
+                  <el-table-column prop="OrderCode" align="center" header-align="center" label="订单编号" width="200">
+                  </el-table-column>
+                  <el-table-column prop="BuyUserName" align="center" header-align="center" label="用户名" >
+                  </el-table-column>
+                  <el-table-column prop="BuyUserPhone" align="center" header-align="center" label="手机号" >
+                  </el-table-column>
+                  <el-table-column prop="OrderDetailList" align="center" header-align="center" label="订单类型">
+                     <template #default="scope">
+                        <span>{{ scope.row.OrderDetailList.WaresName }}</span>
+                     </template>
+                  </el-table-column>
+                  <el-table-column prop="PayChannel" align="center" header-align="center" label="订单来源">
+                     <template #default="scope">
+                        <span>{{ scope.row.orderFrom == 0 ? '微信支付' : '支付宝支付' }}</span>
+                     </template>
 
-                     </el-table-column>
-                     <el-table-column prop="money" align="center" header-align="center" label="消费金额">
-                        <template #default="scope">
-                           ￥{{ scope.row.money }}
-                        </template>
-                     </el-table-column>
-                     <el-table-column prop="orderState" align="center" header-align="center" label="订单状态">
-                        <template #default="scope">
-                           <div style="display: flex;align-items: center;justify-content:center">
-                              <div :style="{ 'background-color': getStateColor(scope.row.orderState) }" class="stateIcon">
-                              </div>
-                              <span :style="{ 'color': getStateColor(scope.row.orderState) }"> {{
-                                 getOrderStateText(scope.row.orderState) }}</span>
+                  </el-table-column>
+                  <el-table-column prop="OrderAmount" align="center" header-align="center" label="消费金额">
+                     <template #default="scope">
+                        ￥{{ scope.row.money }}
+                     </template>
+                  </el-table-column>
+                  <el-table-column prop="orderState" align="center" header-align="center" label="订单状态">
+                     <template #default="scope">
+                        <div style="display: flex;align-items: center;justify-content:center">
+                           <div :style="{ 'background-color': getStateColor(scope.row.OrderStatus) }" class="stateIcon">
                            </div>
-                        </template>
-                     </el-table-column>
-                     <el-table-column prop="time" align="center" header-align="center" label="下单时间" width="200">
-                     </el-table-column>
+                           <span :style="{ 'color': getStateColor(scope.row.OrderStatus) }"> {{ scope.row.OrderStatusText }}</span>
+                        </div>
+                     </template>
+                  </el-table-column>
+                  <el-table-column prop="OrderTimeStr" align="center" header-align="center" label="下单时间" width="200">
+                     <template #default="scope">
+                        {{  scope.row.OrderTimeStr.split('.')[0]}}
+                     </template>
+                  </el-table-column>
 
-                     <el-table-column align="center" header-align="center" label="操作">
-                        <template #default="scope">
-                           <div style="display: flex;justify-content: space-around; cursor: pointer;align-items: center;">
-                              <div style="color: #009fff; " @click="lookDetail(scope.row)">订单详情</div>
+                  <el-table-column align="center" header-align="center" label="操作">
+                     <template #default="scope">
+                        <div style="display: flex;justify-content: space-around; cursor: pointer;align-items: center;">
+                           <div style="color: #009fff; " @click="lookDetail(scope.row)">订单详情</div>
 
-                           </div>
-                        </template>
-                     </el-table-column>
-                  </el-table>
+                        </div>
+                     </template>
+                  </el-table-column>
+               </el-table>
+            </div>
 
-               </el-tab-pane>
-               <el-tab-pane label="待付款" name="wait">待付款</el-tab-pane>
-               <el-tab-pane label="退款中" name="refunding">退款中</el-tab-pane>
-               <el-tab-pane label="已完成" name="finish">已完成</el-tab-pane>
-               <el-tab-pane label="已关闭" name="close">已关闭</el-tab-pane>
-               <el-tab-pane label="已退款" name="refunded">已退款</el-tab-pane>
-            </el-tabs>
 
-            <!-- </div> -->
 
             <div style="margin-top: 40px;display: flex;justify-content: flex-end;align-items: center;">
                <div style="margin-right: 15px;">
                   共<span>{{ pages.total }}</span>条
                </div>
-               <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" :small="small"
-                  :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
-                  @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
+               <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" background
+                  layout=" prev, pager, next, jumper" :total="pages.total"
+                  @current-change="handleCurrentChange"></el-pagination>
             </div>
 
          </div>
@@ -155,59 +163,62 @@ const pages = ref({
    limit: 10
 })
 
-
-const tableData = ref([
-   {
-      orderID: '121323433333311111111354',
-      userID: '121323433333311111111354',
-      orderType: 0,//0-年度会员 1-月度会员
-      orderFrom: 0,//0-微信 1-支付宝
-      money: 199.00,
-      orderState: 0,//0-已完成 1-待付款 2-退款中 3-已关闭 4-已退款
-      time: '2020/02/12 12:33:11'
-   },
-   {
-      orderID: '121323433333311111111354',
-      userID: '121323433333311111111354',
-      orderType: 1,//0-年度会员 1-月度会员
-      orderFrom: 0,//0-微信 1-支付宝
-      money: 199.00,
-      orderState: 1,//0-已完成 1-待付款 2-退款中 3-已关闭 4-已退款
-      time: '2020/02/12 12:33:11'
-   },
-   {
-      orderID: '121323433333311111111354',
-      userID: '121323433333311111111354',
-      orderType: 0,//0-年度会员 1-月度会员
-      orderFrom: 1,//0-微信 1-支付宝
-      money: 199.00,
-      orderState: 2,//0-已完成 1-待付款 2-退款中 3-已关闭 4-已退款
-      time: '2020/02/12 12:33:11'
-   },
-   {
-      orderID: '121323433333311111111354',
-      userID: '121323433333311111111354',
-      orderType: 1,//0-年度会员 1-月度会员
-      orderFrom: 1,//0-微信 1-支付宝
-      money: 199.00,
-      orderState: 3,//0-已完成 1-待付款 2-退款中 3-已关闭 4-已退款
-      time: '2020/02/12 12:33:11'
-   },
-   {
-      orderID: '121323433333311111111354',
-      userID: '121323433333311111111354',
-      orderType: 0,//0-年度会员 1-月度会员
-      orderFrom: 0,//0-微信 1-支付宝
-      money: 199.00,
-      orderState: 4,//0-已完成 1-待付款 2-退款中 3-已关闭 4-已退款
-      time: '2020/02/12 12:33:11'
-   }
-])
+const activeName = ref('all')
+// const tableData = ref([
+//    {
+//       orderID: '121323433333311111111354',
+//       userID: '121323433333311111111354',
+//       orderType: 0,//0-年度会员 1-月度会员
+//       orderFrom: 0,//0-微信 1-支付宝
+//       money: 199.00,
+//       orderState: 0,//0-已完成 1-待付款 2-退款中 3-已关闭 4-已退款
+//       time: '2020/02/12 12:33:11'
+//    },
+//    {
+//       orderID: '121323433333311111111354',
+//       userID: '121323433333311111111354',
+//       orderType: 1,//0-年度会员 1-月度会员
+//       orderFrom: 0,//0-微信 1-支付宝
+//       money: 199.00,
+//       orderState: 1,//0-已完成 1-待付款 2-退款中 3-已关闭 4-已退款
+//       time: '2020/02/12 12:33:11'
+//    },
+//    {
+//       orderID: '121323433333311111111354',
+//       userID: '121323433333311111111354',
+//       orderType: 0,//0-年度会员 1-月度会员
+//       orderFrom: 1,//0-微信 1-支付宝
+//       money: 199.00,
+//       orderState: 2,//0-已完成 1-待付款 2-退款中 3-已关闭 4-已退款
+//       time: '2020/02/12 12:33:11'
+//    },
+//    {
+//       orderID: '121323433333311111111354',
+//       userID: '121323433333311111111354',
+//       orderType: 1,//0-年度会员 1-月度会员
+//       orderFrom: 1,//0-微信 1-支付宝
+//       money: 199.00,
+//       orderState: 3,//0-已完成 1-待付款 2-退款中 3-已关闭 4-已退款
+//       time: '2020/02/12 12:33:11'
+//    },
+//    {
+//       orderID: '121323433333311111111354',
+//       userID: '121323433333311111111354',
+//       orderType: 0,//0-年度会员 1-月度会员
+//       orderFrom: 0,//0-微信 1-支付宝
+//       money: 199.00,
+//       orderState: 4,//0-已完成 1-待付款 2-退款中 3-已关闭 4-已退款
+//       time: '2020/02/12 12:33:11'
+//    }
+// ])
 
 //日期选择器的时间
+const tableData = ref([])
+
+
 const time = ref([])
 //精确查询
-const accurateSearch=ref(null)
+const accurateSearch = ref(null)
 const formData = reactive({
    PageIndex: 1,//第几页
    PageSize: 10,//总页数
@@ -223,6 +234,52 @@ const formData = reactive({
    }
 })
 
+//分页查询订单列表
+const getList = async () => {
+   let res = await getOrderList(formData)
+   console.log('获取订单列表列表数据', res);
+   tableData.value = res.data.Result.Datas
+   pages.total = res.data.Result.totalCount
+
+}
+getList()
+
+//tab菜单选项发生变化
+const handleChange = (value) => {
+   console.log('当前激活的activename', value)
+   //修改反馈状态后重新发起数据请求
+   if (value == 'wait') {
+      formData.PageQueryParam.OrderStatus = 0
+
+   } else if (value == 'refunding') {
+      formData.PageQueryParam.OrderStatus = 1
+
+   } else if (value == 'finish') {
+      formData.PageQueryParam.OrderStatus = 2
+   }
+   else if (value == 'close') {
+      formData.PageQueryParam.OrderStatus = 3
+
+   } else if (value == 'refunded') {
+      formData.PageQueryParam.OrderStatus = 4
+   }
+   else if (value == 'all') {
+      formData.PageQueryParam.OrderStatus = null
+   } else {
+      formData.PageQueryParam.OrderStatus = null
+   }
+   //重新获取数据
+   getList()
+
+}
+//点击分页条
+const handleCurrentChange = (currentPage) => {
+   formData.PageIndex = currentPage
+   //修改当前页数后重新发起数据请求
+   getList()
+}
+
+
 //时间选择器发生变化
 const changeTime = (date) => {
    console.log('时间选择器发生变化', date);
@@ -235,16 +292,16 @@ const changeTime = (date) => {
 
 
 //重置
-const reset=()=>{
-   time.value=[]
-   formData.PageQueryParam.OrderTypeCode=''
-   formData.PageQueryParam.OrderStartTime=null
-   formData.PageQueryParam.OrderEndTime=null
-   formData.PageQueryParam.PayChannelCode=''
-   formData.PageQueryParam.UserCode=''
-   formData.PageQueryParam.OrderCode=''
-   formData.PageQueryParam.UserPhone=''
-   formData.PageQueryParam,OrderStatus=null
+const reset = () => {
+   time.value = []
+   formData.PageQueryParam.OrderTypeCode = ''
+   formData.PageQueryParam.OrderStartTime = null
+   formData.PageQueryParam.OrderEndTime = null
+   formData.PageQueryParam.PayChannelCode = ''
+   formData.PageQueryParam.UserCode = ''
+   formData.PageQueryParam.OrderCode = ''
+   formData.PageQueryParam.UserPhone = ''
+   formData.PageQueryParam, OrderStatus = null
 }
 
 const formatDate = (time) => {
@@ -272,9 +329,15 @@ const setTimeByDays = (value) => {
    }
    //对获取到的时间进行格式化
    time.value = [formatDate(start), formatDate(end)]
+   //修改表单里面的数据
+   formData.PageQueryParam.OrderStartTime = formatDate(start)
+   const newDate = formatDate(end).split('-')
+   newDate[2] = (Number(newDate[2]) + 1).toString()
+   formData.PageQueryParam.OrderEndTime = newDate.join('-')
+   // console.log('点击按钮-查看表单数据的反馈时间变化',formData.PageQueryParam);
 }
 
-const activeName = ref('all')
+
 const getStateColor = (row) => {
    if (row == 0) {
       return "#0adf0a";
@@ -307,17 +370,20 @@ const getOrderStateText = (row) => {
 
 
 //查询
-const serach=()=>{
+const serach = () => {
 
 }
 
 
-//点击查看举报详情
-const lookDetail = (row) => {
+//点击查看订单详情
+const lookDetail = async(row) => {
+   //获取订单详情
+   const res=await getOrderInfoById({ID:row.OrderId})
+   console.log('获取订单详情',res);
    router.push({
       path: '/orderDetail',
       query: {
-         ...row
+         ...res.Result
       }
    })
 

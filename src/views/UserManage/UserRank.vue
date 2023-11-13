@@ -13,9 +13,9 @@
           <div style="margin-right: 25px;margin-left: 15px;display: flex;align-items: center;">
             日期
           </div>
-          <el-date-picker v-model="form.time" format="YYYY-MM-DD" value-format="YYYY-MM-DD"
-            :picker-options="pickerOptions" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
-            style="float:left">
+          <!-- :picker-options="pickerOptions" -->
+          <el-date-picker v-model="form.time" format="YYYY-MM-DD" value-format="YYYY-MM-DD" type="daterange"
+            start-placeholder="开始日期" end-placeholder="结束日期" style="float:left">
           </el-date-picker>
           <div class=" " v-for="(item, index) in daysArr" :key="index" style="cursor: pointer;">
             <div @click="setTimeByDays(index)"
@@ -88,7 +88,7 @@
 
 
   <!-- 新增用户等级 -->
-  <el-dialog v-model="addDialogVisible" :title="operationType== 'add' ? '新增用户等级' : '编辑功能配置'" width="35%"
+  <el-dialog v-model="addDialogVisible" :title="operationType == 'add' ? '新增用户等级' : '编辑功能配置'" width="35%"
     :before-close="handleClose">
     <div>
       <el-form :model="form" label-width="120px">
@@ -96,6 +96,9 @@
           <el-input v-model="form.name" />
         </el-form-item>
         <el-form-item label="等级编码">
+          <el-input v-model="form.rankCode" />
+        </el-form-item>
+        <el-form-item label="级别权重">
           <el-input v-model="form.rankCode" />
         </el-form-item>
 
@@ -207,22 +210,13 @@
 <script setup>
 import { ref, watch, onMounted, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-
+import { getAllRole } from '../../api/user'
 
 //分页条数据
 const pages = ref({
   total: 1000,
   currentPage: 1,
   limit: 10
-
-})
-
-const pickerOptions = ref({
-  disabledDate(time) {
-    // 设置选择今天及今天之后的日期
-    return time.getTime() < Date.now() - 8.64e7;
-  }
-
 })
 
 const daysArr = ref(['今日', '昨日', '最近7天', '最近30天'])
@@ -297,8 +291,21 @@ const setTimeByDays = (value) => {
   }
   //对获取到的时间进行格式化
   form.time = [formatDate(start), formatDate(end)]
+  
   // console.log('form的time', formData.time);
 }
+
+//获取用户等级列表
+const getList = async () => {
+  let res = await getAllRole({
+    PageIndex: pages.currentPage,//页码
+    PageSize: pages.limit,//页数
+    GroupCode: "USER"
+  })
+  console.log('获取用户等级列表',res);
+  // tableData.value=res.data.Result
+}
+getList()
 
 
 const operationType = ref('add')//默认类型为新建等级 setFun为功能配置
@@ -312,7 +319,6 @@ const addUserRank = () => {
 const setFunction = (row) => {
   operationType.value = 'setFun'
   addDialogVisible.value = true
-
 }
 
 //查看用户等级详情
@@ -334,9 +340,9 @@ const updatePermission = (val) => {
 
 //完成
 const finish = () => {
-  console.log('点击完成，查看type',operationType.value);
+  console.log('点击完成，查看type', operationType.value);
   addDialogVisible.value = false
-  console.log("type == 'add'",operationType.value == 'add');
+  console.log("type == 'add'", operationType.value == 'add');
   if (operationType.value == 'add') {
     ElMessage({
       message: '新建成功',
@@ -364,12 +370,6 @@ const delSome = () => {
 onMounted(() => {
   document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
 })
-
-
-
-
-
-
 
 
 

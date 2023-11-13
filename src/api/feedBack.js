@@ -34,7 +34,8 @@ export function exportExcel(data){
     return request({
         url:`${commonUrl}/feedback/exportexcel`,
         method:'post',
-        data:data
+        data:data,
+        responseType: 'blob', //注意 需要规定后台返回文件流格式
     })
 }
 

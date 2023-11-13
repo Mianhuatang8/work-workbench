@@ -1,7 +1,6 @@
-import { data } from "jquery";
 import request from "../request";
 
-const commonUrl = 'http://localhost:5233/app/admin'
+const commonUrl = '/app/admin'
 
 //添加/修改用户信息
 export function editUserInfo(data){
@@ -40,6 +39,8 @@ export function searchSomeUser(data){
 }
 
 
+
+//角色信息-用户等级以及会员
 //查询角色信息
 export function searchRoleInfo(data){
     return request({
