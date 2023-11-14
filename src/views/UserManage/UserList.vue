@@ -19,25 +19,21 @@
       <div class="datePick">
 
         <div style="display: flex;align-items: center;width: 52%;">
-          <div style="margin-right: 25px;margin-left: 15px;display: flex;align-items: center;">
-            注册日期
-          </div>
-          <el-date-picker v-model="form.time" format="YYYY-MM-DD" value-format="YYYY-MM-DD"
-            :picker-options="pickerOptions" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
-            style="float:left">
-          </el-date-picker>
-          <div class=" " v-for="(item, index) in daysArr" :key="index"  style="cursor: pointer;">
-            <div @click="setTimeByDays(index)"
-              style="margin:0 12px;width: 60px;line-height: 32px;font-size: 14px;margin:0 15px">
+          <div style="margin-right: 25px;margin-left: 15px;display: flex;align-items: center;"> 注册日期 </div>
+          <el-date-picker v-model="time" type="date" placeholder="请选择日期" style="float:left" format="YYYY-MM-DD"
+            value-format="YYYY-MM-DD" @change="changeDate" />
+
+          <div class=" " v-for="(item, index) in daysArr" :key="index"
+            style="cursor: pointer;text-align: center;margin-left: 10px;"
+            :class="selectDateIndex == index ? 'selectedRoleStyle' : ''" @click="changeIndex2(index)">
+            <div @click="setTimeByDays(index)" style="width: 60px;line-height: 32px;font-size: 14px;">
               {{ item }}
             </div>
           </div>
-
-
         </div>
         <div style="display: flex;margin-right: 60px;">
-          <el-button type="primary" style="margin-right:10px;" :icon="Search">查询</el-button>
-          <el-button>重置</el-button>
+          <el-button type="primary" style="margin-right:10px;" :icon="Search" @click="getList()">查询</el-button>
+          <el-button @click="reset()">重置</el-button>
 
         </div>
       </div>
@@ -106,11 +102,11 @@
   <el-dialog v-model="lookDialogVisible" :title="type == 'look' ? '查看' : type == 'edit' ? '编辑' : '新增'" width="30%"
     :before-close="handleClose">
     <div class="dialog-content">
-      <el-form :model="form" >
+      <el-form :model="form">
         <el-form-item label="用户头像">
 
-          <el-upload class="avatar-uploader" action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-            :show-file-list="false" :on-success="handleAvatarSuccess" :disabled="type == 'look'">
+          <el-upload class="avatar-uploader" action="#" :http-request="uploadFile" :show-file-list="false"
+            :on-change="handleAvatarChange" :disabled="type == 'look'">
             <img v-if="form.avatarUrl" :src="tableData.avatarUrl" class="avatar" />
             <el-icon v-else class="avatar-uploader-icon">
               <Plus />
@@ -118,32 +114,32 @@
           </el-upload>
 
         </el-form-item>
-        <el-form-item label="用户名称">
-          <el-input v-model="form.name"  :disabled="type == 'look'" style="margin-right: 20px;"/>
+        <el-form-item label="用户ID">
+          <el-input v-model="form.name" :disabled="type == 'look'" style="margin-right: 20px;" />
         </el-form-item>
-        <el-form-item label="用户等级">
-          <el-select v-model="form.userRank" class="m-2" placeholder="请选择"
-            :disabled="type == 'look'">
+
+        <el-form-item label="用户名称">
+          <el-input v-model="form.name" :disabled="type == 'look'" style="margin-right: 20px;" />
+        </el-form-item>
+        <el-form-item label="用户等级(自身等级)">
+          <el-select v-model="form.userRank" class="m-2" placeholder="请选择" :disabled="type == 'look'">
             <el-option v-for="(item, index) in userRankSort" :key="item" :label="item" :value="index" />
           </el-select>
         </el-form-item>
         <el-form-item label="会员等级">
-          <el-select v-model="form.vipRank" class="m-2" placeholder="请选择" 
-            :disabled="type == 'look'">
+          <el-select v-model="form.vipRank" class="m-2" placeholder="请选择" :disabled="type == 'look'">
             <el-option v-for="(item, index) in vipRankSort" :key="item" :label="item" :value="index" />
           </el-select>
         </el-form-item>
         <el-form-item label="会员开始时间-结束时间" style="display: flex;">
-          <el-date-picker v-model="form.startTime" type="date"  :disabled="type == 'look'" />
+          <el-date-picker v-model="form.startTime" type="date" :disabled="type == 'look'" />
           <div style="margin:0 5px">-</div>
           <el-date-picker v-model="form.endTime" type="date" :disabled="type == 'look'" />
         </el-form-item>
-        <el-form-item label="微信号">
-          <el-input v-model="form.vxNumber"  :disabled="type == 'look'"  style="margin-right: 20px;"/>
-        </el-form-item>
+
 
         <el-form-item label="手机号">
-          <el-input v-model="form.phone"  :disabled="type == 'look'"  style="margin-right: 20px;"/>
+          <el-input v-model="form.phone" :disabled="type == 'look'" style="margin-right: 20px;" />
         </el-form-item>
 
         <el-form-item v-if="type == 'look'" label="用户活动日志">
@@ -162,7 +158,7 @@
 
         </el-form-item>
 
-        <el-form-item label="用户私有图库">
+        <!-- <el-form-item label="用户私有图库">
           <el-upload v-model:file-list="form.privacyImages"
             action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" list-type="picture-card"
             v-if="type != 'look'">
@@ -172,11 +168,11 @@
           </el-upload>
           <div v-else style="display: flex;flex-wrap: wrap;">
             <div v-for="file in form.privacyImages" :key="file.url" style="margin-right: 8px;margin-top: 8px;">
-              <img :src="file.url"  style="width: 146px; height: 146px;border-radius: 7px;">
+              <img :src="file.url" style="width: 146px; height: 146px;border-radius: 7px;">
             </div>
           </div>
 
-        </el-form-item>
+        </el-form-item> -->
 
       </el-form>
     </div>
@@ -190,9 +186,11 @@
 </template>
   
 <script setup>
-import { ref, onMounted,reactive } from 'vue'
+import $ from 'jquery'
+import { ref, onMounted, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Delete, Edit, Search, Share, Upload, Plus } from '@element-plus/icons-vue'
+import { searchSomeUser, delUserInfo, userSelfChange, editUserInfo } from '../../api/user.js'
 
 //分页条数据
 const pages = ref({
@@ -203,21 +201,13 @@ const pages = ref({
 
 
 const sortRole = ref(['不限', '普通', '月度', '年度'])
-const selectRoleSortIndex = ref(0)
 
-const pickerOptions = ref({
-  disabledDate(time) {
-    // 设置选择今天及今天之后的日期
-    return time.getTime() < Date.now() - 8.64e7;
-  }
-
-})
 
 const daysArr = ref(['今日', '昨日', '最近7天', '最近30天'])
 
+const time = ref([])
 
-
-const tableData = ref([
+const tableData = reactive([
   {
     id: '1',
     name: '王小虎',
@@ -248,13 +238,7 @@ const tableData = ref([
     createTime: '2020/09/20 16:12:23',
     avatarUrl: ''
   },])
-//改变被选中的角色分类样式index
-const changeIndex = (index) => {
-  selectRoleSortIndex.value = index
-}
 
-const userRankSort = ref(['LV1创作初学者', 'LV2创作爱好者', 'LV3创作工程师', 'LV4创作研究者', 'LV5创作探险家', 'LV6创作修行者', 'LV7创作大师'])
-const vipRankSort = ref(['免费会员', '月度会员', '年度会员'])
 const form = reactive({
   avatarUrl: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
   name: 'SXJ21325',
@@ -298,10 +282,81 @@ const form = reactive({
     },
 
   ],
-  time:null
+  time: null
 
 })
 
+
+const searchData = reactive({
+  RegisterTime: [],//注册时间
+  UserCode: "",//用户code  f67e490f-070a-c46c-c2be-3a0e7783da82
+  VIPLevelCode: ""//VIPcode
+})
+
+
+//获取用户信息
+const getList = async () => {
+  const res = await searchSomeUser(searchData)
+  console.log('获取用户信息列表', res);
+}
+getList()
+
+const userRankSort = ref(['LV1创作初学者', 'LV2创作爱好者', 'LV3创作工程师', 'LV4创作研究者', 'LV5创作探险家', 'LV6创作修行者', 'LV7创作大师'])
+const vipRankSort = ref(['免费会员', '月度会员', '年度会员'])
+const selectRoleSortIndex = ref(0)
+const selectDateIndex = ref(null)
+//改变被选中的会员等级样式index
+const changeIndex = (index) => {
+  selectRoleSortIndex.value = index
+  if (index == 1) {
+    searchData.VIPLevelCode = 'VIP001'
+  } else if (index == 2) {
+    searchData.VIPLevelCode = 'VIP002'
+  } else if (index == 3) {
+    searchData.VIPLevelCode = 'VIP003'
+  } else {
+    searchData.VIPLevelCode = ''
+  }
+  // VIPLevelCode
+}
+const changeIndex2 = (index) => {
+  selectDateIndex.value = index
+}
+
+
+//点击分页条
+const handleCurrentChange = (currentPage) => {
+  searchData.PageIndex = currentPage
+  //修改当前页数后重新发起数据请求
+  getList()
+}
+
+//对接口请求的时间进行加工
+const processTime = (value) => {
+  let newValue = value.split('T')
+  let newValue2 = newValue[1].split(':')
+  return newValue[0] + " " + newValue2[0] + ':' + newValue2[1];
+}
+
+//日期选择器时间发生变化
+const changeDate = (value) => {
+  // console.log('日期选择器发生变化', value);
+  selectDateIndex.value = null
+  searchData.RegisterTime = [time.value]
+}
+
+const reset = () => {
+  selectDateIndex.value = null
+  selectRoleSortIndex.value = 0
+  pages.currentPage = 1
+  time.value = []
+  searchData.RegisterTime
+  searchData.VIPLevelCode =''
+  searchData.UserCode=''
+  //重新发起请求
+  getList()
+
+}
 
 
 const formatDate = (time) => {
@@ -318,20 +373,55 @@ const setTimeByDays = (value) => {
   console.log('点击日期', value);
   const end = new Date()
   const start = new Date()
+  time.value = formatDate(start)
   if (value == 1) {
     // const date = new Date()
     start.setTime(start.getTime() - 3600 * 1000 * 24)
     end.setTime(end.getTime() - 3600 * 1000 * 24)
+    time.value = formatDate(end)
   } else if (value == 2) {
     start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+    time.value = []
   } else if (value == 3) {
     start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+    time.value = []
   }
   //对获取到的时间进行格式化
-  form.time = [formatDate(start), formatDate(end)]
-  // console.log('form的time', formData.time);
+  searchData.RegisterTime = [formatDate(start), formatDate(end)]
 }
 
+
+
+
+//上传图片
+const uploadFile = (file) => {
+  let json;
+  form.imgSrc = null;
+  let formData = new FormData();
+  formData.append("fil1", file.file);
+  $.ajax({
+    url: "https://3dapi.shixianjia.com/api/file/upload",
+    type: "POST",
+    contentType: false,
+    processData: false,
+    async: false,
+    headers: {
+      token:
+        "F45BD6CCB4BF39394DDC58F8C4B125D5271D9A11D4B1E9BB67F53FDBFB1A547B",
+    },
+    data: formData,
+    success: function (data) {
+      console.log(data.Data, 8888);
+      let url = JSON.parse(data.Data);
+      json = url;
+      // addForm.cover = url;
+    },
+  });
+  form.imgSrc = json[0];
+  console.log('json[0]', json[0]);
+  console.log(form.imgSrc);
+  console.log('点击上传图片', form.imgSrc);
+}
 
 const lookDialogVisible = ref(false)
 const type = ref('look')
@@ -477,16 +567,16 @@ onMounted(() => {
   text-align: center;
 }
 
-:deep(.el-form-item){
+:deep(.el-form-item) {
   flex-direction: column;
 }
-:deep(.el-form-item__label){
+
+:deep(.el-form-item__label) {
   justify-content: flex-start;
 }
 
 
-:deep(.el-form-item){
+:deep(.el-form-item) {
   margin-left: 20px;
 }
-
 </style>

@@ -13,22 +13,21 @@
           <div style="margin-right: 25px;margin-left: 15px;display: flex;align-items: center;">
             日期
           </div>
-          <!-- :picker-options="pickerOptions" -->
-          <el-date-picker v-model="form.time" format="YYYY-MM-DD" value-format="YYYY-MM-DD" type="daterange"
-            start-placeholder="开始日期" end-placeholder="结束日期" style="float:left">
+          <el-date-picker v-model="time" type="date" placeholder="请选择日期" style="float:left" format="YYYY-MM-DD"
+            value-format="YYYY-MM-DD" @change="changeDate">
           </el-date-picker>
-          <div class=" " v-for="(item, index) in daysArr" :key="index" style="cursor: pointer;">
-            <div @click="setTimeByDays(index)"
-              style="margin:0 12px;width: 60px;line-height: 32px;font-size: 14px;margin:0 15px">
+          <div class=" " v-for="(item, index) in daysArr" :key="index"
+            style="cursor: pointer;text-align: center;margin-left: 10px;"
+            :class="selectRoleSortIndex == index ? 'selectedRoleStyle' : ''" @click="changeIndex(index)">
+            <div @click="setTimeByDays(index)" style="width: 60px;line-height: 32px;font-size: 14px;">
               {{ item }}
             </div>
           </div>
 
-
         </div>
         <div style="display: flex;margin-right: 60px;">
-          <el-button type="primary" style="margin-right:10px;" :icon="Search">查询</el-button>
-          <el-button>重置</el-button>
+          <el-button type="primary" style="margin-right:10px;" :icon="Search" @click="getList()">查询</el-button>
+          <el-button @click="reset()">重置</el-button>
 
         </div>
       </div>
@@ -39,34 +38,36 @@
       <div
         style="display: flex;margin-bottom: 15px;justify-content: space-between;align-items: center;margin-left: 15px;">
         <el-button type="primary" style="margin-right: 8px;" @click="addUserRank()">+&nbsp;新建</el-button>
-        <div style="display: flex;">
-          <el-button type="primary" plain>批量操作</el-button>
-          <el-button type="danger" plain @click="delSome()">删除</el-button>
-        </div>
+        <!-- <div style="display: flex;"> -->
+        <!-- <el-button type="primary" plain>批量操作</el-button> -->
+        <!-- <el-button type="danger" plain @click="delSome()">删除</el-button> -->
+        <!-- </div> -->
       </div>
 
       <el-table ref="multipleTableDevice" :data="tableData" @select="selectTab" style="width: 100%;margin-left: 15px;"
         :header-cell-style="{ background: '#F2F3F8' }" max-height="380" :row-style="{ height: 40 + 'px' }"
-        :cell-style="{ padding: 0 + 'px' }">
+        :cell-style="{ padding: 0 + 'px' }" @selection-change="changeSelection">
 
         <el-table-column type="selection" width="60">
         </el-table-column>
-        <el-table-column prop="id" align="center" header-align="center" label="等级ID">
+
+        <el-table-column prop="RoleName" align="center" header-align="center" label="等级类型">
         </el-table-column>
-        <el-table-column prop="rankStyle" align="center" header-align="center" label="等级类型">
+        <el-table-column prop="RoleCode" align="center" header-align="center" label="等级编码">
         </el-table-column>
-        <el-table-column prop="rankCode" align="center" header-align="center" label="等级编码">
-        </el-table-column>
-        <el-table-column prop="upLoadTime" align="center" header-align="center" label="上传用户">
+        <el-table-column prop="RecordName" align="center" header-align="center" label="更新者">
         </el-table-column>
 
-        <el-table-column prop="updateTime" align="center" header-align="center" label="更新时间">
+        <el-table-column prop="ModifTime" align="center" header-align="center" label="更新时间">
+          <template #default="scope">
+            {{ processTime(scope.row.ModifTime) }}
+
+          </template>
         </el-table-column>
         <el-table-column align="center" header-align="center" label="操作">
           <template #default="scope">
             <div style="display: flex;justify-content: space-around; cursor: pointer;">
               <el-button type="primary" link @click="gotToRankDetail(scope.row)">详情</el-button>
-              <el-switch v-model="scope.row.changePermission" @change="updatePermission" />
               <el-button type="primary" link @click="setFunction(scope.row)">功能配置</el-button>
 
             </div>
@@ -79,53 +80,76 @@
         <div style="margin-right: 15px;">
           共<span>{{ pages.total }}</span>条
         </div>
-        <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" :small="small"
-          :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
-          @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
+        <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" background
+          layout=" prev, pager, next, jumper" :total="pages.total" @current-change="handleCurrentChange"></el-pagination>
       </div>
     </div>
   </div>
 
 
   <!-- 新增用户等级 -->
-  <el-dialog v-model="addDialogVisible" :title="operationType == 'add' ? '新增用户等级' : '编辑功能配置'" width="35%"
+  <el-dialog v-model="addDialogVisible"
+    :title="operationType == 'add' ? '新增用户等级' : operationType == 'setFun' ? '编辑功能配置' : '查看用户等级详情'" width="35%"
     :before-close="handleClose">
     <div>
-      <el-form :model="form" label-width="120px">
+      <el-form :model="form" label-width="202px">
         <el-form-item label="等级名称">
-          <el-input v-model="form.name" />
+          <el-input v-model="formData.RoleName" :disabled="operationType == 'look'" />
         </el-form-item>
         <el-form-item label="等级编码">
-          <el-input v-model="form.rankCode" />
+          <el-input v-model="formData.RoleCode" :disabled="operationType == 'look'" />
         </el-form-item>
-        <el-form-item label="级别权重">
-          <el-input v-model="form.rankCode" />
+        <el-form-item label="级别权重" v-if="operationType == 'add'">
+          <el-input v-model="formData.Weight" :disabled="operationType == 'look'" />
+        </el-form-item>
+        <el-form-item label="达到该等级所需成长值">
+          <el-input v-model="formData.Weight" :disabled="operationType == 'look'" />
+        </el-form-item>
+
+        <el-form-item label="获得灵感值配置" style="margin-top: 30px;">
+          <el-checkbox v-model="formData.GetTelepathy[0].IsSelect" :disabled="operationType == 'look'">
+            <template #default>
+              主页签到
+              <el-input v-model="formData.GetTelepathy[0].value" placeholder="请输入数字" style="margin-left: 10px;"
+                size="small" :disabled="operationType == 'look'" />
+            </template>
+          </el-checkbox>
+          <el-checkbox v-model="formData.GetTelepathy[1].IsSelect" :disabled="operationType == 'look'">
+            <template #default>
+              微信打卡
+              <el-input v-model="formData.GetTelepathy[1].value" placeholder="请输入数字" style="margin-left: 10px;"
+                size="small" :disabled="operationType == 'look'" />
+            </template>
+          </el-checkbox>
         </el-form-item>
 
 
-        <el-form-item label="获得灵感值配置" style="margin-top: 30px;" v-if="operationType == 'setFun'">
-          <el-checkbox-group v-model="form.getInspiration" @change="handleCheckAllChange"
+        <el-form-item label="消耗灵感值配置" style="margin:30px 0;">
+          <el-checkbox v-model="formData.ConsumeTelepathy[0].IsSelect" :disabled="operationType == 'look'">
+            <template #default>
+              生成
+              <el-input v-model="formData.ConsumeTelepathy[0].value" placeholder="请输入数字" style="margin-left: 10px;"
+                size="small" :disabled="operationType == 'look'" />
+            </template>
+          </el-checkbox>
+          <el-checkbox v-model="formData.ConsumeTelepathy[1].IsSelect" :disabled="operationType == 'look'">
+            <template #default>
+              下载超清
+              <el-input v-model="formData.ConsumeTelepathy[1].value" placeholder="请输入数字" style="margin-left: 10px;"
+                size="small" :disabled="operationType == 'look'" />
+            </template>
+          </el-checkbox>
+          <!-- <el-checkbox v-for="item in formData.ConsumeTelepathy" :key="item.Key" v-model="item.IsSelect">
+            <template #default>
+              {{ item.Name }}
+              <el-input v-model="item.Value" placeholder="请输入数字" style="margin-left: 10px;" size="small" />
+            </template>
+          </el-checkbox> -->
+
+
+
+          <!-- <el-checkbox-group v-model="form.useInspiration" @change="handleCheckAllChange"
             style="display: flex; flex-direction: column;">
-            <el-checkbox label="0">
-              <template #default>
-                主页签到
-                <el-input v-model="form.homeSign" placeholder="请输入数字" style="margin-left: 10px;" size="small" />
-              </template>
-            </el-checkbox>
-            <el-checkbox label="1">
-              <template #default>
-                微信打卡
-                <el-input v-model="form.vxCount" placeholder="请输入数字(例如+10)" style="margin-left: 10px;" size="small" />
-              </template>
-            </el-checkbox>
-          </el-checkbox-group>
-        </el-form-item>
-
-
-        <el-form-item label="消耗灵感值配置" style="margin:30px 0;" v-if="operationType == 'setFun'">
-          <el-checkbox-group v-model="form.useInspiration" @change="handleCheckAllChange"
-            style="display: flex; flex-direction: column;">
-            <el-checkbox label="4">专属标识</el-checkbox>
             <el-checkbox label="0">
               <template #default>
                 生成
@@ -138,32 +162,36 @@
                 <el-input v-model="form.downLoad" placeholder="请输入数字" style="margin-left: 10px;" size="small" />
               </template>
             </el-checkbox>
-          </el-checkbox-group>
+          </el-checkbox-group> -->
         </el-form-item>
 
 
         <el-form-item label="创作权益配置">
-          <el-checkbox-group v-model="form.checkList" @change="handleCheckAllChange"
-            style="display: flex; flex-direction: column;">
-            <el-checkbox label="1">专属标识</el-checkbox>
-            <el-checkbox label="2">
+          <div style="display:flex;flex-direction:column">
+            <el-checkbox v-model="formData.Authorities[0].IsSelect" :disabled="operationType == 'look'">专属标识</el-checkbox>
+            <!-- <el-checkbox v-model="value" :disabled="operationType == 'look'">
               <template #default>
                 每日灵感值
-                <el-input v-model="form.inspiration" placeholder="请输入数字(例如+10)" style="margin-left: 10px;" size="small" />
+                <el-input v-model="formData.GetCreationTelepathy" placeholder="请输入数字(例如+10)" style="margin-left: 10px;"
+                  size="small" :disabled="operationType == 'look'" />
               </template>
             </el-checkbox>
-            <el-checkbox label="3">
+            <el-checkbox v-model="value" :disabled="operationType == 'look'">
               <template #default>
                 VIP天数
-                <el-input v-model="form.vipDay" placeholder="请输入数字(例如+20)" style="margin-left: 10px;" size="small" />
+                <el-input v-model="formData.VIPGiftDate" placeholder="请输入数字" style="margin-left: 10px;"
+                  :disabled="operationType == 'look'" size="small" />
               </template>
-            </el-checkbox>
-            <el-checkbox label="4">随机会员</el-checkbox>
-            <el-checkbox label="5">购买优惠券包</el-checkbox>
-            <el-checkbox label="6">灵感值包</el-checkbox>
-            <el-checkbox label="7">创作资源包</el-checkbox>
-            <el-checkbox label="8">参与设计竞选资格</el-checkbox>
-          </el-checkbox-group>
+            </el-checkbox> -->
+            <el-checkbox v-model="formData.Authorities[1].IsSelect" :disabled="operationType == 'look'">随机会员</el-checkbox>
+            <el-checkbox v-model="formData.Authorities[2].IsSelect"
+              :disabled="operationType == 'look'">购买优惠券包</el-checkbox>
+            <el-checkbox v-model="formData.Authorities[3].IsSelect" :disabled="operationType == 'look'">灵感值包</el-checkbox>
+            <el-checkbox v-model="formData.Authorities[4].IsSelect" :disabled="operationType == 'look'">创作资源包</el-checkbox>
+            <el-checkbox v-model="formData.Authorities[5].IsSelect"
+              :disabled="operationType == 'look'">参与设计竞选资格</el-checkbox>
+          </div>
+
 
 
         </el-form-item>
@@ -172,14 +200,18 @@
     </div>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="addDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="finish()">确认 </el-button>
+        <el-button @click="addDialogVisible = false" v-if="operationType == 'look'">关闭</el-button>
+        <div v-else>
+          <el-button @click="addDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="finish()">确认 </el-button>
+        </div>
+
       </span>
     </template>
   </el-dialog>
 
   <!-- 查看用户等级详情 -->
-  <el-dialog v-model="detailDialogVisible" title="用户等级详情" width="35%" :before-close="handleClose">
+  <!-- <el-dialog v-model="detailDialogVisible" title="用户等级详情" width="35%" :before-close="handleClose">
     <div class="green-card">
       <div class="title">{{ currentUserRankData.name }}</div>
       <div class="process" style="margin-bottom: 10px;">
@@ -193,10 +225,12 @@
       <div style="font-size: 17px;font-weight: bold;margin-bottom: 15px;">创作权益</div>
       <div style="display: flex;align-items: center;margin-left: 25px;margin-top: 15px;"
         v-for="item in currentUserRankData.createPermission " :key="item">
-        <el-icon style="margin-right: 20px;font-size: 16px;">
-          <CircleCheckFilled />
-        </el-icon>
-        <div style="font-size: 14px;">{{ item }}</div>
+        <template v-if="item.IsSelect">
+          <el-icon style="margin-right: 20px;font-size: 16px;">
+            <CircleCheckFilled />
+          </el-icon>
+          <div style="font-size: 14px;">{{ item.AuthorityName }}</div>
+        </template>
       </div>
     </div>
     <template #footer>
@@ -204,67 +238,135 @@
         <el-button @click="detailDialogVisible = false">关闭</el-button>
       </span>
     </template>
-  </el-dialog>
+  </el-dialog> -->
 </template>
   
 <script setup>
 import { ref, watch, onMounted, reactive } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { getAllRole } from '../../api/user'
+import { ElMessage, ElMessageBox, valueEquals } from 'element-plus'
+import { Delete, Edit, Search, Share, Upload, Plus } from '@element-plus/icons-vue'
+import { getAllRole, searchRoleInfo, addRoleInfo, editRoleInfo, delRoleInfo } from '../../api/user'
 
 //分页条数据
-const pages = ref({
-  total: 1000,
+const pages = reactive({
+  total: 0,
   currentPage: 1,
   limit: 10
 })
 
 const daysArr = ref(['今日', '昨日', '最近7天', '最近30天'])
-
-const tableData = ref([
-  {
-    id: '1',
-    rankStyle: 'User',
-    rankCode: '后台用户',
-    upLoadTime: '2020/09/20 16:12:23',
-    updateTime: '2020/09/20 16:12:23',
-    changePermission: false
-  },
-  {
-    id: '2',
-    rankStyle: '玛卡阿卡',
-    rankCode: '管理员',
-    upLoadTime: '2020/09/20 16:12:23',
-    updateTime: '2020/09/20 16:12:23',
-    changePermission: true
-  },
-  {
-    id: '3',
-    rankStyle: 'Janeefiks',
-    rankCode: '等级编码',
-    upLoadTime: '2020/09/20 16:12:23',
-    updateTime: '2020/09/20 16:12:23',
-    changePermission: false
-  },
+const selectRoleSortIndex = ref(null)
+//改变被选中的角色分类样式index
+const changeIndex = (index) => {
+  selectRoleSortIndex.value = index
+}
 
 
-])
+// const form = reactive({
+//   name: '',
+//   rankCode: '',
+//   vipDay: null,
+//   inspiration: null,
+//   checkList: [],//['1', '5', '8']
+//   getInspiration: [],// ['1',]
+//   useInspiration: [],//['1', '3']
+//   homeSign: '',
+//   vxCount: '',
+//   generate: '',
+//   downLoad: '',
+//   time: null
+// })
 
-const form = reactive({
-  name: '',
-  rankCode: '',
-  vipDay: null,
-  inspiration: null,
-  checkList: [],//['1', '5', '8']
-  getInspiration: [],// ['1',]
-  useInspiration: [],//['1', '3']
-  homeSign: '',
-  vxCount: '',
-  generate: '',
-  downLoad: '',
-  time: null
+//被选中的表格数据
+const selections = ref([])
+const tableData = ref([])
 
+const time = ref([])
+
+const formData = reactive({
+  GroupCode: "",
+  RoleName: "",
+  RoleCode: "",
+  Weight: null,
+  Remark: "",
+  Authorities: [
+    {
+      AuthorityKey: "Identification",
+      AuthorityName: "专属标识",
+      IsSelect: true,
+      Value: "true"
+    },
+    {
+      AuthorityKey: "RandomVIP",
+      AuthorityName: "是否有随机会员",
+      IsSelect: true,
+      Value: "true"
+    },
+    {
+      AuthorityKey: "TelepathyPack",
+      AuthorityName: "是否能购买灵感值包",
+      IsSelect: true,
+      Value: "true"
+    },
+    {
+      AuthorityKey: "CreatePack",
+      AuthorityName: "是否能购买创作资源包",
+      IsSelect: true,
+      Value: "true"
+    },
+    {
+      AuthorityKey: "ElectionQualification",
+      AuthorityName: "是否能参与设计竞选资格",
+      IsSelect: true,
+      Value: "true"
+    },
+    {
+      AuthorityKey: "CouponPack",
+      AuthorityName: "是否能购买优惠劵包",
+      IsSelect: true,
+      Value: "true"
+    }
+  ],
+  GetTelepathy: [
+    {
+      Key: "SignDay",
+      Name: "每日签到",
+      IsSelect: true,
+      Value: ''
+    },
+    {
+      Key: "SignWx",
+      Name: "微信签到",
+      IsSelect: true,
+      Value: ''
+    }
+  ],
+  ConsumeTelepathy: [
+    {
+      Key: "GeneratePicture",
+      Name: "生成图片",
+      IsSelect: true,
+      Value: ''
+    },
+    {
+      Key: "DownloadPicture",
+      Name: "下载图片",
+      IsSelect: true,
+      Value: ''
+    }
+  ],
+  GetGrowthValue: []
 })
+
+const searchData = reactive({
+  PageIndex: 1, //页码
+  PageSize: 10,  //页数
+  GroupCode: "USER", //分组code 目前有VIP、USER 
+  DateTimes: []  //更新日期
+})
+
+
+
 
 const formatDate = (time) => {
   const y = time.getFullYear();
@@ -275,37 +377,68 @@ const formatDate = (time) => {
   const dd = d < 10 ? '0' + d : d
   return `${yy}-${mm}-${dd}`;
 }
+const changeDate = (value) => {
+  // console.log('日期选择器发生变化', value);
+  selectRoleSortIndex.value = null
+  searchData.DateTimes = [time.value]
+}
 
 const setTimeByDays = (value) => {
   console.log('点击日期', value);
   const end = new Date()
   const start = new Date()
+  time.value = formatDate(start)
   if (value == 1) {
     // const date = new Date()
     start.setTime(start.getTime() - 3600 * 1000 * 24)
     end.setTime(end.getTime() - 3600 * 1000 * 24)
+    time.value = formatDate(end)
   } else if (value == 2) {
     start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+    time.value = []
   } else if (value == 3) {
     start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+    time.value = []
   }
   //对获取到的时间进行格式化
-  form.time = [formatDate(start), formatDate(end)]
-  
-  // console.log('form的time', formData.time);
+  searchData.DateTimes = [formatDate(start), formatDate(end)]
+}
+
+
+//对接口请求的时间进行加工
+const processTime = (value) => {
+  let newValue = value.split('T')
+  let newValue2 = newValue[1].split(':')
+  return newValue[0] + " " + newValue2[0] + ':' + newValue2[1];
 }
 
 //获取用户等级列表
 const getList = async () => {
-  let res = await getAllRole({
-    PageIndex: pages.currentPage,//页码
-    PageSize: pages.limit,//页数
-    GroupCode: "USER"
-  })
-  console.log('获取用户等级列表',res);
-  // tableData.value=res.data.Result
+  let res = await searchRoleInfo(searchData)
+  console.log('获取用户等级列表', res);
+  tableData.value = res.data.Result.Datas
+  pages.total = res.data.Result.totalCount
 }
 getList()
+
+//点击分页条
+const handleCurrentChange = (currentPage) => {
+  searchData.PageIndex = currentPage
+  //修改当前页数后重新发起数据请求
+  getList()
+}
+
+
+//重置
+const reset = () => {
+  pages.currentPage = 1
+  time.value = []
+  selectRoleSortIndex.value = null
+  searchData.DateTimes = []
+  searchData.PageIndex = 1
+  //重新发起请求
+  getList()
+}
 
 
 const operationType = ref('add')//默认类型为新建等级 setFun为功能配置
@@ -314,6 +447,7 @@ const addDialogVisible = ref(false)
 const addUserRank = () => {
   operationType.value = 'add'
   addDialogVisible.value = true
+
 }
 //功能配置
 const setFunction = (row) => {
@@ -321,61 +455,198 @@ const setFunction = (row) => {
   addDialogVisible.value = true
 }
 
-//查看用户等级详情
-const detailDialogVisible = ref(false)
-//当前用户的等级详情信息
-const currentUserRankData = ref({
-  name: 'LV1.创作初学者',
-  growthValue: 40,
-  createPermission: ['专属标识', '每日灵感值+5']
-})
+// //查看用户等级详情
+// const detailDialogVisible = ref(false)
+
+// //当前用户的等级详情信息
+// const currentUserRankData = reactive({
+//   name: '',
+//   growthValue: [],
+//   createPermission: []
+// })
+
 const gotToRankDetail = (row) => {
-  detailDialogVisible.value = true
+  console.log('当前用户等级的全部信息', row);
+  addDialogVisible.value = true
+  operationType.value = 'look'
+  // detailDialogVisible.value = true
+  // currentUserRankData.name = row.RoleName
+  // currentUserRankData.createPermission = row.Authority
+  // currentUserRankData.growthValue = row.GetGrowthValue
 }
 
-//启用/停用权限
-const updatePermission = (val) => {
-  console.log('修改权限', val);
-}
+
 
 //完成
-const finish = () => {
-  console.log('点击完成，查看type', operationType.value);
+const finish = async () => {
+  // console.log('点击完成，查看type', operationType.value);
   addDialogVisible.value = false
-  console.log("type == 'add'", operationType.value == 'add');
+  // console.log("type == 'add'", operationType.value == 'add');
+
   if (operationType.value == 'add') {
+    //发起新增请求
+    let res1 = await addRoleInfo(formData)
+    console.log('新增角色信息', res1);
+
     ElMessage({
       message: '新建成功',
       type: 'success',
     })
   }
   if (operationType.value == 'setFun') {
+    //发起修改请求
+    //发起新增请求
+    let res2 = await editRoleInfo()
+    console.log('编辑角色信息', res2);
+
     ElMessage({
       message: '修改成功',
       type: 'success',
     })
   }
+  //重置表单数据
+  resetForm()
 }
+
+//重置表单数据
+const resetForm = () => {
+  formData.GroupCode = ''
+  formData.RoleName = ''
+  formData.RoleCode = ''
+  formData.Weight = null
+  formData.Remark = ''
+  formData.GetGrowthValue = []
+  formData.GetTelepathy = [
+    {
+      Key: "SignDay",
+      Name: "每日签到",
+      IsSelect: true,
+      Value: ''
+    },
+    {
+      Key: "SignWx",
+      Name: "微信签到",
+      IsSelect: true,
+      Value: ''
+    }
+
+  ]
+  formData.ConsumeTelepathy = [
+    {
+      Key: "GeneratePicture",
+      Name: "生成图片",
+      IsSelect: true,
+      Value: ''
+    },
+    {
+      Key: "DownloadPicture",
+      Name: "下载图片",
+      IsSelect: true,
+      Value: ''
+    }
+  ]
+  formData.Authorities = [
+    {
+      AuthorityKey: "Identification",
+      AuthorityName: "专属标识",
+      IsSelect: true,
+      Value: "true"
+    },
+    {
+      AuthorityKey: "RandomVIP",
+      AuthorityName: "是否有随机会员",
+      IsSelect: true,
+      Value: "true"
+    },
+    {
+      AuthorityKey: "TelepathyPack",
+      AuthorityName: "是否能购买灵感值包",
+      IsSelect: true,
+      Value: "true"
+    },
+    {
+      AuthorityKey: "CreatePack",
+      AuthorityName: "是否能购买创作资源包",
+      IsSelect: true,
+      Value: "true"
+    },
+    {
+      AuthorityKey: "ElectionQualification",
+      AuthorityName: "是否能参与设计竞选资格",
+      IsSelect: true,
+      Value: "true"
+    },
+    {
+      AuthorityKey: "CouponPack",
+      AuthorityName: "是否能购买优惠劵包",
+      IsSelect: true,
+      Value: "true"
+    }
+
+  ]
+
+
+}
+
+
+//表格选择项发生变化
+const changeSelection = (item) => {
+  // console.log('选择项发生变化', item);
+  selections.value = []
+  item.map((item) => {
+    selections.value.push(item.RoleCode)
+  })
+  // console.log('选择项selection', selections.value);
+}
+
 
 //批量删除
-const delSome = () => {
-  ElMessage({
-    message: '删除成功',
-    type: 'success',
-  })
-}
+const delSome = async () => {
+  for (let [index, value] of selections.value.entries()) {
+    console.log('循环遍历数组', index, value);
+    let res = await delRoleInfo({ RoleCode: value })
+    console.log('删除角色信息', res);
+    if (res.status == 200) {
+      ElMessage({
+        message: '删除成功',
+        type: 'success',
+      })
 
+    }
+    else {
+      ElMessage({
+        message: '删除失败',
+        type: 'error',
+      })
+
+    }
+  }
+  //重新获取角色信息
+  getList()
+}
 
 
 onMounted(() => {
   document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
+  // console.log('测试',formData.GetTelepathy[0].IsSelect);
+  console.log('测试', formData.Authorities[0]);
 })
-
 
 
 </script>
   
 <style lang="scss" scoped>
+.selectedRoleStyle {
+  color: white;
+  display: flex;
+  justify-content: center;
+  background-color: #06a6ff;
+  width: 70px;
+  line-height: 30px;
+  height: 30px;
+  border-radius: 25px;
+}
+
 .card-content {
   background-color: white;
   padding: 17px;
@@ -411,5 +682,4 @@ onMounted(() => {
   :deep(.el-progress__text) {
     display: none;
   }
-}
-</style>
+}</style>

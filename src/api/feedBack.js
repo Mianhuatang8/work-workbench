@@ -1,11 +1,9 @@
 import request from "../request"
 
-const commonUrl = 'http://www.caotanghuali.com:9003/app/admin'
-
 //分页查询反馈信息列表
 export function getFeedBackList(searchForm){
     return request({
-        url: `${commonUrl}/feedback/getbypage`,
+        url: '/app/admin/feedback/getbypage',
         method: 'post',
         data:searchForm
     })
@@ -14,7 +12,7 @@ export function getFeedBackList(searchForm){
 //根据id查询反馈列表
 export function getListById(id){
     return request({
-        url:`${commonUrl}/feedback/getbyid`,
+        url:'/app/admin/feedback/getbyid',
         method:'post',
         data:id
     })
@@ -23,7 +21,7 @@ export function getListById(id){
 //关闭反馈
 export function closeFeedBack(id){
     return request({
-        url:`${commonUrl}/feedback/close`,
+        url:'/app/admin/feedback/close',
         method:'post',
         data:id
     })
@@ -32,7 +30,7 @@ export function closeFeedBack(id){
 //导出excel
 export function exportExcel(data){
     return request({
-        url:`${commonUrl}/feedback/exportexcel`,
+        url:'/app/admin/feedback/exportexcel',
         method:'post',
         data:data,
         responseType: 'blob', //注意 需要规定后台返回文件流格式
@@ -42,7 +40,7 @@ export function exportExcel(data){
 //完成反馈
 export function finishFeedBack(id){
     return request({
-        url:`${commonUrl}/feedback/complete`,
+        url:'/app/admin/feedback/complete',
         method:'post',
         data:id
     })
@@ -52,7 +50,7 @@ export function finishFeedBack(id){
 //获取平台内容/问题类型选择项
 export function getSelectionType(code){
     return request({
-        url:`${commonUrl}/dictionary/getaidicitembytype`,
+        url:'/app/admin/dictionary/getaidicitembytype',
         method:'post',
         data:code
     })
