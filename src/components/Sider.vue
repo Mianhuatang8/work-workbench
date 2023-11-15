@@ -2,7 +2,7 @@
     <div class="leftNav">
         <el-menu :default-active='activePath' class="el-menu-vertical-demo" active-text-color="#6ea2f5"
             style="border: 0px;font-size: 14px;">
-            <template v-for="(item, index) in router.options.routes.slice(0, 10)" :key="index">
+            <template v-for="(item, index) in router.options.routes.slice(0, 11)" :key="index">
                 <el-sub-menu :index="index + ''" v-if="item.children">
                     <template #title>
                         <img :src="getAssetsFile(index)" style="width: 20px;height: 20px;" />
@@ -72,7 +72,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .leftNav {
-    width: 165px;
+    width: 190px;
     height: calc(100vh - 64px);
     background-color: #f5f9fc;
     overflow-x: hidden;

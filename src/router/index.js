@@ -43,6 +43,24 @@ const router = createRouter({
       ],
     },
     {
+      path: '/userGrowthManage',
+      name: '用户成长管理',
+      children: [
+        {
+          path: '/userGrowthManage/signIn',
+          name: '签到',
+          component: () => import('../views/UserGrowthManage/SignIn.vue'),
+        },
+        {
+          path: '/userGrowthManage/task',
+          name: '任务',
+          component: () => import('../views/UserGrowthManage/Task.vue'),
+        },
+      ],
+    },
+
+
+    {
       path: '/vipManage',
       name: '会员管理',
       children: [

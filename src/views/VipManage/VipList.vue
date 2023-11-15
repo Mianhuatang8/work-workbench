@@ -74,7 +74,7 @@
         <el-table-column align="center" header-align="center" label="操作">
           <template #default="scope">
             <div style="display: flex;justify-content: space-around; cursor: pointer;align-items: center;">
-              <el-switch v-model="scope.row.IsEnable" @change="updatePermission" />
+              <el-switch v-model="scope.row.IsEnable" @change="updatePermission(scope.row)" />
               <div style="color: #009fff; " @click="lookDetail(scope.row)">详情</div>
               <div style="color: #009fff; " @click="setFunItem(scope.row)">功能配置</div>
             </div>
@@ -112,7 +112,7 @@
               <template #default>
                 每日灵感值
                 <el-input v-model="formData.GetTelepathy[0].Value" placeholder="请输入数字" style="margin-left: 10px;"
-                  size="small" />
+                  :disabled="!formData.GetTelepathy[0].IsSelect" size="small" />
               </template>
             </el-checkbox>
 
@@ -120,7 +120,7 @@
               <template #default>
                 每日成长值
                 <el-input v-model="formData.GetGrowthValue[0].Value" placeholder="请输入数字" style="margin-left: 10px;"
-                  size="small" />
+                  :disabled="!formData.GetGrowthValue[0].IsSelect" size="small" />
               </template>
             </el-checkbox>
 
@@ -193,18 +193,18 @@ const yearVipFunc = ref(['专属标识', '高级设置', '功能无水印下载'
 
 const tableData = ref([])
 
-//改变被选中的角色分类样式index
+//改变被选中的会员分类样式index
 const changeIndex = (index) => {
   selectRoleSortIndex.value = index
-  // if(index==1){
-  //   searchData.RoleCode='VIP001'
-  // }else if(index==2){
-  //   searchData.RoleCode='VIP002'
-  // }else if(index==3){
-  //   searchData.RoleCode='VIP003'
-  // }else{
-  //   searchData.RoleCode=''
-  // }
+  if (index == 1) {
+    searchData.RoleCode = 'VIP001'
+  } else if (index == 2) {
+    searchData.RoleCode = 'VIP002'
+  } else if (index == 3) {
+    searchData.RoleCode = 'VIP003'
+  } else {
+    searchData.RoleCode = ''
+  }
 }
 const changeIndex2 = (index) => {
   selectDateSortIndex.value = index
@@ -264,11 +264,13 @@ const searchData = reactive({
   PageIndex: 1, //页码
   PageSize: 10,  //页数
   GroupCode: "VIP", //分组code 目前有VIP、USER 
-  DateTimes: []  //更新日期
+  DateTimes: [],  //更新日期
+  RoleCode: '',//会员类型
 })
 
 //获取vip用户列表
 const getList = async () => {
+  console.log('发起请求的数据', searchData);
   let res = await searchRoleInfo(searchData)
   console.log('获取vip用户列表', res);
   tableData.value = res.data.Result.Datas
@@ -298,7 +300,10 @@ const processTime = (value) => {
 const changeDate = (value) => {
   // console.log('日期选择器发生变化', value);
   selectDateSortIndex.value = null
-  searchData.DateTimes = [time.value]
+  // searchData.DateTimes = [time.value]
+  const newDate = value.split('-')
+  newDate[2] = (Number(newDate[2]) + 1).toString()
+  searchData.DateTimes = [time.value, newDate.join('-')]
 }
 
 
@@ -313,17 +318,17 @@ const formatDate = (time) => {
   return `${yy}-${mm}-${dd}`;
 }
 
-//格式化时间
 const setTimeByDays = (value) => {
   console.log('点击日期', value);
   const end = new Date()
   const start = new Date()
   time.value = formatDate(start)
   if (value == 1) {
-    // const date = new Date()
+
     start.setTime(start.getTime() - 3600 * 1000 * 24)
     end.setTime(end.getTime() - 3600 * 1000 * 24)
     time.value = formatDate(end)
+
   } else if (value == 2) {
     start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
     time.value = []
@@ -331,9 +336,16 @@ const setTimeByDays = (value) => {
     start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
     time.value = []
   }
-  //对获取到的时间进行格式化
-  searchData.DateTimes = [formatDate(start), formatDate(end)]
+
+  const newDate = formatDate(end).split('-')
+  newDate[2] = (Number(newDate[2]) + 1).toString()
+  //日期往后多取一个时间
+  // console.log('点击按钮实现的时间', formatDate(start), formatDate(end));
+  searchData.DateTimes = [formatDate(start), newDate.join('-')]
+  // console.log("加工后的时间", searchData.DateTimes);
 }
+
+
 
 //详情页数据
 const detailDialogVisible = ref(false)
@@ -429,9 +441,24 @@ const finish = async () => {
 }
 
 // 启用/停用权限
-const updatePermission = (value) => {
-  console.log('会员列表-启用/停用权限', value);
+const updatePermission = async (row) => {
+  console.log('会员列表-启用/停用权限', row, row.IsEnable);
   //通知后台修改数据
+  // let res = await editRoleInfo({
+  //   RoleCode: row.RoleCode,
+  //   RoleName: row.RoleName,
+  //   Weight: row.Wegiht,
+  //   GroupCode: 'VIP',
+  //   Authorities: row.Authority,
+  //   //获取灵感值方式
+  //   GetTelepathy: row.GetTelepathy,
+  //   //消耗灵感值方式
+  //   ConsumeTelepathy: row.ConsumeTelepathy,
+  //   //获取成长值方式
+  //   GetGrowthValue: row.GetGrowthValue,
+  //   IsEnable:row.IsEnable
+  // })
+  console.log('启用/停用权限', res);
 }
 
 
@@ -482,6 +509,7 @@ const reset = () => {
   time.value = []
   searchData.DateTimes = []
   searchData.PageIndex = 1
+  searchData.RoleCode = ''
   //重新发起请求
   getList()
 }

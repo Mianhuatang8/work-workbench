@@ -43,43 +43,50 @@
     <div style="background-color: white;padding: 30px;">
       <div
         style="display: flex;margin-bottom: 15px;justify-content: space-between;align-items: center;margin-left: 15px;">
-        <el-button type="primary" style="margin-right: 8px;" @click="addUser()">+&nbsp;新建</el-button>
-        <div style="display: flex;">
+        <el-button type="primary" style="margin-right: 8px;" @click="addUser()" disabled>+&nbsp;新建</el-button>
+        <!-- <div style="display: flex;">
           <el-button type="primary" style="margin-right: 8px;" plain>批量操作</el-button>
           <el-button type="danger" plain @click="delSome()">删除</el-button>
-        </div>
+        </div> -->
       </div>
       <el-table ref="multipleTableDevice" :data="tableData" @select="selectTab" style="width: 100%;margin-left: 15px;"
         :header-cell-style="{ background: '#F2F3F8' }" max-height="380" :row-style="{ height: 40 + 'px' }"
         :cell-style="{ padding: 0 + 'px' }">
 
-        <el-table-column type="selection" width="60">
-        </el-table-column>
+        <!-- <el-table-column type="selection" width="60">
+        </el-table-column> -->
 
-        <el-table-column prop="id" align="center" header-align="center" label="用户ID">
+        <el-table-column prop="UserName" align="center" header-align="center" label="用户名">
         </el-table-column>
-        <el-table-column prop="name" align="center" header-align="center" label="用户名">
+        <el-table-column prop="Telepathy" align="center" header-align="center" label="灵感额总额">
         </el-table-column>
-        <el-table-column prop="inspirationCount" align="center" header-align="center" label="灵感额总值">
-        </el-table-column>
-        <el-table-column prop="vipRank" align="center" header-align="center" label="会员等级">
+        <el-table-column prop="VIPLevelName" align="center" header-align="center" label="会员等级">
 
         </el-table-column>
-        <el-table-column prop="userRank" align="center" header-align="center" label="用户等级">
+        <el-table-column prop="UserInfoLevelName" align="center" header-align="center" label="用户等级">
 
         </el-table-column>
-
-
-        <el-table-column prop="lastOnlineTime" align="center" header-align="center" label="最近上线时间">
+        <el-table-column prop="AllGrowthValue" align="center" header-align="center" label="成长值总额">
         </el-table-column>
-        <el-table-column prop="createTime" align="center" header-align="center" label="创建时间">
+
+        <el-table-column prop="RecentlyLaunchedDate" align="center" header-align="center" label="最近上线时间">
+          <template #default="scope">
+            {{ processTime(scope.row.RecentlyLaunchedDate) }}
+          </template>
+
+        </el-table-column>
+        <el-table-column prop="RegisterDate" align="center" header-align="center" label="注册时间">
+          <template #default="scope">
+            {{ processTime(scope.row.RegisterDate) }}
+          </template>
+
         </el-table-column>
         <el-table-column align="center" header-align="center" label="操作">
           <template #default="scope">
             <div style="display: flex;justify-content: space-around; cursor: pointer;">
               <div style="color: #009fff; " @click="lookDetail(scope.row)">查看</div>
               <div style="color: #009fff; " @click="editItem(scope.row)">编辑</div>
-              <div style="color: red;" @click="delItem(scope.row)">删除</div>
+              <!-- <div style="color: red;" @click="delItem(scope.row)">删除</div> -->
             </div>
           </template>
         </el-table-column>
@@ -89,9 +96,9 @@
         <div style="margin-right: 15px;">
           共<span>{{ pages.total }}</span>条
         </div>
-        <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" :small="small"
-          :disabled="disabled" background layout=" prev, pager, next, jumper" :total="pages.total"
-          @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
+        <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" 
+          background layout=" prev, pager, next, jumper" :total="pages.total"
+          @current-change="handleCurrentChange"></el-pagination>
       </div>
 
     </div>
@@ -201,43 +208,44 @@ const pages = ref({
 
 
 const sortRole = ref(['不限', '普通', '月度', '年度'])
-
-
 const daysArr = ref(['今日', '昨日', '最近7天', '最近30天'])
 
 const time = ref([])
 
-const tableData = reactive([
-  {
-    id: '1',
-    name: '王小虎',
-    inspirationCount: '后台用户',
-    vipRank: '普通会员',
-    userRank: 'V.1 创作初学者',
-    lastOnlineTime: '2020/09/20 16:12:23',
-    createTime: '2020/09/20 16:12:23',
-    avatarUrl: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
-  },
-  {
-    id: '2',
-    name: '王小虎',
-    inspirationCount: '管理员',
-    vipRank: '月度会员',
-    userRank: 'V.3 创作工程师',
-    lastOnlineTime: '2020/09/20 16:12:23',
-    createTime: '2020/09/20 16:12:23',
-    avatarUrl: ''
-  },
-  {
-    id: '3',
-    name: '王小虎',
-    inspirationCount: '运营',
-    vipRank: '年度会员',
-    userRank: 'V.7 创作大师',
-    lastOnlineTime: '2020/09/20 16:12:23',
-    createTime: '2020/09/20 16:12:23',
-    avatarUrl: ''
-  },])
+// const tableData = reactive([
+//   {
+//     id: '1',
+//     name: '王小虎',
+//     inspirationCount: '后台用户',
+//     vipRank: '普通会员',
+//     userRank: 'V.1 创作初学者',
+//     lastOnlineTime: '2020/09/20 16:12:23',
+//     createTime: '2020/09/20 16:12:23',
+//     avatarUrl: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
+//   },
+//   {
+//     id: '2',
+//     name: '王小虎',
+//     inspirationCount: '管理员',
+//     vipRank: '月度会员',
+//     userRank: 'V.3 创作工程师',
+//     lastOnlineTime: '2020/09/20 16:12:23',
+//     createTime: '2020/09/20 16:12:23',
+//     avatarUrl: ''
+//   },
+//   {
+//     id: '3',
+//     name: '王小虎',
+//     inspirationCount: '运营',
+//     vipRank: '年度会员',
+//     userRank: 'V.7 创作大师',
+//     lastOnlineTime: '2020/09/20 16:12:23',
+//     createTime: '2020/09/20 16:12:23',
+//     avatarUrl: ''
+//   },])
+
+
+const tableData = ref([])
 
 const form = reactive({
   avatarUrl: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
@@ -296,10 +304,14 @@ const searchData = reactive({
 
 //获取用户信息
 const getList = async () => {
+  console.log('发起请求传递的参数', searchData);
   const res = await searchSomeUser(searchData)
   console.log('获取用户信息列表', res);
+  tableData.value = res.data.Result
 }
 getList()
+
+
 
 const userRankSort = ref(['LV1创作初学者', 'LV2创作爱好者', 'LV3创作工程师', 'LV4创作研究者', 'LV5创作探险家', 'LV6创作修行者', 'LV7创作大师'])
 const vipRankSort = ref(['免费会员', '月度会员', '年度会员'])
@@ -326,7 +338,7 @@ const changeIndex2 = (index) => {
 
 //点击分页条
 const handleCurrentChange = (currentPage) => {
-  searchData.PageIndex = currentPage
+  // searchData.PageIndex = currentPage
   //修改当前页数后重新发起数据请求
   getList()
 }
@@ -343,7 +355,10 @@ const processTime = (value) => {
 const changeDate = (value) => {
   // console.log('日期选择器发生变化', value);
   selectDateIndex.value = null
-  searchData.RegisterTime = [time.value]
+  // searchData.RegisterTime = [time.value]
+  const newDate = value.split('-')
+  newDate[2] = (Number(newDate[2]) + 1).toString()
+  searchData.RegisterTime = [time.value, newDate.join('-')]
 }
 
 const reset = () => {
@@ -351,7 +366,7 @@ const reset = () => {
   selectRoleSortIndex.value = 0
   pages.currentPage = 1
   time.value = []
-  searchData.RegisterTime
+  searchData.RegisterTime = []
   searchData.VIPLevelCode = ''
   searchData.UserCode = ''
   //重新发起请求
@@ -370,16 +385,38 @@ const formatDate = (time) => {
   return `${yy}-${mm}-${dd}`;
 }
 
+// const setTimeByDays = (value) => {
+//   console.log('点击日期', value);
+//   const end = new Date()
+//   const start = new Date()
+//   time.value = formatDate(start)
+//   if (value == 1) {
+//     // const date = new Date()
+//     start.setTime(start.getTime() - 3600 * 1000 * 24)
+//     end.setTime(end.getTime() - 3600 * 1000 * 24)
+//     time.value = formatDate(end)
+//   } else if (value == 2) {
+//     start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+//     time.value = []
+//   } else if (value == 3) {
+//     start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+//     time.value = []
+//   }
+//   //对获取到的时间进行格式化
+//   searchData.RegisterTime = [formatDate(start), formatDate(end)]
+// }
+
 const setTimeByDays = (value) => {
   console.log('点击日期', value);
   const end = new Date()
   const start = new Date()
   time.value = formatDate(start)
   if (value == 1) {
-    // const date = new Date()
+
     start.setTime(start.getTime() - 3600 * 1000 * 24)
     end.setTime(end.getTime() - 3600 * 1000 * 24)
     time.value = formatDate(end)
+
   } else if (value == 2) {
     start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
     time.value = []
@@ -387,10 +424,14 @@ const setTimeByDays = (value) => {
     start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
     time.value = []
   }
-  //对获取到的时间进行格式化
-  searchData.RegisterTime = [formatDate(start), formatDate(end)]
-}
 
+  const newDate = formatDate(end).split('-')
+  newDate[2] = (Number(newDate[2]) + 1).toString()
+  //日期往后多取一个时间
+  // console.log('点击按钮实现的时间', formatDate(start), formatDate(end));
+  searchData.RegisterTime = [formatDate(start), newDate.join('-')]
+  // console.log("加工后的时间", searchData.DateTimes);
+}
 
 
 

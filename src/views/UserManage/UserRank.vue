@@ -45,7 +45,7 @@
       </div>
 
       <el-table ref="multipleTableDevice" :data="tableData" @select="selectTab" style="width: 100%;margin-left: 15px;"
-        :header-cell-style="{ background: '#F2F3F8' }" max-height="380" :row-style="{ height: 40 + 'px' }"
+        :header-cell-style="{ background: '#F2F3F8' }" max-height="480" :row-style="{ height: 40 + 'px' }"
         :cell-style="{ padding: 0 + 'px' }" @selection-change="changeSelection">
 
         <el-table-column type="selection" width="60">
@@ -61,7 +61,6 @@
         <el-table-column prop="ModifTime" align="center" header-align="center" label="更新时间">
           <template #default="scope">
             {{ processTime(scope.row.ModifTime) }}
-
           </template>
         </el-table-column>
         <el-table-column align="center" header-align="center" label="操作">
@@ -69,12 +68,10 @@
             <div style="display: flex;justify-content: space-around; cursor: pointer;">
               <el-button type="primary" link @click="gotToRankDetail(scope.row)">详情</el-button>
               <el-button type="primary" link @click="setFunction(scope.row)">功能配置</el-button>
-
             </div>
           </template>
         </el-table-column>
       </el-table>
-
 
       <div style="margin-top: 40px;display: flex;justify-content: flex-end;align-items: center;">
         <div style="margin-right: 15px;">
@@ -111,14 +108,14 @@
             <template #default>
               主页签到
               <el-input v-model="formData.GetTelepathy[0].Value" placeholder="请输入数字" style="margin-left: 10px;"
-                size="small" :disabled="operationType == 'look'" />
+                size="small" :disabled="operationType == 'look' || !formData.GetTelepathy[0].IsSelect" />
             </template>
           </el-checkbox>
           <el-checkbox v-model="formData.GetTelepathy[1].IsSelect" :disabled="operationType == 'look'">
             <template #default>
               微信打卡
               <el-input v-model="formData.GetTelepathy[1].Value" placeholder="请输入数字" style="margin-left: 10px;"
-                size="small" :disabled="operationType == 'look'" />
+                size="small" :disabled="operationType == 'look' || !formData.GetTelepathy[1].IsSelect" />
             </template>
           </el-checkbox>
         </el-form-item>
@@ -129,74 +126,36 @@
             <template #default>
               生成
               <el-input v-model="formData.ConsumeTelepathy[0].Value" placeholder="请输入数字" style="margin-left: 10px;"
-                size="small" :disabled="operationType == 'look'" />
+                size="small" :disabled="operationType == 'look' || !formData.ConsumeTelepathy[0].IsSelect" />
             </template>
           </el-checkbox>
           <el-checkbox v-model="formData.ConsumeTelepathy[1].IsSelect" :disabled="operationType == 'look'">
             <template #default>
               下载超清
               <el-input v-model="formData.ConsumeTelepathy[1].Value" placeholder="请输入数字" style="margin-left: 10px;"
-                size="small" :disabled="operationType == 'look'" />
+                size="small" :disabled="operationType == 'look' || !formData.ConsumeTelepathy[1].IsSelect" />
             </template>
           </el-checkbox>
-          <!-- <el-checkbox v-for="item in formData.ConsumeTelepathy" :key="item.Key" v-model="item.IsSelect">
-            <template #default>
-              {{ item.Name }}
-              <el-input v-model="item.Value" placeholder="请输入数字" style="margin-left: 10px;" size="small" />
-            </template>
-          </el-checkbox> -->
-
-
-
-          <!-- <el-checkbox-group v-model="form.useInspiration" @change="handleCheckAllChange"
-            style="display: flex; flex-direction: column;">
-            <el-checkbox label="0">
-              <template #default>
-                生成
-                <el-input v-model="form.generate" placeholder="请输入数字" style="margin-left: 10px;" size="small" />
-              </template>
-            </el-checkbox>
-            <el-checkbox label="1">
-              <template #default>
-                下载超清
-                <el-input v-model="form.downLoad" placeholder="请输入数字" style="margin-left: 10px;" size="small" />
-              </template>
-            </el-checkbox>
-          </el-checkbox-group> -->
         </el-form-item>
 
 
         <el-form-item label="创作权益配置">
           <div style="display:flex;flex-direction:column">
             <el-checkbox v-model="formData.Authorities[0].IsSelect" :disabled="operationType == 'look'">专属标识</el-checkbox>
-            <!-- <el-checkbox v-model="value" :disabled="operationType == 'look'">
-              <template #default>
-                每日灵感值
-                <el-input v-model="formData.GetCreationTelepathy" placeholder="请输入数字(例如+10)" style="margin-left: 10px;"
-                  size="small" :disabled="operationType == 'look'" />
-              </template>
-            </el-checkbox>
-            <el-checkbox v-model="value" :disabled="operationType == 'look'">
-              <template #default>
-                VIP天数
-                <el-input v-model="formData.VIPGiftDate" placeholder="请输入数字" style="margin-left: 10px;"
-                  :disabled="operationType == 'look'" size="small" />
-              </template>
-            </el-checkbox> -->
 
-            <el-checkbox v-model="formData.GetTelepathy[0].IsSelect">
+            <el-checkbox v-model="formData.GetTelepathy[0].IsSelect" :disabled="operationType == 'look'">
               <template #default>
                 每日灵感值
                 <el-input v-model="formData.GetTelepathy[0].Value" placeholder="请输入数字" style="margin-left: 10px;"
-                  size="small" />
+                  :disabled="operationType == 'look' || !formData.GetTelepathy[0].IsSelect" size="small" />
               </template>
             </el-checkbox>
 
-            <el-checkbox v-model="formData.GetVIPGiftDate[0].IsSelect">
+            <el-checkbox v-model="formData.Authorities[1].IsSelect" :disabled="operationType == 'look'">
               <template #default>
                 VIP天数
-                <el-input v-model="formData.GetVIPGiftDate[0].Value" placeholder="请输入数字" style="margin-left: 10px;"
-                  size="small" />
+                <el-input v-model="formData.Authorities[1].Value" placeholder="请输入数字" style="margin-left: 10px;"
+                  :disabled="operationType == 'look' || !formData.Authorities[1].IsSelect" size="small" />
               </template>
             </el-checkbox>
 
@@ -265,6 +224,7 @@ import { ElMessage, ElMessageBox, valueEquals } from 'element-plus'
 import { Delete, Edit, Search, Share, Upload, Plus } from '@element-plus/icons-vue'
 import { getAllRole, searchRoleInfo, addRoleInfo, editRoleInfo, delRoleInfo } from '../../api/user'
 
+
 //分页条数据
 const pages = reactive({
   total: 0,
@@ -278,22 +238,6 @@ const selectRoleSortIndex = ref(null)
 const changeIndex = (index) => {
   selectRoleSortIndex.value = index
 }
-
-
-// const form = reactive({
-//   name: '',
-//   rankCode: '',
-//   vipDay: null,
-//   inspiration: null,
-//   checkList: [],//['1', '5', '8']
-//   getInspiration: [],// ['1',]
-//   useInspiration: [],//['1', '3']
-//   homeSign: '',
-//   vxCount: '',
-//   generate: '',
-//   downLoad: '',
-//   time: null
-// })
 
 //被选中的表格数据
 const selections = ref([])
@@ -318,7 +262,7 @@ const formData = reactive({
       AuthorityKey: "RandomVIP",
       AuthorityName: "是否有随机会员",
       IsSelect: false,
-      Value: "true"
+      Value:undefined
     },
     {
       AuthorityKey: "TelepathyPack",
@@ -349,13 +293,13 @@ const formData = reactive({
     {
       Key: "SignDay",
       Name: "每日签到",
-      IsSelect: true,
+      IsSelect: false,
       Value: undefined
     },
     {
       Key: "SignWx",
       Name: "微信签到",
-      IsSelect: true,
+      IsSelect: false,
       Value: undefined
     }
   ],
@@ -373,16 +317,6 @@ const formData = reactive({
       Value: undefined
     }
   ],
-  //获取灵感值方式
-  GetTelepathy: [
-    {
-      Key: "SignDay",
-      Name: "每日灵感值",
-      Value: undefined,
-      IsSelect: false
-    }
-  ],
-
   //获取成长值方式
   GetGrowthValue: [
     {
@@ -392,16 +326,6 @@ const formData = reactive({
       IsSelect: false
     }
   ],
-  //获取vip天数
-  GetVIPGiftDate: [
-    {
-      Key: "VIPGiftDate",
-      Name: "赠送的VIP天数",
-      Value: undefined,
-      IsSelect: false
-    }
-
-  ]
 })
 
 
@@ -427,7 +351,10 @@ const formatDate = (time) => {
 const changeDate = (value) => {
   // console.log('日期选择器发生变化', value);
   selectRoleSortIndex.value = null
-  searchData.DateTimes = [time.value]
+  const newDate = value.split('-')
+  newDate[2] = (Number(newDate[2]) + 1).toString()
+  searchData.DateTimes = [time.value,newDate.join('-')]
+  // console.log('日期选择器时间发生变化加工的时间',searchData.DateTimes);
 }
 
 const setTimeByDays = (value) => {
@@ -436,10 +363,11 @@ const setTimeByDays = (value) => {
   const start = new Date()
   time.value = formatDate(start)
   if (value == 1) {
-    // const date = new Date()
+
     start.setTime(start.getTime() - 3600 * 1000 * 24)
     end.setTime(end.getTime() - 3600 * 1000 * 24)
     time.value = formatDate(end)
+
   } else if (value == 2) {
     start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
     time.value = []
@@ -447,21 +375,27 @@ const setTimeByDays = (value) => {
     start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
     time.value = []
   }
-  //对获取到的时间进行格式化
-  searchData.DateTimes = [formatDate(start), formatDate(end)]
+
+  const newDate = formatDate(end).split('-')
+  newDate[2] = (Number(newDate[2]) + 1).toString()
+  //日期往后多取一个时间
+  // console.log('点击按钮实现的时间', formatDate(start), formatDate(end));
+  searchData.DateTimes = [formatDate(start), newDate.join('-')]
+  // console.log("加工后的时间", searchData.DateTimes);
 }
 
 
 //对接口请求的时间进行加工
 const processTime = (value) => {
   let newValue = value.split('T')
-  let processValue = newValue[0].split('-').join('/')
+  // let processValue = newValue[0].split('-').join('/')
   let newValue2 = newValue[1].split(':')
-  return processValue + " " + newValue2[0] + ':' + newValue2[1];
+  return newValue[0] + " " + newValue2[0] + ':' + newValue2[1];
 }
 
 //获取用户等级列表
 const getList = async () => {
+  console.log('查询时间', searchData);
   let res = await searchRoleInfo(searchData)
   console.log('获取用户等级列表', res);
   tableData.value = res.data.Result.Datas
@@ -503,82 +437,103 @@ const addUserRank = () => {
 const setFunction = (row) => {
   operationType.value = 'setFun'
   addDialogVisible.value = true
+  console.log('当前行数据', row);
+  //回填表单数据
+  formData.GroupCode = 'USER'
+  formData.RoleName = row.RoleName
+  formData.RoleCode = row.RoleCode
+  formData.Weight = row.Wegiht
+  formData.GetGrowthValue = row.GetGrowthValue
+  formData.GetTelepathy = row.GetTelepathy
+  formData.ConsumeTelepathy = row.ConsumeTelepathy
+  formData.Authorities = row.Authority
+
 }
 
-// //查看用户等级详情
-// const detailDialogVisible = ref(false)
-
-// //当前用户的等级详情信息
-// const currentUserRankData = reactive({
-//   name: '',
-//   growthValue: [],
-//   createPermission: []
-// })
 
 const gotToRankDetail = (row) => {
   console.log('当前用户等级的全部信息', row);
   addDialogVisible.value = true
   operationType.value = 'look'
-  // detailDialogVisible.value = true
-  // currentUserRankData.name = row.RoleName
-  // currentUserRankData.createPermission = row.Authority
-  // currentUserRankData.growtselectionschangeSelectionhValue = row.GetGrowthValue
+  formData.GroupCode = 'USER'
+  formData.RoleName = row.RoleName
+  formData.RoleCode = row.RoleCode
+  formData.Weight = row.Wegiht
+  formData.GetGrowthValue = row.GetGrowthValue
+  formData.GetTelepathy = row.GetTelepathy
+  formData.ConsumeTelepathy = row.ConsumeTelepathy
+  formData.Authorities = row.Authority
 }
 
 
 
 //完成
 const finish = async () => {
-  // console.log('点击完成，查看type', operationType.value);
-
-  // console.log("type == 'add'", operationType.value == 'add');
-
   if (operationType.value == 'add') {
     //发起新增请求
     let res1 = await addRoleInfo(formData)
     console.log('新增角色信息', res1);
 
-    addDialogVisible.value = false
-    ElMessage({
-      message: '新建成功',
-      type: 'success',
-    })
+    if (res1.data.StatusCode == 200) {
+      ElMessage({
+        message: '新建成功',
+        type: 'success',
+      })
+      addDialogVisible.value = false
+    } else {
+      ElMessage({
+        message: res1.data.Message,
+        type: 'error',
+      })
+      console.log('新建失败2222', res1.data.Message);
+    }
+
   }
   if (operationType.value == 'setFun') {
     //发起修改请求
-    //发起新增请求
-    let res2 = await editRoleInfo()
+    console.log('发起修改角色请求数据', formData);
+    let res2 = await editRoleInfo(formData)
     console.log('编辑角色信息', res2);
-
-    ElMessage({
-      message: '修改成功',
-      type: 'success',
-    })
+    if (res2.data.StatusCode == 200) {
+      ElMessage({
+        message: '修改成功',
+        type: 'success',
+      })
+      console.log('修改成功11111');
+      addDialogVisible.value = false
+    } else {
+      ElMessage({
+        message: res2.data.Message,
+        type: 'error',
+      })
+      console.log('修改失败2222', res2.data.Message);
+    }
   }
+  //重新发起数据请求
+  getList()
 }
 
 //重置表单数据
 const resetForm = () => {
-  formData.GroupCode = ''
+  formData.GroupCode = 'USER'
   formData.RoleName = ''
   formData.RoleCode = ''
-  formData.Weight = null
+  formData.Weight = undefined
   formData.Remark = ''
   formData.GetGrowthValue = []
   formData.GetTelepathy = [
     {
       Key: "SignDay",
       Name: "每日签到",
-      IsSelect: true,
+      IsSelect: false,
       Value: undefined
     },
     {
       Key: "SignWx",
       Name: "微信签到",
-      IsSelect: true,
+      IsSelect: false,
       Value: undefined
     }
-
   ]
   formData.ConsumeTelepathy = [
     {
@@ -605,7 +560,7 @@ const resetForm = () => {
       AuthorityKey: "RandomVIP",
       AuthorityName: "是否有随机会员",
       IsSelect: false,
-      Value: "true"
+      Value: undefined
     },
     {
       AuthorityKey: "TelepathyPack",
@@ -633,8 +588,6 @@ const resetForm = () => {
     }
 
   ]
-
-
 }
 
 
@@ -677,8 +630,6 @@ const delSome = async () => {
 
 onMounted(() => {
   document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";
-  // console.log('测试',formData.GetTelepathy[0].IsSelect);
-  console.log('测试', formData.Authorities[0]);
 })
 
 
