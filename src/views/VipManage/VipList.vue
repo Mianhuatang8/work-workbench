@@ -5,7 +5,6 @@
       <span style="margin:0 5px">/</span>
       <span style="margin:0 5px;font-weight: bold;">会员列表</span>
     </div>
-
     <div class="card-content">
       <div class="role-sort" style="display:flex;">
         <div style="margin-right: 25px;margin-left: 15px;display: flex;align-items: center;">
@@ -40,21 +39,21 @@
 
         </div>
       </div>
-
     </div>
+
 
     <div style="background-color: white;padding: 30px;">
       <div
         style="display: flex;margin-bottom: 15px;justify-content: space-between;align-items: center;margin-left: 15px;">
         <el-button type="primary" style="margin-right: 8px;" @click="addVipRank()">+&nbsp;新建</el-button>
-        <!-- <div style="display: flex;">
-          <el-button type="primary" style="margin-right: 8px;" plain>批量操作</el-button>
+        <div style="display: flex;">
+          <el-button style="margin-right: 8px;" disabled>批量操作</el-button>
           <el-button type="danger" plain @click="delSome()">删除</el-button>
-        </div> -->
+        </div>
       </div>
-      <el-table ref="multipleTableDevice" :data="tableData" @select="selectTab" style="width: 100%;margin-left: 15px;"
+      <el-table ref="multipleTableDevice" :data="tableData" style="width: 100%;margin-left: 15px;"
         :header-cell-style="{ background: '#F2F3F8' }" max-height="380" :row-style="{ height: 40 + 'px' }"
-        :cell-style="{ padding: 0 + 'px' }">
+        :cell-style="{ padding: 0 + 'px' }" @selection-change="changeSelection">
 
         <el-table-column type="selection" width="60">
         </el-table-column>
@@ -95,76 +94,62 @@
   </div>
 
 
-  <el-dialog v-model="addDialogVisible" :title="type == 'add' ? '新增会员等级' : '编辑功能配置'" width="35%"
-    :before-close="handleClose">
+  <el-dialog v-model="addDialogVisible" :title="type == 'add' ? '新增会员等级' : '编辑功能配置'" width="35%">
     <div>
-      <el-form :model="form" label-width="120px">
-        <el-form-item label="等级名称">
-          <el-input v-model="form.name" />
+      <el-form :model="formData" label-width="120px">
+        <el-form-item label="会员名称">
+          <el-input v-model="formData.RoleName" />
         </el-form-item>
-        <el-form-item label="等级编码">
-          <el-input v-model="form.rankCode" />
+        <el-form-item label="会员编码">
+          <el-input v-model="formData.RoleCode" />
+        </el-form-item>
+        <el-form-item label="级别权重">
+          <el-input v-model="formData.Weight" />
         </el-form-item>
         <el-form-item label="创作权益配置">
           <div style="display:flex;flex-direction:column">
-            <el-checkbox v-model="formData.Authorities[0].IsSelect" :disabled="operationType == 'look'">专属标识</el-checkbox>
-            <!-- <el-checkbox v-model="value" :disabled="operationType == 'look'">
+            <el-checkbox v-model="formData.GetTelepathy[0].IsSelect">
               <template #default>
                 每日灵感值
-                <el-input v-model="formData.GetCreationTelepathy" placeholder="请输入数字(例如+10)" style="margin-left: 10px;"
-                  size="small" :disabled="operationType == 'look'" />
-              </template>
-            </el-checkbox>
-            <el-checkbox v-model="value" :disabled="operationType == 'look'">
-              <template #default>
-                每日成长值
-                <el-input v-model="formData.VIPGiftDate" placeholder="请输入数字" style="margin-left: 10px;"
-                  :disabled="operationType == 'look'" size="small" />
-              </template>
-            </el-checkbox> -->
-            <el-checkbox v-model="formData.Authorities[1].IsSelect" :disabled="operationType == 'look'">高级设置</el-checkbox>
-            <el-checkbox v-model="formData.Authorities[2].IsSelect"
-              :disabled="operationType == 'look'">购买优惠券包</el-checkbox>
-            <el-checkbox v-model="formData.Authorities[3].IsSelect"
-              :disabled="operationType == 'look'">功能无水印下载</el-checkbox>
-            <el-checkbox v-model="formData.Authorities[4].IsSelect"
-              :disabled="operationType == 'look'">创作资源包</el-checkbox>
-          </div>
-          <!-- <el-checkbox-group v-model="form.checkList" @change="handleCheckAllChange"
-            style="display: flex; flex-direction: column;">
-            <el-checkbox label="2">
-              <template #default>
-                每日灵感值
-                <el-input v-model="form.inspiration" placeholder="请输入数字(例如+10)" style="margin-left: 10px;" size="small" />
-              </template>
-            </el-checkbox>
-            <el-checkbox label="3">
-              <template #default>
-                每日成长值
-                <el-input v-model="form.getInspiration" placeholder="请输入数字(例如+20)" style="margin-left: 10px;"
+                <el-input v-model="formData.GetTelepathy[0].Value" placeholder="请输入数字" style="margin-left: 10px;"
                   size="small" />
               </template>
             </el-checkbox>
-            <el-checkbox label="4">高级设置</el-checkbox>
-            <el-checkbox label="5">功能无水印下载</el-checkbox>
-          </el-checkbox-group> -->
+
+            <el-checkbox v-model="formData.GetGrowthValue[0].IsSelect">
+              <template #default>
+                每日成长值
+                <el-input v-model="formData.GetGrowthValue[0].Value" placeholder="请输入数字" style="margin-left: 10px;"
+                  size="small" />
+              </template>
+            </el-checkbox>
+
+            <el-checkbox v-model="formData.Authorities[0].IsSelect">使用高级设置</el-checkbox>
+            <el-checkbox v-model="formData.Authorities[1].IsSelect">图片无水印下载</el-checkbox>
+          </div>
         </el-form-item>
+
+
       </el-form>
+
+
     </div>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="addDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="finish(type)">确认 </el-button>
+        <el-button type="primary" @click="finish()">确认 </el-button>
       </span>
     </template>
   </el-dialog>
 
+
+
   <!-- 查看详情对话框 -->
-  <el-dialog v-model="detailDialogVisible" title="查看会员详情" width="35%" :before-close="handleClose">
+  <el-dialog v-model="detailDialogVisible" title="查看会员详情" width="35%">
     <div class="orange-card">
       <div class="title">{{ detailData.RoleName }}</div>
-      <div class="content">+180灵感值/天</div>
-      <div class="content">+20成长值/天</div>
+      <div class="content">+{{ detailData.GetTelepathy[0].Value }}灵感值/天</div>
+      <div class="content">+{{ detailData.GetGrowthValue[0].Value }}成长值/天</div>
     </div>
     <div class="orange-card" style="margin-top: 20px;height: 130px;">
       <div class="title">{{ detailData.RoleName }}功能权益</div>
@@ -211,6 +196,15 @@ const tableData = ref([])
 //改变被选中的角色分类样式index
 const changeIndex = (index) => {
   selectRoleSortIndex.value = index
+  // if(index==1){
+  //   searchData.RoleCode='VIP001'
+  // }else if(index==2){
+  //   searchData.RoleCode='VIP002'
+  // }else if(index==3){
+  //   searchData.RoleCode='VIP003'
+  // }else{
+  //   searchData.RoleCode=''
+  // }
 }
 const changeIndex2 = (index) => {
   selectDateSortIndex.value = index
@@ -220,80 +214,51 @@ const addDialogVisible = ref(false)
 const type = ref('add')
 
 const formData = reactive({
-  GroupCode: "",
+  GroupCode: "VIP",
   RoleName: "",
   RoleCode: "",
-  Weight: null,
-  Remark: "",
+  Weight: undefined,
   Authorities: [
     {
-      AuthorityKey: "Identification",
-      AuthorityName: "专属标识",
-      IsSelect: true,
-      Value: "true"
+      AuthorityKey: "AdvancedSettings",
+      AuthorityName: "使用高级设置",
+      Value: "true",
+      IsSelect: false,
+      Order: 0
     },
     {
-      AuthorityKey: "RandomVIP",
-      AuthorityName: "是否有随机会员",
-      IsSelect: true,
-      Value: "true"
-    },
-    {
-      AuthorityKey: "TelepathyPack",
-      AuthorityName: "是否能购买灵感值包",
-      IsSelect: true,
-      Value: "true"
-    },
-    {
-      AuthorityKey: "CreatePack",
-      AuthorityName: "是否能购买创作资源包",
-      IsSelect: true,
-      Value: "true"
-    },
-    {
-      AuthorityKey: "ElectionQualification",
-      AuthorityName: "是否能参与设计竞选资格",
-      IsSelect: true,
-      Value: "true"
-    },
-    {
-      AuthorityKey: "CouponPack",
-      AuthorityName: "是否能购买优惠劵包",
-      IsSelect: true,
-      Value: "true"
+      AuthorityKey: "IsWatermark",
+      AuthorityName: "是否有无水印下载功能",
+      Value: "true",
+      IsSelect: false,
+      Order: 0
     }
   ],
+  //获取灵感值方式
   GetTelepathy: [
     {
       Key: "SignDay",
-      Name: "每日签到",
-      IsSelect: true,
-      Value: ''
-    },
-    {
-      Key: "SignWx",
-      Name: "微信签到",
-      IsSelect: true,
-      Value: ''
+      Name: "每日灵感值",
+      Value: undefined,
+      IsSelect: false
     }
   ],
-  ConsumeTelepathy: [
+  //消耗灵感值方式
+  ConsumeTelepathy: [],
+  //获取成长值方式
+  GetGrowthValue: [
     {
-      Key: "GeneratePicture",
-      Name: "生成图片",
-      IsSelect: true,
-      Value: ''
-    },
-    {
-      Key: "DownloadPicture",
-      Name: "下载图片",
-      IsSelect: true,
-      Value: ''
+      Key: "GetGrowthValue",
+      Name: "获取成长值",
+      Value: undefined,
+      IsSelect: false
     }
-  ],
-  GetGrowthValue: []
+  ]
+
 })
 
+
+const selections = ref([])
 const time = ref([])
 const searchData = reactive({
   PageIndex: 1, //页码
@@ -323,8 +288,9 @@ const handleCurrentChange = (currentPage) => {
 //对接口请求的时间进行加工
 const processTime = (value) => {
   let newValue = value.split('T')
+  let processValue = newValue[0].split('-').join('/')
   let newValue2 = newValue[1].split(':')
-  return newValue[0] + " " + newValue2[0] + ':' + newValue2[1];
+  return processValue + " " + newValue2[0] + ':' + newValue2[1];
 }
 
 
@@ -336,7 +302,7 @@ const changeDate = (value) => {
 }
 
 
-
+//格式化时间
 const formatDate = (time) => {
   const y = time.getFullYear();
   const yy = y < 10 ? '0' + y : y
@@ -347,7 +313,7 @@ const formatDate = (time) => {
   return `${yy}-${mm}-${dd}`;
 }
 
-
+//格式化时间
 const setTimeByDays = (value) => {
   console.log('点击日期', value);
   const end = new Date()
@@ -369,47 +335,97 @@ const setTimeByDays = (value) => {
   searchData.DateTimes = [formatDate(start), formatDate(end)]
 }
 
-
-
-
-
+//详情页数据
 const detailDialogVisible = ref(false)
+const detailData = reactive({
+  Authority: [],
+  RoleName: '',
+  GetTelepathy: [],//每日灵感值
+  GetGrowthValue: [],//每日成长值
+})
 
+//详情
+const lookDetail = (row) => {
+  console.log('当前vip的详情信息', row);
+  type.value = 'look'
+  detailDialogVisible.value = true
+  detailData.Authority = row.Authority
+  detailData.RoleName = row.RoleName
+  detailData.GetTelepathy = row.GetTelepathy
+  detailData.GetGrowthValue = row.GetGrowthValue
+}
 
 
 //新增会员等级
 const addVipRank = () => {
+  //重置表单数据
+  resetFormData()
   type.value = 'add'
   addDialogVisible.value = true
 
 }
 
-
-const detailData=reactive({
-  Authority:[],
-  RoleName:'',
-  GetTelepathy:[],//每日灵感值
-  GetGrowthValue:[],//每日成长值
-
-
-})
-
-//详情
-const lookDetail = (row) => {
-  console.log('当前vip的详情信息',row);
-  type.value = 'look'
-  detailDialogVisible.value = true
-  detailData.Authority=row.Authority
-  detailData.RoleName=row.RoleName
-  detailData.GetTelepathy=row.GetTelepathy
-  detailData.GetGrowthValue=row.GetGrowthValue
-
-}
 //功能配置
-const setFunItem = () => {
+const setFunItem = (row) => {
   type.value = 'set'
   addDialogVisible.value = true
+  //传递当前表单数据过去
+  console.log('当前表单数据：', row);
+  formData.RoleCode = row.RoleCode
+  formData.RoleName = row.RoleName
+  formData.Weight = row.Wegiht
+  formData.GroupCode = 'VIP'
+  formData.Authorities = row.Authority
+  //获取灵感值方式
+  formData.GetTelepathy = row.GetTelepathy
+  //消耗灵感值方式
+  formData.ConsumeTelepathy = row.ConsumeTelepathy
+  //获取成长值方式
+  formData.GetGrowthValue = row.GetGrowthValue
+}
 
+//完成新建/编辑
+const finish = async () => {
+  console.log('编辑等级', type.value);
+  if (type.value == 'add') {
+    //发起新建请求
+    let res1 = await addRoleInfo(formData)
+    console.log('新建角色信息', res1);
+    if (res1.data.StatusCode == 200) {
+      ElMessage({
+        message: '新建成功',
+        type: 'success',
+      })
+      addDialogVisible.value = false
+      console.log('新建成功11111');
+    } else {
+      ElMessage({
+        message: res1.data.Message,
+        type: 'error',
+      })
+      console.log('新建失败2222', res1.data.Message);
+    }
+  }
+
+  if (type.value == 'set') {
+    let res2 = await editRoleInfo(formData)
+    console.log('修改角色信息', res2);
+    if (res2.data.StatusCode == 200) {
+      ElMessage({
+        message: '修改成功',
+        type: 'success',
+      })
+      console.log('修改成功11111');
+      addDialogVisible.value = false
+    } else {
+      ElMessage({
+        message: res2.data.Message,
+        type: 'error',
+      })
+      console.log('修改失败2222', res2.data.Message);
+    }
+  }
+  getList()
 }
 
 // 启用/停用权限
@@ -419,29 +435,44 @@ const updatePermission = (value) => {
 }
 
 
-//批量删除
-const delSome = () => {
-  ElMessage({
-    message: '删除成功',
-    type: 'success',
+
+//表格选择项发生变化
+const changeSelection = (item) => {
+  // console.log('选择项发生变化', item);
+  selections.value = []
+  item.map((item) => {
+    selections.value.push(item.RoleCode)
   })
+  // console.log('选择项selection', selections.value);
 }
-//完成新建/编辑/查看
-const finish = (type) => {
-  addDialogVisible.value = false
-  if (type = 'add') {
-    ElMessage({
-      message: '新建成功',
-      type: 'success',
-    })
+
+
+//批量删除
+const delSome = async () => {
+  //删除角色信息
+  for (let [index, value] of selections.value.entries()) {
+    console.log('循环遍历数组', index, value);
+    let res = await delRoleInfo({ RoleCode: value })
+    console.log('删除角色信息', res);
+    if (res.status == 200) {
+      ElMessage({
+        message: '删除成功',
+        type: 'success',
+      })
+      console.log('删除成功1111');
+
+    }
+    else {
+      ElMessage({
+        message: '删除失败',
+        type: 'error',
+      })
+    }
   }
-  if (type == 'set') {
-    ElMessage({
-      message: '修改成功',
-      type: 'success',
-    })
-  }
+  //重新获取角色信息
+  getList()
 }
+
 
 //重置
 const reset = () => {
@@ -453,8 +484,53 @@ const reset = () => {
   searchData.PageIndex = 1
   //重新发起请求
   getList()
+}
+
+//重置表单数据
+const resetFormData = () => {
+  formData.RoleCode = ''
+  formData.RoleName = ''
+  formData.Weight = undefined
+  formData.GroupCode = 'VIP'
+  formData.Authorities = [
+    {
+      AuthorityKey: "AdvancedSettings",
+      AuthorityName: "使用高级设置",
+      Value: "true",
+      IsSelect: false,
+      Order: 0
+    },
+    {
+      AuthorityKey: "IsWatermark",
+      AuthorityName: "是否有无水印下载功能",
+      Value: "true",
+      IsSelect: false,
+      Order: 0
+    }
+  ]
+  //获取灵感值方式
+  formData.GetTelepathy = [
+    {
+      Key: "SignDay",
+      Name: "每日灵感值",
+      Value: undefined,
+      IsSelect: false
+    }
+  ],
+    //消耗灵感值方式
+    formData.ConsumeTelepathy = [],
+    //获取成长值方式
+    formData.GetGrowthValue = [
+      {
+        Key: "GetGrowthValue",
+        Name: "获取成长值",
+        Value: undefined,
+        IsSelect: false
+      }
+    ]
 
 }
+
 
 onMounted(() => {
   document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";

@@ -334,8 +334,9 @@ const handleCurrentChange = (currentPage) => {
 //对接口请求的时间进行加工
 const processTime = (value) => {
   let newValue = value.split('T')
+  let processValue = newValue[0].split('-').join('/')
   let newValue2 = newValue[1].split(':')
-  return newValue[0] + " " + newValue2[0] + ':' + newValue2[1];
+  return processValue + " " + newValue2[0] + ':' + newValue2[1];
 }
 
 //日期选择器时间发生变化
@@ -351,8 +352,8 @@ const reset = () => {
   pages.currentPage = 1
   time.value = []
   searchData.RegisterTime
-  searchData.VIPLevelCode =''
-  searchData.UserCode=''
+  searchData.VIPLevelCode = ''
+  searchData.UserCode = ''
   //重新发起请求
   getList()
 

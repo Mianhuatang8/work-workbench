@@ -38,10 +38,10 @@
       <div
         style="display: flex;margin-bottom: 15px;justify-content: space-between;align-items: center;margin-left: 15px;">
         <el-button type="primary" style="margin-right: 8px;" @click="addUserRank()">+&nbsp;新建</el-button>
-        <!-- <div style="display: flex;"> -->
-        <!-- <el-button type="primary" plain>批量操作</el-button> -->
-        <!-- <el-button type="danger" plain @click="delSome()">删除</el-button> -->
-        <!-- </div> -->
+        <div style="display: flex;">
+          <el-button disabled="true">批量操作</el-button>
+          <el-button type="danger" plain @click="delSome()">删除</el-button>
+        </div>
       </div>
 
       <el-table ref="multipleTableDevice" :data="tableData" @select="selectTab" style="width: 100%;margin-left: 15px;"
@@ -110,14 +110,14 @@
           <el-checkbox v-model="formData.GetTelepathy[0].IsSelect" :disabled="operationType == 'look'">
             <template #default>
               主页签到
-              <el-input v-model="formData.GetTelepathy[0].value" placeholder="请输入数字" style="margin-left: 10px;"
+              <el-input v-model="formData.GetTelepathy[0].Value" placeholder="请输入数字" style="margin-left: 10px;"
                 size="small" :disabled="operationType == 'look'" />
             </template>
           </el-checkbox>
           <el-checkbox v-model="formData.GetTelepathy[1].IsSelect" :disabled="operationType == 'look'">
             <template #default>
               微信打卡
-              <el-input v-model="formData.GetTelepathy[1].value" placeholder="请输入数字" style="margin-left: 10px;"
+              <el-input v-model="formData.GetTelepathy[1].Value" placeholder="请输入数字" style="margin-left: 10px;"
                 size="small" :disabled="operationType == 'look'" />
             </template>
           </el-checkbox>
@@ -128,14 +128,14 @@
           <el-checkbox v-model="formData.ConsumeTelepathy[0].IsSelect" :disabled="operationType == 'look'">
             <template #default>
               生成
-              <el-input v-model="formData.ConsumeTelepathy[0].value" placeholder="请输入数字" style="margin-left: 10px;"
+              <el-input v-model="formData.ConsumeTelepathy[0].Value" placeholder="请输入数字" style="margin-left: 10px;"
                 size="small" :disabled="operationType == 'look'" />
             </template>
           </el-checkbox>
           <el-checkbox v-model="formData.ConsumeTelepathy[1].IsSelect" :disabled="operationType == 'look'">
             <template #default>
               下载超清
-              <el-input v-model="formData.ConsumeTelepathy[1].value" placeholder="请输入数字" style="margin-left: 10px;"
+              <el-input v-model="formData.ConsumeTelepathy[1].Value" placeholder="请输入数字" style="margin-left: 10px;"
                 size="small" :disabled="operationType == 'look'" />
             </template>
           </el-checkbox>
@@ -183,15 +183,33 @@
                   :disabled="operationType == 'look'" size="small" />
               </template>
             </el-checkbox> -->
+
+            <el-checkbox v-model="formData.GetTelepathy[0].IsSelect">
+              <template #default>
+                每日灵感值
+                <el-input v-model="formData.GetTelepathy[0].Value" placeholder="请输入数字" style="margin-left: 10px;"
+                  size="small" />
+              </template>
+            </el-checkbox>
+
+            <el-checkbox v-model="formData.GetVIPGiftDate[0].IsSelect">
+              <template #default>
+                VIP天数
+                <el-input v-model="formData.GetVIPGiftDate[0].Value" placeholder="请输入数字" style="margin-left: 10px;"
+                  size="small" />
+              </template>
+            </el-checkbox>
+
+
             <el-checkbox v-model="formData.Authorities[1].IsSelect" :disabled="operationType == 'look'">随机会员</el-checkbox>
-            <el-checkbox v-model="formData.Authorities[2].IsSelect"
-              :disabled="operationType == 'look'">购买优惠券包</el-checkbox>
-            <el-checkbox v-model="formData.Authorities[3].IsSelect" :disabled="operationType == 'look'">灵感值包</el-checkbox>
-            <el-checkbox v-model="formData.Authorities[4].IsSelect" :disabled="operationType == 'look'">创作资源包</el-checkbox>
             <el-checkbox v-model="formData.Authorities[5].IsSelect"
+              :disabled="operationType == 'look'">购买优惠券包</el-checkbox>
+            <el-checkbox v-model="formData.Authorities[2].IsSelect" :disabled="operationType == 'look'">灵感值包</el-checkbox>
+            <el-checkbox v-model="formData.Authorities[3].IsSelect"
+              :disabled="operationType == 'look'">创作资源包</el-checkbox>
+            <el-checkbox v-model="formData.Authorities[4].IsSelect"
               :disabled="operationType == 'look'">参与设计竞选资格</el-checkbox>
           </div>
-
 
 
         </el-form-item>
@@ -284,46 +302,46 @@ const tableData = ref([])
 const time = ref([])
 
 const formData = reactive({
-  GroupCode: "",
+  GroupCode: "USER",
   RoleName: "",
   RoleCode: "",
-  Weight: null,
+  Weight: undefined,
   Remark: "",
   Authorities: [
     {
       AuthorityKey: "Identification",
       AuthorityName: "专属标识",
-      IsSelect: true,
+      IsSelect: false,
       Value: "true"
     },
     {
       AuthorityKey: "RandomVIP",
       AuthorityName: "是否有随机会员",
-      IsSelect: true,
+      IsSelect: false,
       Value: "true"
     },
     {
       AuthorityKey: "TelepathyPack",
       AuthorityName: "是否能购买灵感值包",
-      IsSelect: true,
+      IsSelect: false,
       Value: "true"
     },
     {
       AuthorityKey: "CreatePack",
       AuthorityName: "是否能购买创作资源包",
-      IsSelect: true,
+      IsSelect: false,
       Value: "true"
     },
     {
       AuthorityKey: "ElectionQualification",
       AuthorityName: "是否能参与设计竞选资格",
-      IsSelect: true,
+      IsSelect: false,
       Value: "true"
     },
     {
       AuthorityKey: "CouponPack",
       AuthorityName: "是否能购买优惠劵包",
-      IsSelect: true,
+      IsSelect: false,
       Value: "true"
     }
   ],
@@ -332,13 +350,13 @@ const formData = reactive({
       Key: "SignDay",
       Name: "每日签到",
       IsSelect: true,
-      Value: ''
+      Value: undefined
     },
     {
       Key: "SignWx",
       Name: "微信签到",
       IsSelect: true,
-      Value: ''
+      Value: undefined
     }
   ],
   ConsumeTelepathy: [
@@ -346,17 +364,46 @@ const formData = reactive({
       Key: "GeneratePicture",
       Name: "生成图片",
       IsSelect: true,
-      Value: ''
+      Value: undefined
     },
     {
       Key: "DownloadPicture",
       Name: "下载图片",
       IsSelect: true,
-      Value: ''
+      Value: undefined
     }
   ],
-  GetGrowthValue: []
+  //获取灵感值方式
+  GetTelepathy: [
+    {
+      Key: "SignDay",
+      Name: "每日灵感值",
+      Value: undefined,
+      IsSelect: false
+    }
+  ],
+
+  //获取成长值方式
+  GetGrowthValue: [
+    {
+      Key: "GetGrowthValue",
+      Name: "获取成长值",
+      Value: undefined,
+      IsSelect: false
+    }
+  ],
+  //获取vip天数
+  GetVIPGiftDate: [
+    {
+      Key: "VIPGiftDate",
+      Name: "赠送的VIP天数",
+      Value: undefined,
+      IsSelect: false
+    }
+
+  ]
 })
+
 
 const searchData = reactive({
   PageIndex: 1, //页码
@@ -408,8 +455,9 @@ const setTimeByDays = (value) => {
 //对接口请求的时间进行加工
 const processTime = (value) => {
   let newValue = value.split('T')
+  let processValue = newValue[0].split('-').join('/')
   let newValue2 = newValue[1].split(':')
-  return newValue[0] + " " + newValue2[0] + ':' + newValue2[1];
+  return processValue + " " + newValue2[0] + ':' + newValue2[1];
 }
 
 //获取用户等级列表
@@ -445,6 +493,8 @@ const operationType = ref('add')//默认类型为新建等级 setFun为功能配
 const addDialogVisible = ref(false)
 //新增用户等级
 const addUserRank = () => {
+  //重置表单数据
+  resetForm()
   operationType.value = 'add'
   addDialogVisible.value = true
 
@@ -472,7 +522,7 @@ const gotToRankDetail = (row) => {
   // detailDialogVisible.value = true
   // currentUserRankData.name = row.RoleName
   // currentUserRankData.createPermission = row.Authority
-  // currentUserRankData.growthValue = row.GetGrowthValue
+  // currentUserRankData.growtselectionschangeSelectionhValue = row.GetGrowthValue
 }
 
 
@@ -480,7 +530,7 @@ const gotToRankDetail = (row) => {
 //完成
 const finish = async () => {
   // console.log('点击完成，查看type', operationType.value);
-  addDialogVisible.value = false
+
   // console.log("type == 'add'", operationType.value == 'add');
 
   if (operationType.value == 'add') {
@@ -488,6 +538,7 @@ const finish = async () => {
     let res1 = await addRoleInfo(formData)
     console.log('新增角色信息', res1);
 
+    addDialogVisible.value = false
     ElMessage({
       message: '新建成功',
       type: 'success',
@@ -504,8 +555,6 @@ const finish = async () => {
       type: 'success',
     })
   }
-  //重置表单数据
-  resetForm()
 }
 
 //重置表单数据
@@ -521,13 +570,13 @@ const resetForm = () => {
       Key: "SignDay",
       Name: "每日签到",
       IsSelect: true,
-      Value: ''
+      Value: undefined
     },
     {
       Key: "SignWx",
       Name: "微信签到",
       IsSelect: true,
-      Value: ''
+      Value: undefined
     }
 
   ]
@@ -535,51 +584,51 @@ const resetForm = () => {
     {
       Key: "GeneratePicture",
       Name: "生成图片",
-      IsSelect: true,
-      Value: ''
+      IsSelect: false,
+      Value: undefined
     },
     {
       Key: "DownloadPicture",
       Name: "下载图片",
-      IsSelect: true,
-      Value: ''
+      IsSelect: false,
+      Value: undefined
     }
   ]
   formData.Authorities = [
     {
       AuthorityKey: "Identification",
       AuthorityName: "专属标识",
-      IsSelect: true,
+      IsSelect: false,
       Value: "true"
     },
     {
       AuthorityKey: "RandomVIP",
       AuthorityName: "是否有随机会员",
-      IsSelect: true,
+      IsSelect: false,
       Value: "true"
     },
     {
       AuthorityKey: "TelepathyPack",
       AuthorityName: "是否能购买灵感值包",
-      IsSelect: true,
+      IsSelect: false,
       Value: "true"
     },
     {
       AuthorityKey: "CreatePack",
       AuthorityName: "是否能购买创作资源包",
-      IsSelect: true,
+      IsSelect: false,
       Value: "true"
     },
     {
       AuthorityKey: "ElectionQualification",
       AuthorityName: "是否能参与设计竞选资格",
-      IsSelect: true,
+      IsSelect: false,
       Value: "true"
     },
     {
       AuthorityKey: "CouponPack",
       AuthorityName: "是否能购买优惠劵包",
-      IsSelect: true,
+      IsSelect: false,
       Value: "true"
     }
 
@@ -682,4 +731,5 @@ onMounted(() => {
   :deep(.el-progress__text) {
     display: none;
   }
-}</style>
+}
+</style>
