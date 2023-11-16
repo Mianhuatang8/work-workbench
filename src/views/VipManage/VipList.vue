@@ -556,7 +556,6 @@ const resetFormData = () => {
         IsSelect: false
       }
     ]
-
 }
 
 

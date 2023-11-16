@@ -41,15 +41,15 @@
     </div>
 
     <div style="background-color: white;padding: 30px;">
-      <div
+      <!-- <div
         style="display: flex;margin-bottom: 15px;justify-content: space-between;align-items: center;margin-left: 15px;">
         <el-button type="primary" style="margin-right: 8px;" @click="addUser()" disabled>+&nbsp;新建</el-button>
-        <!-- <div style="display: flex;">
+        <div style="display: flex;">
           <el-button type="primary" style="margin-right: 8px;" plain>批量操作</el-button>
           <el-button type="danger" plain @click="delSome()">删除</el-button>
-        </div> -->
-      </div>
-      <el-table ref="multipleTableDevice" :data="tableData" @select="selectTab" style="width: 100%;margin-left: 15px;"
+        </div>
+      </div> -->
+      <el-table ref="multipleTableDevice" :data="tableData" style="width: 100%;margin-left: 15px;"
         :header-cell-style="{ background: '#F2F3F8' }" max-height="380" :row-style="{ height: 40 + 'px' }"
         :cell-style="{ padding: 0 + 'px' }">
 
@@ -96,9 +96,8 @@
         <div style="margin-right: 15px;">
           共<span>{{ pages.total }}</span>条
         </div>
-        <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" 
-          background layout=" prev, pager, next, jumper" :total="pages.total"
-          @current-change="handleCurrentChange"></el-pagination>
+        <el-pagination v-model:current-page="pages.currentPage" :page-size="pages.limit" background
+          layout=" prev, pager, next, jumper" :total="pages.total" @current-change="handleCurrentChange"></el-pagination>
       </div>
 
     </div>
@@ -106,35 +105,41 @@
 
 
   <!-- 查看对话框 -->
-  <el-dialog v-model="lookDialogVisible" :title="type == 'look' ? '查看' : type == 'edit' ? '编辑' : '新增'" width="30%"
-    :before-close="handleClose">
+  <el-dialog v-model="lookDialogVisible" :title="type == 'look' ? '查看' : type == 'edit' ? '编辑' : '新增'" width="30%">
     <div class="dialog-content">
-      <el-form :model="form">
+      <el-form :model="formData">
         <el-form-item label="用户头像">
 
           <el-upload class="avatar-uploader" action="#" :http-request="uploadFile" :show-file-list="false"
             :on-change="handleAvatarChange" :disabled="type == 'look'">
-            <img v-if="form.avatarUrl" :src="tableData.avatarUrl" class="avatar" />
+            <img v-if="formData.HeadImage" :src="formData.HeadImage" class="avatar" />
             <el-icon v-else class="avatar-uploader-icon">
               <Plus />
             </el-icon>
           </el-upload>
 
         </el-form-item>
-        <el-form-item label="用户ID">
-          <el-input v-model="form.name" :disabled="type == 'look'" style="margin-right: 20px;" />
+        <el-form-item label="用户ID" v-if="type == 'edit'">
+          <el-input v-model="formData.ID" :disabled="type == 'look'" style="margin-right: 20px;" />
         </el-form-item>
 
         <el-form-item label="用户名称">
-          <el-input v-model="form.name" :disabled="type == 'look'" style="margin-right: 20px;" />
+          <el-input v-model="formData.UserName" :disabled="type == 'look'" style="margin-right: 20px;" />
         </el-form-item>
-        <el-form-item label="用户等级(自身等级)">
-          <el-select v-model="form.userRank" class="m-2" placeholder="请选择" :disabled="type == 'look'">
+
+        <el-form-item label="用户等级(系统配置)" v-if="type == 'edit'">
+          <el-select v-model="formData.SysUserInfoLevelCode" class="m-2" placeholder="请选择" :disabled="type == 'look'">
+            <el-option v-for="(item, index) in userRankSort" :key="item" :label="item" :value="index" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item :label="type == 'edit' ? '用户等级(自身等级)' : '用户等级'">
+          <el-select v-model="formData.UserInfoLevelCode" class="m-2" placeholder="请选择" :disabled="type == 'look'">
             <el-option v-for="(item, index) in userRankSort" :key="item" :label="item" :value="index" />
           </el-select>
         </el-form-item>
         <el-form-item label="会员等级">
-          <el-select v-model="form.vipRank" class="m-2" placeholder="请选择" :disabled="type == 'look'">
+          <el-select v-model="formData.VIPLevelCode" class="m-2" placeholder="请选择" :disabled="type == 'look'">
             <el-option v-for="(item, index) in vipRankSort" :key="item" :label="item" :value="index" />
           </el-select>
         </el-form-item>
@@ -146,12 +151,12 @@
 
 
         <el-form-item label="手机号">
-          <el-input v-model="form.phone" :disabled="type == 'look'" style="margin-right: 20px;" />
+          <el-input v-model="formData.PhoneNumber" :disabled="type == 'look'" style="margin-right: 20px;" />
         </el-form-item>
 
         <el-form-item v-if="type == 'look'" label="用户活动日志">
           <div class="record" style="height:150px;overflow-y:auto;background-color: #f5f7fa;width: 400px;">
-            <div v-for="item in form.records" :key="item"
+            <div v-for="item in formData.UserLog" :key="item"
               style="display:flex;margin-top:15px;align-item:center;justify-content:space-between">
               <div style="display:flex" :style="{ 'margin-left': Number(item.spiritsValue) > 0 ? '3px' : '' }">
                 <div style="font-size:14px;">{{ item.operation }}</div>
@@ -196,12 +201,12 @@
 import $ from 'jquery'
 import { ref, onMounted, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Delete, Edit, Search, Share, Upload, Plus } from '@element-plus/icons-vue'
+import { Delete, Edit, Search, Share, Upload, Plus, List } from '@element-plus/icons-vue'
 import { searchSomeUser, delUserInfo, userSelfChange, editUserInfo } from '../../api/user.js'
 
 //分页条数据
-const pages = ref({
-  total: 1000,
+const pages = reactive({
+  total: 0,
   currentPage: 1,
   limit: 10
 })
@@ -295,6 +300,25 @@ const form = reactive({
 })
 
 
+//查看 表单数据
+const formData = reactive({
+  HeadImage: '',
+  ID: '',
+  UserName: '',
+  SysUserInfoLevelCode: '',
+  SysUserInfoLevelName: '',//系统配置用户等级
+  UserInfoLevelName: '',
+  UserInfoLevelCode: '',//用户自身等级
+  VIPLevelCode: '',
+  VIPLevelName: '',//会员等级
+  PhoneNumber: '',
+  UserLog:[]//用户活动日志
+
+})
+
+
+
+
 const searchData = reactive({
   RegisterTime: [],//注册时间
   UserCode: "",//用户code  f67e490f-070a-c46c-c2be-3a0e7783da82
@@ -308,9 +332,9 @@ const getList = async () => {
   const res = await searchSomeUser(searchData)
   console.log('获取用户信息列表', res);
   tableData.value = res.data.Result
+  pages.total = res.data.Result.length
 }
 getList()
-
 
 
 const userRankSort = ref(['LV1创作初学者', 'LV2创作爱好者', 'LV3创作工程师', 'LV4创作研究者', 'LV5创作探险家', 'LV6创作修行者', 'LV7创作大师'])
@@ -434,7 +458,6 @@ const setTimeByDays = (value) => {
 }
 
 
-
 //上传图片
 const uploadFile = (file) => {
   let json;
@@ -465,24 +488,38 @@ const uploadFile = (file) => {
   console.log('点击上传图片', form.imgSrc);
 }
 
+
 const lookDialogVisible = ref(false)
 const type = ref('look')
-//新建用户
-const addUser = () => {
-  type.value = 'add'
-  lookDialogVisible.value = true
+// //新建用户
+// const addUser = () => {
+//   type.value = 'add'
+//   lookDialogVisible.value = true
+// }
 
-}
 //查看
 const lookDetail = (row) => {
   type.value = 'look'
   lookDialogVisible.value = true
+  console.log('当前查看的用户信息', row)
+  formData.HeadImage=row.HeadImage
+  formData.ID=row.ID
+  formData.UserName=row.UserName
+  formData.SysUserInfoLevelCode=row.SysUserInfoLevelCode
+  formData.SysUserInfoLevelName=row.SysUserInfoLevelName
+  formData.UserInfoLevelCode=row.UserInfoLevelCode
+  formData.UserInfoLevelName=row.UserInfoLevelName
+  formData.VIPLevelCode=row.VIPLevelCode
+  formData.VIPLevelName=row.VIPLevelName
+  formData.PhoneNumber=row.PhoneNumber
+  formData.UserLog=row.UserLog
+
 }
+
 //编辑
 const editItem = (row) => {
   type.value = 'edit'
   lookDialogVisible.value = true
-
 }
 
 //完成
@@ -501,37 +538,37 @@ const finish = () => {
     })
   }
 }
-//删除
-const delItem = () => {
-  ElMessageBox.confirm(
-    '是否确认删除?',
-    {
-      confirmButtonText: '确认',
-      cancelButtonText: '取消',
-      type: 'warning',
-    }
-  )
-    .then(() => {
-      ElMessage({
-        type: 'success',
-        message: '删除成功',
-      })
-    })
-    .catch(() => {
-      ElMessage({
-        type: 'info',
-        message: '取消删除',
-      })
-    })
+// //删除
+// const delItem = () => {
+//   ElMessageBox.confirm(
+//     '是否确认删除?',
+//     {
+//       confirmButtonText: '确认',
+//       cancelButtonText: '取消',
+//       type: 'warning',
+//     }
+//   )
+//     .then(() => {
+//       ElMessage({
+//         type: 'success',
+//         message: '删除成功',
+//       })
+//     })
+//     .catch(() => {
+//       ElMessage({
+//         type: 'info',
+//         message: '取消删除',
+//       })
+//     })
 
-}
-//批量删除
-const delSome = () => {
-  ElMessage({
-    message: '删除成功',
-    type: 'success',
-  })
-}
+// }
+// //批量删除
+// const delSome = () => {
+//   ElMessage({
+//     message: '删除成功',
+//     type: 'success',
+//   })
+// }
 
 onMounted(() => {
   document.getElementsByClassName("el-pagination__goto")[0].childNodes[0].nodeValue = "跳至";

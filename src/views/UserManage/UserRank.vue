@@ -39,12 +39,12 @@
         style="display: flex;margin-bottom: 15px;justify-content: space-between;align-items: center;margin-left: 15px;">
         <el-button type="primary" style="margin-right: 8px;" @click="addUserRank()">+&nbsp;新建</el-button>
         <div style="display: flex;">
-          <el-button disabled="true">批量操作</el-button>
+          <el-button disabled>批量操作</el-button>
           <el-button type="danger" plain @click="delSome()">删除</el-button>
         </div>
       </div>
 
-      <el-table ref="multipleTableDevice" :data="tableData" @select="selectTab" style="width: 100%;margin-left: 15px;"
+      <el-table ref="multipleTableDevice" :data="tableData" style="width: 100%;margin-left: 15px;"
         :header-cell-style="{ background: '#F2F3F8' }" max-height="480" :row-style="{ height: 40 + 'px' }"
         :cell-style="{ padding: 0 + 'px' }" @selection-change="changeSelection">
 
@@ -86,10 +86,9 @@
 
   <!-- 新增用户等级 -->
   <el-dialog v-model="addDialogVisible"
-    :title="operationType == 'add' ? '新增用户等级' : operationType == 'setFun' ? '编辑功能配置' : '查看用户等级详情'" width="35%"
-    :before-close="handleClose">
+    :title="operationType == 'add' ? '新增用户等级' : operationType == 'setFun' ? '编辑功能配置' : '查看用户等级详情'" width="35%">
     <div>
-      <el-form :model="form" label-width="202px">
+      <el-form :model="formData" label-width="202px">
         <el-form-item label="等级名称">
           <el-input v-model="formData.RoleName" :disabled="operationType == 'look'" />
         </el-form-item>

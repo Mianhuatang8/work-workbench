@@ -5,7 +5,7 @@
             <span style="margin:0 5px">/</span>
             <span @click="goback" style="cursor: pointer;">文章</span>
             <span style="margin:0 5px;">/</span>
-            <span style="font-weight: bold;"> {{ currentType == 'add' ? '新增文章' : currentType == 'edit' ? '编辑文章' : '查看文章'
+            <span style="font-weight: bold;"> {{ route.query.type == 'add' ? '新增文章' : route.query.type == 'edit' ? '编辑文章' : '查看文章'
             }}</span>
         </div>
 
@@ -15,7 +15,7 @@
 
                 <el-form label-width="80px" ref="articleFormRef" :model="addForm" label-position="left" :rules="rules">
                     <el-form-item label="标题" prop="title">
-                        <el-input style="width:360px" v-model="addForm.title"
+                        <el-input style="width:360px" v-model="addForm.Title"
                             :disabled="route.query.type == 'look'"></el-input>
                     </el-form-item>
                     <el-form-item label="描述词">
@@ -23,11 +23,11 @@
                             :disabled="route.query.type == 'look'"></el-input>
                     </el-form-item>
 
-                    <el-form-item label="封面" prop="cover" style="position: relative;">
+                    <el-form-item label="封面" prop="CoverPic" style="position: relative;">
                         <el-upload class="avatar-uploader" :show-file-list="false" action="#" :http-request="uploadFile"
                             :before-upload="beforeAvatarUpload" :on-preview="handlePictureCardPreview"
-                            :on-change="handleAvatarChange" v-if="currentType != 'look'">
-                            <img v-if="addForm.cover" :src="addForm.cover" class="avatar" />
+                            :on-change="handleAvatarChange" v-if="route.query.type != 'look'">
+                            <img v-if="addForm.CoverPic" :src="addForm.CoverPic" class="avatar" />
                             <el-icon v-else class="avatar-uploader-icon">
                                 <Plus />
                             </el-icon>
@@ -39,16 +39,16 @@
                         </el-upload>
 
                         <div v-else style="display: flex;flex-wrap: wrap;">
-                            <img :src="addForm.cover" style="width: 146px; height: 146px;border-radius: 7px;">
+                            <img :src="addForm.CoverPic" style="width: 146px; height: 146px;border-radius: 7px;">
                         </div>
                     </el-form-item>
 
                     <el-form-item label="图文详情" style="width:770px" prop="content">
-                        <div v-if="currentType != 'look'">
+                        <div v-if="route.query.type != 'look'">
                             <div style="width:600px">
                                 <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef"
                                     :defaultConfig="toolbarConfig" :mode="mode" />
-                                <Editor style="height: 400px; overflow-y: hidden;" v-model="addForm.valueHtml"
+                                <Editor style="height: 400px; overflow-y: hidden;" v-model="addForm.MainContent"
                                     :defaultConfig="editorConfig" :mode="mode" @onCreated="handleCreated" />
                             </div>
                         </div>
@@ -58,20 +58,20 @@
                              min-height: 300px;overflow-y: scroll;display: flex;flex-wrap: wrap;">
                             <!-- <img :src="form.detailImgSrc" style="width: 200px;height: 200px;margin: 0 auto;margin-top: 10px;"> -->
                             <!-- <div style="line-height: 20px;padding: 15px;">{{ addForm.detailText }}</div> -->
-                            <div v-html="addForm.valueHtml"></div>
+                            <div v-html="addForm.MainContent"></div>
 
                         </div>
 
                     </el-form-item>
 
                     <el-form-item style="display: flex;flex-direction: row-reverse;">
-                        <el-button plain @click="empty" v-if="route.query.currentType != 'look'">清空</el-button>
-                        <el-button plain @click="temporaryArticle()" v-if="currentType == 'add'">保存为草稿</el-button>
-                        <el-button type="primary" @click="publishArticle()" v-if="currentType != 'look'">{{
-                            currentType == 'edit' ? '提交' : '发布'
+                        <el-button plain @click="empty" v-if="route.query.type != 'look'">清空</el-button>
+                        <el-button plain @click="temporaryArticle()" v-if="route.query.type == 'add'">保存为草稿</el-button>
+                        <el-button type="primary" @click="publishArticle()" v-if="route.query.type != 'look'">{{
+                            route.query.type == 'edit' ? '提交' : '发布'
                         }}</el-button>
-                        <el-button plain v-if="currentType == 'look'" @click="goToList()">返回</el-button>
-                        <el-button @click="gotoEdit()" v-if="currentType == 'look'" type="primary">去编辑</el-button>
+                        <el-button plain v-if="route.query.type == 'look'" @click="goToList()">返回</el-button>
+                        <el-button @click="gotoEdit()" v-if="route.query.type == 'look'" type="primary">去编辑</el-button>
                     </el-form-item>
 
                 </el-form>
@@ -94,24 +94,36 @@ import $ from 'jquery'
 
 const router = useRouter()
 const route = useRoute()
-// console.log('1111', route.query);
+console.log('1111', route.query);
 //当前路由传递过来的参数-类型type
-const currentType = ref('')
-currentType.value = route.query.type
-// console.log('currentType.value',currentType.value);
+// const currentType = ref('')
+// currentType.value = route.query.type
 
 const addForm = reactive({
-    title: '你好啊',
-    desc: '12345',
-    cover: '',
-    labels: [],
-    content: null,
-    draft: null,
-    audit: 0,
-    collectId: null,
-    detailText: '',
-    valueHtml: "<p><br></p><p>hello<img src=\"https://sxj-model.oss-cn-shenzhen.aliyuncs.com/sxj3606306email.png\" alt=\"\" data-href=\"\" style=\"\"/></p><p><br></p>"
+    ID: "654d92c9b661dcb752b4e6dd",
+    Title: "后端测试1",
+    CoverPic: "url1",
+    MainContent: "&lt;h3&gt;&lt;/h3&gt;",
+    IsDraft: false,
+    VisitCount: 0,
+    LikeCount: 0,
+    CreatedOn: "2023-11-10T02:17:45.554Z",
+    UserId: "",
+    Role: "后台用户",
+    UserName: null,
+    Avatar: null
+    // title: '你好啊',
+    // desc: '12345',
+    // cover: '',
+    // labels: [],
+    // content: null,
+    // draft: null,
+    // audit: 0,
+    // collectId: null,
+    // detailText: '',
+    // valueHtml: ""
 })
+addForm=route.query
 
 const articleFormRef = ref(null)
 var validateContent = (rule, value, callback) => {
@@ -196,7 +208,7 @@ const temporaryArticle = () => {
 const publishArticle = async () => {
     articleFormRef.value.validate((valid, fields) => {
         if (valid) {
-            if (currentType.value == 'add') {
+            if (route.query.type == 'add') {
                 ElMessage({
                     message: '发布成功',
                     type: 'success',
@@ -205,7 +217,7 @@ const publishArticle = async () => {
                     path: '/communityManage/articleList'
                 })
             }
-            if (currentType.value == 'edit') {
+            if (route.query.type == 'edit') {
                 ElMessage({
                     message: '提交成功',
                     type: 'success',
@@ -228,13 +240,13 @@ const publishArticle = async () => {
 
 //去编辑
 const gotoEdit = () => {
-    currentType.value = 'edit'
-    // router.push({
-    //     path: "/articleListInfo",
-    //     query: {
-    //         type: 'edit'
-    //     }
-    // });
+    // currentType.value = 'edit'
+    router.push({
+        path: "/articleListInfo",
+        query: {
+            type: 'edit'
+        }
+    });
 }
 const goToList = () => {
     router.push({
